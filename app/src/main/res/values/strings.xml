@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Matur</string>
+    <string name="to_register_label">Зарегистрироваться</string>
+    <string name="email_label">Email</string>
+    <string name="family_label">Фамилия</string>
+    <string name="name_label">Имя</string>
+    <string name="next_label">Далее</string>
+    <string name="logo_matur_description">logo Matur</string>
+</resources>
