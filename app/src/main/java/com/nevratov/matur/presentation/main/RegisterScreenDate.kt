@@ -1,6 +1,5 @@
 package com.nevratov.matur.presentation.main
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -250,7 +249,7 @@ fun TextFieldWithRadioButtonOnDialog(
 
 @Preview
 @Composable
-fun Prev() {
+private fun Prev() {
     MaturTheme(darkTheme = false) {
         RegisterScreenDate()
     }
