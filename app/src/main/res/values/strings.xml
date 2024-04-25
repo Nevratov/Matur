@@ -6,4 +6,7 @@
     <string name="name_label">Имя</string>
     <string name="next_label">Далее</string>
     <string name="logo_matur_description">logo Matur</string>
+    <string name="day_label">День</string>
+    <string name="month_label">Месяц</string>
+    <string name="year_label">Год</string>
 </resources>
