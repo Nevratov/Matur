@@ -1,5 +1,6 @@
 package com.nevratov.matur.presentation.main
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -212,17 +213,14 @@ fun TextFieldWithRadioButtonOnDialog(
             modifier = Modifier.background(Color.White)
 
         ) {
-            var selectedOption by rememberSaveable { mutableStateOf(options[0]) }
-
             Column(modifier = Modifier.selectableGroup()) {
                 options.forEach { option ->
                     Row(modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp)
                         .selectable(
-                            selected = text == selectedOption,
+                            selected = option == text,
                             onClick = {
-                                selectedOption = option
                                 changeStateText(option)
                                 changeStateDialog(false)
                             },
@@ -232,9 +230,8 @@ fun TextFieldWithRadioButtonOnDialog(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = text == selectedOption,
+                            selected = option == text,
                             onClick = {
-                                selectedOption = option
                                 changeStateText(option)
                                 changeStateDialog(false)
                             }
@@ -244,7 +241,6 @@ fun TextFieldWithRadioButtonOnDialog(
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(start = 16.dp)
                         )
-
                     }
                 }
             }
