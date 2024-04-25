@@ -42,7 +42,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,7 +52,6 @@ import com.nevratov.matur.ui.theme.MaturTheme
 
 @Composable
 fun RegisterScreenDate() {
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,8 +89,6 @@ fun RegisterScreenDate() {
                 Text(text = stringResource(R.string.next_label))
             }
         }
-
-
     }
 }
 
@@ -114,91 +110,22 @@ fun RowScope.DayTextField() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RowScope.MonthTextField() {
-    var text by rememberSaveable { mutableStateOf("") }
-    val openDialog = remember { mutableStateOf(false) }
+    var month by rememberSaveable { mutableStateOf("") }
+    var isOpenDialog by remember { mutableStateOf(false) }
 
-
-        OutlinedTextField(
-            modifier = Modifier
-                .weight(1.4f)
-                .clickable { openDialog.value = true },
-            value = text,
-            enabled = false,
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
-            singleLine = true,
-            onValueChange = { text = it },
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledBorderColor = MaterialTheme.colorScheme.outline,
-                disabledContainerColor = MaterialTheme.colorScheme.background,
-                disabledTextColor = MaterialTheme.colorScheme.primary,
-                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledTrailingIconColor = MaterialTheme.colorScheme.outline,
-
-            ),
-            label = { Text(
-                modifier = Modifier.clickable { openDialog.value = true },
-                text = stringResource(R.string.month_label)
-            ) },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(30.dp)
-                        .clickable { openDialog.value = true }
-                )
-            }
-        )
-
-
-    if (openDialog.value) {
-        AlertDialog(
-            onDismissRequest = { openDialog.value = false },
-            modifier = Modifier.background(Color.White)
-
-        ) {
-            val months = stringArrayResource(id = R.array.monthsOfYear)
-            var selectedOption by rememberSaveable { mutableStateOf(months[0]) }
-
-            Column(modifier = Modifier.selectableGroup()) {
-                months.forEach { month ->
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                        .selectable(
-                            selected = text == selectedOption,
-                            onClick = {
-                                selectedOption = month
-                                text = month
-                                openDialog.value = false
-                            },
-                            role = Role.Button
-                        )
-                        .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = text == selectedOption,
-                            onClick = {
-                                selectedOption = month
-                                text = month
-                                openDialog.value = false
-                            }
-                        )
-                        Text(
-                            text = month,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
-
-                    }
-                }
-            }
-        }
-    }
+    TextFieldWithRadioButtonOnDialog(
+        modifier = Modifier
+            .weight(1.4f)
+            .clickable { isOpenDialog = true },
+        label = stringResource(id = R.string.month_label),
+        options = stringArrayResource(id = R.array.monthsOfYear),
+        text = month,
+        isOpenDialog = isOpenDialog,
+        changeStateDialog = { isOpenDialog = it },
+        changeStateText = { month = it }
+    )
 }
 
 @Composable
@@ -219,22 +146,43 @@ fun RowScope.YearTextField() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenderTextField() {
-    var text by rememberSaveable { mutableStateOf("") }
-    val openDialog = remember { mutableStateOf(false) }
+    var gender by rememberSaveable { mutableStateOf("") }
+    val isOpenDialog = remember { mutableStateOf(false) }
 
 
-    OutlinedTextField(
+    TextFieldWithRadioButtonOnDialog(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { openDialog.value = true },
+            .clickable { isOpenDialog.value = true },
+        label = stringResource(id = R.string.gender_label),
+        options = stringArrayResource(id = R.array.genders),
+        text = gender,
+        isOpenDialog = isOpenDialog.value,
+        changeStateDialog = { isOpenDialog.value = it },
+        changeStateText = { gender = it }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TextFieldWithRadioButtonOnDialog(
+    modifier: Modifier,
+    label: String,
+    options: Array<String>,
+    text: String,
+    isOpenDialog: Boolean,
+    changeStateDialog: (Boolean) -> Unit,
+    changeStateText: (String) -> Unit
+) {
+
+    OutlinedTextField(
+        modifier = modifier,
         value = text,
         enabled = false,
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
         singleLine = true,
-        onValueChange = { text = it },
+        onValueChange = { changeStateText(it) },
         colors = OutlinedTextFieldDefaults.colors(
             disabledBorderColor = MaterialTheme.colorScheme.outline,
             disabledContainerColor = MaterialTheme.colorScheme.background,
@@ -244,8 +192,8 @@ fun GenderTextField() {
 
             ),
         label = { Text(
-            modifier = Modifier.clickable { openDialog.value = true },
-            text = stringResource(R.string.gender_label)
+            modifier = Modifier.clickable { changeStateDialog(true) },
+            text = label
         ) },
         trailingIcon = {
             Icon(
@@ -253,31 +201,30 @@ fun GenderTextField() {
                 contentDescription = null,
                 modifier = Modifier
                     .size(30.dp)
-                    .clickable { openDialog.value = true }
+                    .clickable { changeStateDialog(true) }
             )
         }
     )
 
-    if (openDialog.value) {
+    if (isOpenDialog) {
         AlertDialog(
-            onDismissRequest = { openDialog.value = false },
+            onDismissRequest = { changeStateDialog(false) },
             modifier = Modifier.background(Color.White)
 
         ) {
-            val genders = stringArrayResource(id = R.array.genders)
-            var selectedOption by rememberSaveable { mutableStateOf(genders[0]) }
+            var selectedOption by rememberSaveable { mutableStateOf(options[0]) }
 
             Column(modifier = Modifier.selectableGroup()) {
-                genders.forEach { gender ->
+                options.forEach { option ->
                     Row(modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp)
                         .selectable(
                             selected = text == selectedOption,
                             onClick = {
-                                selectedOption = gender
-                                text = gender
-                                openDialog.value = false
+                                selectedOption = option
+                                changeStateText(option)
+                                changeStateDialog(false)
                             },
                             role = Role.Button
                         )
@@ -287,13 +234,13 @@ fun GenderTextField() {
                         RadioButton(
                             selected = text == selectedOption,
                             onClick = {
-                                selectedOption = gender
-                                text = gender
-                                openDialog.value = false
+                                selectedOption = option
+                                changeStateText(option)
+                                changeStateDialog(false)
                             }
                         )
                         Text(
-                            text = gender,
+                            text = option,
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(start = 16.dp)
                         )
