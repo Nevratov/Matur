@@ -9,4 +9,25 @@
     <string name="day_label">День</string>
     <string name="month_label">Месяц</string>
     <string name="year_label">Год</string>
+    <string name="gender_label">Пол</string>
+
+    <array name="monthsOfYear">
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сетнябрь</item>
+        <item>Октябрь</item>
+        <item>Ноябрь</item>
+        <item>Декабрь</item>
+    </array>
+
+    <array name="genders">
+        <item>Мужской</item>
+        <item>Женский</item>
+    </array>
 </resources>

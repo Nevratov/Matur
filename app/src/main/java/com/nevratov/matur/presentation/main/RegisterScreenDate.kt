@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -39,8 +38,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
@@ -80,6 +79,8 @@ fun RegisterScreenDate() {
             Spacer(modifier = Modifier.width(12.dp))
             YearTextField()
         }
+        Spacer(modifier = Modifier.width(12.dp))
+        GenderTextField()
         Spacer(modifier = Modifier.height(40.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
@@ -123,9 +124,7 @@ fun RowScope.MonthTextField() {
         OutlinedTextField(
             modifier = Modifier
                 .weight(1.4f)
-                .padding(0.dp)
-                .clickable { openDialog.value = true }
-            ,
+                .clickable { openDialog.value = true },
             value = text,
             enabled = false,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
@@ -155,14 +154,13 @@ fun RowScope.MonthTextField() {
         )
 
 
-
     if (openDialog.value) {
         AlertDialog(
             onDismissRequest = { openDialog.value = false },
             modifier = Modifier.background(Color.White)
 
         ) {
-            val months = arrayOf("Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сетнябрь", "Октябрь", "Ноябрь", "Декабрь")
+            val months = stringArrayResource(id = R.array.monthsOfYear)
             var selectedOption by rememberSaveable { mutableStateOf(months[0]) }
 
             Column(modifier = Modifier.selectableGroup()) {
@@ -221,7 +219,91 @@ fun RowScope.YearTextField() {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GenderTextField() {
+    var text by rememberSaveable { mutableStateOf("") }
+    val openDialog = remember { mutableStateOf(false) }
 
+
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { openDialog.value = true },
+        value = text,
+        enabled = false,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
+        singleLine = true,
+        onValueChange = { text = it },
+        colors = OutlinedTextFieldDefaults.colors(
+            disabledBorderColor = MaterialTheme.colorScheme.outline,
+            disabledContainerColor = MaterialTheme.colorScheme.background,
+            disabledTextColor = MaterialTheme.colorScheme.primary,
+            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledTrailingIconColor = MaterialTheme.colorScheme.outline,
+
+            ),
+        label = { Text(
+            modifier = Modifier.clickable { openDialog.value = true },
+            text = stringResource(R.string.gender_label)
+        ) },
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable { openDialog.value = true }
+            )
+        }
+    )
+
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = { openDialog.value = false },
+            modifier = Modifier.background(Color.White)
+
+        ) {
+            val genders = stringArrayResource(id = R.array.genders)
+            var selectedOption by rememberSaveable { mutableStateOf(genders[0]) }
+
+            Column(modifier = Modifier.selectableGroup()) {
+                genders.forEach { gender ->
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                        .selectable(
+                            selected = text == selectedOption,
+                            onClick = {
+                                selectedOption = gender
+                                text = gender
+                                openDialog.value = false
+                            },
+                            role = Role.Button
+                        )
+                        .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = text == selectedOption,
+                            onClick = {
+                                selectedOption = gender
+                                text = gender
+                                openDialog.value = false
+                            }
+                        )
+                        Text(
+                            text = gender,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Preview
 @Composable
