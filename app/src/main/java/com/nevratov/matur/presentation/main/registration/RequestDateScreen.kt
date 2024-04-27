@@ -1,10 +1,11 @@
-package com.nevratov.matur.presentation.main
+package com.nevratov.matur.presentation.main.registration
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -51,12 +52,15 @@ import com.nevratov.matur.ui.theme.MaturTheme
 
 
 @Composable
-fun RegisterScreenDate() {
+fun RequestDateScreen(
+    onNextClickListener: () -> Unit,
+    paddingValues: PaddingValues
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
+            .padding(paddingValues)
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_m),
@@ -83,7 +87,7 @@ fun RegisterScreenDate() {
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Button(
-                onClick = { },
+                onClick = { onNextClickListener() },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Text(text = stringResource(R.string.next_label))
@@ -244,14 +248,6 @@ fun TextFieldWithRadioButtonOnDialog(
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun Prev() {
-    MaturTheme(darkTheme = false) {
-        RegisterScreenDate()
     }
 }
 

@@ -1,9 +1,10 @@
-package com.nevratov.matur.presentation.main
+package com.nevratov.matur.presentation.main.registration
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,12 +34,15 @@ import com.nevratov.matur.R
 import com.nevratov.matur.ui.theme.MaturTheme
 
 @Composable
-fun RegisterScreenEmail() {
+fun RequestEmailScreen(
+    onNextClickListener: () -> Unit,
+    paddingValues: PaddingValues
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
+            .padding(paddingValues)
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_m),
@@ -54,7 +58,7 @@ fun RegisterScreenEmail() {
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Button(
-                onClick = { },
+                onClick = { onNextClickListener() },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Text(text = stringResource(R.string.next_label))
@@ -80,13 +84,4 @@ fun EmailTextField() {
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
         singleLine = true
     )
-}
-
-
-@Preview
-@Composable
-private fun Prev() {
-    MaturTheme(darkTheme = false) {
-        RegisterScreenEmail()
-    }
 }

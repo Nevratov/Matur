@@ -1,9 +1,9 @@
-package com.nevratov.matur
+package com.nevratov.matur.presentation.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.nevratov.matur.presentation.main.RegisterScreenEmail
+import com.nevratov.matur.presentation.main.registration.RegistrationScreen
 import com.nevratov.matur.ui.theme.MaturTheme
 
 class MainActivity : ComponentActivity() {
@@ -11,7 +11,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaturTheme {
-                RegisterScreenEmail()
+                RegistrationScreen()
             }
         }
     }
