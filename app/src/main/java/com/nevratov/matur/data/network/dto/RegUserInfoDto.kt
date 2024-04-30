@@ -1,6 +1,6 @@
 package com.nevratov.matur.data.network.dto
 
-data class RegUserInfo(
+data class RegUserInfoDto(
     val name: String,
     val gender: String,
     val email: String,

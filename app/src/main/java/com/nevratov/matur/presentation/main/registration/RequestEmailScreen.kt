@@ -35,9 +35,10 @@ import com.nevratov.matur.ui.theme.MaturTheme
 
 @Composable
 fun RequestEmailScreen(
-    onNextClickListener: () -> Unit,
+    onNextClickListener: (String) -> Unit,
     paddingValues: PaddingValues
 ) {
+    var email by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,12 +54,15 @@ fun RequestEmailScreen(
         Spacer(modifier = Modifier.height(12.dp))
         Text(text = "Укажите email адрес почтового ящика", fontSize = 16.sp)
         Spacer(modifier = Modifier.height(22.dp))
-        EmailTextField()
+        EmailTextField(
+            email = email,
+            onEmailChange = { email = it }
+        )
         Spacer(modifier = Modifier.height(40.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Button(
-                onClick = { onNextClickListener() },
+                onClick = { onNextClickListener(email) },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Text(text = stringResource(R.string.next_label))
@@ -68,9 +72,7 @@ fun RequestEmailScreen(
 }
 
 @Composable
-fun EmailTextField() {
-    var email by remember { mutableStateOf("") }
-
+fun EmailTextField(email: String, onEmailChange: (String) -> Unit) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth(),
@@ -79,7 +81,7 @@ fun EmailTextField() {
             text = "example@gmail.com",
             color = Color.Gray,
         )},
-        onValueChange = { email = it },
+        onValueChange = { onEmailChange(it) },
         label = { Text("Email") },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
         singleLine = true

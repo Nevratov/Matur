@@ -29,9 +29,14 @@ import com.nevratov.matur.R
 
 @Composable
 fun RequestNameScreen(
-    onNextOnClickListener: () -> Unit,
+    onNextOnClickListener: (name: String) -> Unit,
     paddingValues: PaddingValues
 ) {
+    var firstName by rememberSaveable { mutableStateOf("") }
+    var lastName by rememberSaveable { mutableStateOf("") }
+    var isErrorFirstName by rememberSaveable { mutableStateOf(false) }
+    var isErrorLastName by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -47,12 +52,32 @@ fun RequestNameScreen(
         Spacer(modifier = Modifier.height(12.dp))
         Text(text = "Введите своё имя", fontSize = 16.sp)
         Spacer(modifier = Modifier.height(22.dp))
-        FirstNameTextField()
+        FirstNameTextField(
+            firstName = firstName,
+            onFirstNameChange = {
+                firstName = it
+                isErrorFirstName = false
+            },
+            isError = isErrorFirstName
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        LastNameTextField()
+        LastNameTextField(
+            lastName = lastName,
+            onLastNameChange = {
+                lastName = it
+                isErrorLastName = false
+            },
+            isError = isErrorLastName
+        )
         Spacer(modifier = Modifier.height(32.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Button(onClick = { onNextOnClickListener() }) {
+            Button(onClick = {
+                if (firstName.isEmpty()) isErrorFirstName = true
+                if (lastName.isEmpty()) isErrorLastName = true
+                if (firstName.isEmpty() || lastName.isEmpty()) return@Button
+                onNextOnClickListener(firstName)
+            }
+            ) {
                 Text(text = stringResource(R.string.next_label))
             }
         }
@@ -60,26 +85,24 @@ fun RequestNameScreen(
 }
 
 @Composable
-fun FirstNameTextField() {
-    var text by rememberSaveable { mutableStateOf("") }
-
+fun FirstNameTextField(firstName: String, onFirstNameChange: (String) -> Unit, isError: Boolean) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = text,
-        onValueChange = { text = it },
-        label = { Text(text = stringResource(R.string.name_label)) }
+        value = firstName,
+        onValueChange = { onFirstNameChange(it) },
+        label = { Text(text = stringResource(R.string.name_label)) },
+        isError = isError
     )
 }
 
 @Composable
-fun LastNameTextField() {
-    var text by rememberSaveable { mutableStateOf("") }
-
+fun LastNameTextField(lastName: String, onLastNameChange: (String) -> Unit, isError: Boolean) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = text,
-        onValueChange = { text = it },
-        label = { Text(text = stringResource(R.string.family_label)) }
+        value = lastName,
+        onValueChange = { onLastNameChange(it) },
+        label = { Text(text = stringResource(R.string.family_label)) },
+        isError = isError
     )
 }
 

@@ -5,7 +5,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object RetrofitInstance {
+object ApiFactory {
 
     private val interceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -16,11 +16,11 @@ object RetrofitInstance {
         .build()
 
 
-    val retrofit = Retrofit.Builder()
+    private val retrofit = Retrofit.Builder()
         .baseUrl("https://test.matur.app/api/")
         .addConverterFactory(GsonConverterFactory.create())
         .client(client)
         .build()
 
-    val productApi = retrofit.create(MaturApi::class.java)
+    val apiService: ApiService = retrofit.create(ApiService::class.java)
 }
