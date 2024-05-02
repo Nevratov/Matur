@@ -1,5 +1,6 @@
 package com.nevratov.matur.presentation.main.registration
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,6 +59,11 @@ fun RequestDateScreen(
     var year by rememberSaveable { mutableStateOf("") }
     var gender by rememberSaveable { mutableStateOf("") }
 
+    var isErrorDay by rememberSaveable { mutableStateOf(false) }
+    var isErrorMonth by rememberSaveable { mutableStateOf(false) }
+    var isErrorYear by rememberSaveable { mutableStateOf(false) }
+    var isErrorGender by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,29 +85,50 @@ fun RequestDateScreen(
         ) {
             DayTextField(
                 day = day,
-                onDayChange = { day = it }
+                onDayChange = {
+                    day = it
+                    isErrorDay = false
+                },
+                isError = isErrorDay
             )
             Spacer(modifier = Modifier.width(12.dp))
             MonthTextField(
                 month = month,
-                onMonthChange = { month = it }
+                onMonthChange = {
+                    month = it
+                    isErrorMonth = false
+                },
+                isError = isErrorMonth
             )
             Spacer(modifier = Modifier.width(12.dp))
             YearTextField(
                 year = year,
-                onYearChange = { year = it }
+                onYearChange = {
+                    year = it
+                    isErrorYear = false
+                },
+                isError = isErrorYear
             )
         }
         Spacer(modifier = Modifier.width(12.dp))
         GenderTextField(
             gender = gender,
-            onGenderChange = { gender = it }
+            onGenderChange = {
+                gender = it
+                isErrorGender = false
+            },
+            isError = isErrorGender
         )
         Spacer(modifier = Modifier.height(40.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Button(
                 onClick = {
+                    if (day.isEmpty() || day.toInt() !in 1..31) isErrorDay = true
+                    if (month.isEmpty()) isErrorMonth = true
+                    if (year.isEmpty() || year.toInt() !in 1900..2024) isErrorYear = true
+                    if (gender.isEmpty()) isErrorGender = true
+                    if (isErrorDay || isErrorYear || isErrorMonth || isErrorGender) return@Button
                     onNextClickListener(day, month, year, gender)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
@@ -113,23 +140,20 @@ fun RequestDateScreen(
 }
 
 @Composable
-fun RowScope.DayTextField(day: String, onDayChange: (String) -> Unit) {
+fun RowScope.DayTextField(day: String, onDayChange: (String) -> Unit, isError: Boolean) {
     OutlinedTextField(
         modifier = Modifier.weight(1f),
         value = day,
         onValueChange = { if (it.length <= DAY_MAX_CHAR) onDayChange(it) },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         singleLine = true,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            unfocusedTextColor = MaterialTheme.colorScheme.primary
-        ),
-        label = { Text(text = stringResource(R.string.day_label)) }
+        label = { Text(text = stringResource(R.string.day_label)) },
+        isError = isError
     )
 }
 
 @Composable
-fun RowScope.MonthTextField(month: String, onMonthChange: (String) -> Unit) {
+fun RowScope.MonthTextField(month: String, onMonthChange: (String) -> Unit, isError: Boolean) {
     var isOpenDialog by remember { mutableStateOf(false) }
     val months = Months.entries.map { it.monthName }
 
@@ -140,29 +164,27 @@ fun RowScope.MonthTextField(month: String, onMonthChange: (String) -> Unit) {
         label = stringResource(id = R.string.month_label),
         options = months,
         text = month,
+        isError = isError,
         isOpenDialog = isOpenDialog,
         changeStateDialog = { isOpenDialog = it }
     ) { onMonthChange(it) }
 }
 
 @Composable
-fun RowScope.YearTextField(year: String, onYearChange: (String) -> Unit) {
+fun RowScope.YearTextField(year: String, onYearChange: (String) -> Unit, isError: Boolean) {
     OutlinedTextField(
         modifier = Modifier.weight(1f),
         value = year,
         onValueChange = { if (it.length <= YEAR_CHAR) onYearChange(it) },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            unfocusedTextColor = MaterialTheme.colorScheme.secondary
-        ),
         singleLine = true,
-        label = { Text(text = stringResource(R.string.year_label)) }
+        label = { Text(text = stringResource(R.string.year_label)) },
+        isError = isError
     )
 }
 
 @Composable
-fun GenderTextField(gender: String, onGenderChange: (String) -> Unit) {
+fun GenderTextField(gender: String, onGenderChange: (String) -> Unit, isError: Boolean) {
     val isOpenDialog = remember { mutableStateOf(false) }
     val genders = Genders.entries.map { it.genderName }
 
@@ -173,6 +195,7 @@ fun GenderTextField(gender: String, onGenderChange: (String) -> Unit) {
         label = stringResource(id = R.string.gender_label),
         options = genders,
         text = gender,
+        isError = isError,
         isOpenDialog = isOpenDialog.value,
         changeStateDialog = { isOpenDialog.value = it }
     ) { onGenderChange(it) }
@@ -185,6 +208,7 @@ fun TextFieldWithRadioButtonOnDialog(
     label: String,
     options: List<String>,
     text: String,
+    isError: Boolean,
     isOpenDialog: Boolean,
     changeStateDialog: (Boolean) -> Unit,
     changeStateText: (String) -> Unit
@@ -197,13 +221,12 @@ fun TextFieldWithRadioButtonOnDialog(
         singleLine = true,
         onValueChange = { changeStateText(it) },
         colors = OutlinedTextFieldDefaults.colors(
-            disabledBorderColor = MaterialTheme.colorScheme.outline,
+            disabledBorderColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
             disabledContainerColor = MaterialTheme.colorScheme.background,
-            disabledTextColor = MaterialTheme.colorScheme.primary,
-            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            disabledLabelColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
             disabledTrailingIconColor = MaterialTheme.colorScheme.outline,
-
-            ),
+        ),
         label = {
             Text(
                 modifier = Modifier.clickable { changeStateDialog(true) },

@@ -39,6 +39,7 @@ fun RequestEmailScreen(
     paddingValues: PaddingValues
 ) {
     var email by remember { mutableStateOf("") }
+    var isErrorEmail by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,13 +57,23 @@ fun RequestEmailScreen(
         Spacer(modifier = Modifier.height(22.dp))
         EmailTextField(
             email = email,
-            onEmailChange = { email = it }
+            onEmailChange = {
+                email = it
+                isErrorEmail = false
+            },
+            isError = isErrorEmail
         )
         Spacer(modifier = Modifier.height(40.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Button(
-                onClick = { onNextClickListener(email) },
+                onClick = {
+                    if (!email.contains('@') || !email.contains('.')) {
+                        isErrorEmail = true
+                        return@Button
+                    }
+                    onNextClickListener(email)
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Text(text = stringResource(R.string.next_label))
@@ -72,16 +83,19 @@ fun RequestEmailScreen(
 }
 
 @Composable
-fun EmailTextField(email: String, onEmailChange: (String) -> Unit) {
+fun EmailTextField(email: String, onEmailChange: (String) -> Unit, isError: Boolean) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth(),
         value = email,
-        placeholder = { Text(
-            text = "example@gmail.com",
-            color = Color.Gray,
-        )},
+        placeholder = {
+            Text(
+                text = "example@gmail.com",
+                color = Color.Gray,
+            )
+        },
         onValueChange = { onEmailChange(it) },
+        isError = isError,
         label = { Text("Email") },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
         singleLine = true

@@ -74,7 +74,7 @@ fun RequestNameScreen(
             Button(onClick = {
                 if (firstName.isEmpty()) isErrorFirstName = true
                 if (lastName.isEmpty()) isErrorLastName = true
-                if (firstName.isEmpty() || lastName.isEmpty()) return@Button
+                if (isErrorFirstName || isErrorLastName) return@Button
                 onNextOnClickListener(firstName)
             }
             ) {
