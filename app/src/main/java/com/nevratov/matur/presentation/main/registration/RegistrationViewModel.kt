@@ -2,14 +2,19 @@ package com.nevratov.matur.presentation.main.registration
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.nevratov.matur.data.repository.RepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.lang.RuntimeException
 import com.nevratov.matur.presentation.main.registration.RegistrationState.Initial
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import java.util.Locale
 
 class RegistrationViewModel: ViewModel() {
+    private val repository = RepositoryImpl()
     private val userInfo = RegUserInfo()
 
 
@@ -18,7 +23,7 @@ class RegistrationViewModel: ViewModel() {
     }
 
     fun setBirthdayAndGender(day: String, month: String, year: String, gender: String) {
-        userInfo.day = String.format("%02d", day.toInt())
+        userInfo.day = String.format(Locale.getDefault(),"%02d", day.toInt())
         userInfo.month = getMonthNumber(month)
         userInfo.year = year
         userInfo.gender = gender
@@ -38,7 +43,10 @@ class RegistrationViewModel: ViewModel() {
 
 
     private fun registration() {
-        Log.d("RegistrationViewModel", userInfo.toString())
+        viewModelScope.launch {
+            repository.registration(userInfo)
+            Log.d("RegistrationViewModel", userInfo.toString())
+        }
     }
     
 }

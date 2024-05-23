@@ -48,9 +48,13 @@ fun RegistrationScreen() {
                     paddingValues = paddingValues,
                     onNextClickListener = { email ->
                         viewModel.setEmail(email)
+                        navigationState.navigateToRegistrationSuccess(Screen.RegistrationSuccess.route)
                     },
                 )
             },
+            registrationSuccessScreenContent = {
+                RegistrationSuccessScreen()
+            }
         )
     }
 }

@@ -3,6 +3,7 @@ package com.nevratov.matur.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
 
 class NavigationState(
@@ -11,6 +12,12 @@ class NavigationState(
 
     fun navigateTo(route: String) {
         navHostController.navigate(route)
+    }
+
+    fun navigateToRegistrationSuccess(route: String) {
+        navHostController.navigate(route) {
+            popUpTo(0)
+        }
     }
 }
 

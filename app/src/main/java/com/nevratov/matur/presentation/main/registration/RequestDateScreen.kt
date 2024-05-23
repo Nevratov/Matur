@@ -1,6 +1,5 @@
 package com.nevratov.matur.presentation.main.registration
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +29,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonColors
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,8 +47,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nevratov.matur.R
+import com.nevratov.matur.ui.theme.MaturColorLight
+import com.nevratov.matur.ui.theme.MaturColorPrimary
 
 @Composable
 fun RequestDateScreen(
@@ -175,7 +177,7 @@ fun RowScope.YearTextField(year: String, onYearChange: (String) -> Unit, isError
     OutlinedTextField(
         modifier = Modifier.weight(1f),
         value = year,
-        onValueChange = { if (it.length <= YEAR_CHAR) onYearChange(it) },
+        onValueChange = { if (it.length <= YEAR_MAX_CHAR) onYearChange(it) },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         singleLine = true,
         label = { Text(text = stringResource(R.string.year_label)) },
@@ -246,9 +248,8 @@ fun TextFieldWithRadioButtonOnDialog(
 
     if (isOpenDialog) {
         AlertDialog(
+            modifier = Modifier.background(Color.DarkGray),
             onDismissRequest = { changeStateDialog(false) },
-            modifier = Modifier.background(Color.White)
-
         ) {
             Column(modifier = Modifier.selectableGroup()) {
                 options.forEach { option ->
@@ -272,12 +273,16 @@ fun TextFieldWithRadioButtonOnDialog(
                             onClick = {
                                 changeStateText(option)
                                 changeStateDialog(false)
-                            }
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                unselectedColor = MaterialTheme.colorScheme.outline
+                            )
                         )
                         Text(
                             text = option,
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(start = 16.dp)
+                            modifier = Modifier.padding(start = 16.dp),
+                            color = Color.White
                         )
                     }
                 }
@@ -286,7 +291,7 @@ fun TextFieldWithRadioButtonOnDialog(
     }
 }
 
-private const val YEAR_CHAR = 4
+private const val YEAR_MAX_CHAR = 4
 private const val DAY_MAX_CHAR = 2
 
 

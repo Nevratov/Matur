@@ -9,6 +9,7 @@ fun NavGraphBuilder.registrationScreenNavGraph(
     requestNameScreenContent: @Composable () -> Unit,
     requestDateScreenContent: @Composable () -> Unit,
     requestEmailScreenContent: @Composable () -> Unit,
+    registrationSuccessScreenContent: @Composable () -> Unit
 ) {
     navigation(
         startDestination = Screen.RequestName.route,
@@ -25,6 +26,10 @@ fun NavGraphBuilder.registrationScreenNavGraph(
             composable(
                 route = Screen.RequestEmail.route,
                 content = { requestEmailScreenContent() }
+            )
+            composable(
+                route = Screen.RegistrationSuccess.route,
+                content = { registrationSuccessScreenContent() }
             )
         }
     )

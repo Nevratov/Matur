@@ -10,6 +10,7 @@ fun AppNavGraph(
     requestNameScreenContent: @Composable () -> Unit,
     requestDateScreenContent: @Composable () -> Unit,
     requestEmailScreenContent: @Composable () -> Unit,
+    registrationSuccessScreenContent: @Composable () -> Unit
 ) {
     NavHost(
         navController = navHostController,
@@ -18,7 +19,8 @@ fun AppNavGraph(
             registrationScreenNavGraph(
                 requestNameScreenContent = requestNameScreenContent,
                 requestDateScreenContent = requestDateScreenContent,
-                requestEmailScreenContent = requestEmailScreenContent
+                requestEmailScreenContent = requestEmailScreenContent,
+                registrationSuccessScreenContent = registrationSuccessScreenContent
             )
         }
     )
