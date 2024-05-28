@@ -22,6 +22,10 @@ sealed class RegistrationState {
         val email: String
     ) : RegistrationState()
 
+    data class RequestCity(
+        val cities: List<City>
+    ) : RegistrationState()
+
     companion object {
         private const val EMPTY = ""
     }

@@ -7,6 +7,7 @@ data class RegUserInfo(
     var year: String = EMPTY,
     var gender: String = EMPTY,
     var email: String = EMPTY,
+    var city: City? = null
 ) {
     companion object {
         private const val EMPTY = ""

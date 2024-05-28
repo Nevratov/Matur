@@ -8,6 +8,7 @@ import androidx.navigation.navigation
 fun NavGraphBuilder.registrationScreenNavGraph(
     requestNameScreenContent: @Composable () -> Unit,
     requestDateScreenContent: @Composable () -> Unit,
+    requestCityScreenContent: @Composable () -> Unit,
     requestEmailScreenContent: @Composable () -> Unit,
     registrationSuccessScreenContent: @Composable () -> Unit
 ) {
@@ -22,6 +23,10 @@ fun NavGraphBuilder.registrationScreenNavGraph(
             composable(
                 route = Screen.RequestDate.route,
                 content = { requestDateScreenContent() }
+            )
+            composable(
+                route = Screen.RequestCity.route,
+                content = { requestCityScreenContent() }
             )
             composable(
                 route = Screen.RequestEmail.route,

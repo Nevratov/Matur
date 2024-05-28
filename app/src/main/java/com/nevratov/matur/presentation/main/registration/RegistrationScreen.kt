@@ -39,6 +39,14 @@ fun RegistrationScreen() {
                     paddingValues = paddingValues,
                     onNextClickListener = { day, month, year, gender ->
                         viewModel.setBirthdayAndGender(day, month, year, gender)
+                        navigationState.navigateTo(Screen.RequestCity.route)
+                    }
+                )
+            },
+            requestCityScreenContent = {
+                RequestCityScreen(
+                    paddingValues = paddingValues,
+                    onCitySelected = {
                         navigationState.navigateTo(Screen.RequestEmail.route)
                     }
                 )

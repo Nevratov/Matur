@@ -6,12 +6,13 @@ import com.nevratov.matur.presentation.main.registration.RegUserInfo
 
 class Mapper {
 
-    fun RegUserInfoToRegUserInfoDto(regUserInfo: RegUserInfo): RegUserInfoDto {
+    fun regUserInfoToRegUserInfoDto(regUserInfo: RegUserInfo): RegUserInfoDto {
         return RegUserInfoDto(
             name = regUserInfo.name,
             gender = getNumberGender(regUserInfo.gender),
             email = regUserInfo.email,
-            birthday = getBirthday(regUserInfo.day, regUserInfo.month, regUserInfo.year)
+            birthday = getBirthday(regUserInfo.day, regUserInfo.month, regUserInfo.year),
+            city = regUserInfo.city?.id.toString()
         )
     }
 
