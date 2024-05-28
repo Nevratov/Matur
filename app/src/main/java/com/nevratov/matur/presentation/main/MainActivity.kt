@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.nevratov.matur.presentation.main.registration.RegistrationScreen
 import com.nevratov.matur.presentation.main.registration.RegistrationSuccessScreen
+import com.nevratov.matur.presentation.message.ChatScreen
 import com.nevratov.matur.ui.theme.MaturTheme
 
 class MainActivity : ComponentActivity() {
@@ -12,7 +13,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaturTheme {
-                RegistrationScreen()
+//                RegistrationScreen()
+                ChatScreen()
             }
         }
     }
