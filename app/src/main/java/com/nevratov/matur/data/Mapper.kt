@@ -12,7 +12,7 @@ class Mapper {
             gender = getNumberGender(regUserInfo.gender),
             email = regUserInfo.email,
             birthday = getBirthday(regUserInfo.day, regUserInfo.month, regUserInfo.year),
-            city = regUserInfo.city?.id.toString()
+            cityId = regUserInfo.city?.id.toString()
         )
     }
 

@@ -1,7 +1,9 @@
 package com.nevratov.matur.presentation.explore
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -102,17 +104,18 @@ private fun ActionButton(
 
 ) {
     Spacer(modifier = Modifier.height(16.dp))
-    IconButton(
+
+    Box(
         modifier = Modifier
-            .size(60.dp)
-            .shadow(elevation = 12.dp, shape = CircleShape),
-        onClick = onClick,
-        colors = IconButtonDefaults.iconButtonColors(
-            containerColor = MaterialTheme.colorScheme.background,
-        )
+            .size(70.dp)
+            .clip(CircleShape)
+            .shadow(elevation = 30.dp, shape = CircleShape)
+            .clickable { onClick() }
+        ,
+        contentAlignment = Alignment.Center
     ) {
         Icon(
-            modifier = Modifier.size(30.dp),
+            modifier = Modifier.size(40.dp),
             imageVector = ico,
             contentDescription = "like person",
             tint = colorIco

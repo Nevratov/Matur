@@ -37,7 +37,7 @@ import com.nevratov.matur.R
 
 @Composable
 fun RequestCityScreen(
-    onCitySelected: () -> Unit,
+    onCitySelected: (City) -> Unit,
     paddingValues: PaddingValues
 ) {
     val viewModel: RegistrationViewModel = viewModel()
@@ -79,8 +79,7 @@ fun RequestCityScreen(
         ShowCities(
             cities = cit,
             onCitySelected = {
-                viewModel.setCity(it)
-                onCitySelected()
+                onCitySelected(it)
             }
         )
     }

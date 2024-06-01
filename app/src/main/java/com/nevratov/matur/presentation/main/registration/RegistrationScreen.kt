@@ -47,6 +47,7 @@ fun RegistrationScreen() {
                 RequestCityScreen(
                     paddingValues = paddingValues,
                     onCitySelected = {
+                        viewModel.setCity(it)
                         navigationState.navigateTo(Screen.RequestEmail.route)
                     }
                 )
