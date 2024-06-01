@@ -1,5 +1,7 @@
 [versions]
+accompanistCoilVersion = "<latest-version>"
 agp = "8.3.1"
+coilComposeVersion = "2.1.0"
 kotlin = "1.9.0"
 coreKtx = "1.12.0"
 junit = "4.13.2"
@@ -10,10 +12,13 @@ activityCompose = "1.8.2"
 composeBom = "2023.08.00"
 lottieCompose = "2.8.0"
 lottieComposeVersion = "6.1.0"
+picasso = "2.71828"
 stompAndroid = "0.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeVersion" }
+google-accompanist-coil = { module = "com.google.accompanist:accompanist-coil", version.ref = "accompanistCoilVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -29,6 +34,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 lottie-compose-v610 = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieComposeVersion" }
+picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
 stomp-android = { module = "com.github.naichuan:stomp-android", version.ref = "stompAndroid" }
 
 [plugins]

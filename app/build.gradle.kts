@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.lottie.compose.v610)
 
     implementation ("com.google.code.gson:gson:2.8.6")
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
