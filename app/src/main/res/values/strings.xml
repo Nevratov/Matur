@@ -11,6 +11,7 @@
     <string name="year_label">Год</string>
     <string name="gender_label">Пол</string>
     <string name="messages_label">Сообщения</string>
+    <string name="Matches_label">Совпадения</string>
 
     <array name="monthsOfYear">
         <item>Январь</item>

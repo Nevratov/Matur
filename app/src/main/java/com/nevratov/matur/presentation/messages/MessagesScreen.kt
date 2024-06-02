@@ -35,9 +35,9 @@ import com.nevratov.matur.ui.theme.MaturTheme
 @Composable
 fun MessagesScreen() {
 
-    val testListMessageItems = mutableListOf<UserMessageProfile>().apply {
+    val testListMessageItems = mutableListOf<UserProfile>().apply {
         repeat(20) {
-            add(UserMessageProfile(
+            add(UserProfile(
                 id = it,
                 firstName = "Kate",
                 lastName = "Jhonson $it",
@@ -65,7 +65,7 @@ fun MessagesScreen() {
 
 @Composable
 fun MessageItem(
-    userMessageProfile: UserMessageProfile
+    userMessageProfile: UserProfile
 ) {
     
     Row(modifier = Modifier

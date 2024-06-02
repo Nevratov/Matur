@@ -1,6 +1,6 @@
 package com.nevratov.matur.presentation.messages
 
-data class UserMessageProfile(
+data class UserProfile(
     val id: Int,
     val firstName: String,
     val lastName: String,

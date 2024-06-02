@@ -14,3 +14,5 @@ val Pink40 = Color(0xFF7D5260)
 val MaturColorPrimary = Color(0xFFB294F9)
 val MaturColorLight = Color(0xFFBEA6F8)
 val MaturColorDark = Color(0xFF895AF8)
+
+val VeryLightGray = Color(0xFFf7f5f5)
