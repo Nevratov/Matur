@@ -1,4 +1,4 @@
-package com.nevratov.matur.presentation.message
+package com.nevratov.matur.presentation.chat
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,10 +15,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import com.nevratov.matur.data.network.webSocket.WebSocketClient
 import com.nevratov.matur.data.network.webSocket.WebSocketListener
 
-//Test Screen / to delete
+
 @Composable
 fun ChatScreen() {
     val messages = remember { mutableStateListOf<String>() }
@@ -67,6 +68,12 @@ fun ChatForm(
             message = ""
         })
     )
+}
+
+@Preview
+@Composable
+private fun PreviewChatScreen() {
+    ChatScreen()
 }
 
 

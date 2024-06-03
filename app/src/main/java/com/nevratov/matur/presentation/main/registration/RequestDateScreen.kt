@@ -142,7 +142,7 @@ fun RequestDateScreen(
 }
 
 @Composable
-fun RowScope.DayTextField(day: String, onDayChange: (String) -> Unit, isError: Boolean) {
+private fun RowScope.DayTextField(day: String, onDayChange: (String) -> Unit, isError: Boolean) {
     OutlinedTextField(
         modifier = Modifier.weight(1f),
         value = day,
@@ -155,7 +155,7 @@ fun RowScope.DayTextField(day: String, onDayChange: (String) -> Unit, isError: B
 }
 
 @Composable
-fun RowScope.MonthTextField(month: String, onMonthChange: (String) -> Unit, isError: Boolean) {
+private fun RowScope.MonthTextField(month: String, onMonthChange: (String) -> Unit, isError: Boolean) {
     var isOpenDialog by remember { mutableStateOf(false) }
     val months = Months.entries.map { it.monthName }
 
@@ -173,7 +173,7 @@ fun RowScope.MonthTextField(month: String, onMonthChange: (String) -> Unit, isEr
 }
 
 @Composable
-fun RowScope.YearTextField(year: String, onYearChange: (String) -> Unit, isError: Boolean) {
+private fun RowScope.YearTextField(year: String, onYearChange: (String) -> Unit, isError: Boolean) {
     OutlinedTextField(
         modifier = Modifier.weight(1f),
         value = year,
@@ -186,7 +186,7 @@ fun RowScope.YearTextField(year: String, onYearChange: (String) -> Unit, isError
 }
 
 @Composable
-fun GenderTextField(gender: String, onGenderChange: (String) -> Unit, isError: Boolean) {
+private fun GenderTextField(gender: String, onGenderChange: (String) -> Unit, isError: Boolean) {
     val isOpenDialog = remember { mutableStateOf(false) }
     val genders = Genders.entries.map { it.genderName }
 
@@ -205,7 +205,7 @@ fun GenderTextField(gender: String, onGenderChange: (String) -> Unit, isError: B
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TextFieldWithRadioButtonOnDialog(
+private fun TextFieldWithRadioButtonOnDialog(
     modifier: Modifier,
     label: String,
     options: List<String>,

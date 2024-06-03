@@ -1,4 +1,4 @@
-package com.nevratov.matur.presentation.message
+package com.nevratov.matur.presentation.chat
 
 //Test class / to delete
 data class UserId(

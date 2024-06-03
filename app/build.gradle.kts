@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -67,6 +68,7 @@ dependencies {
     implementation(libs.lottie.compose.v610)
 
     implementation ("com.google.code.gson:gson:2.8.6")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
     implementation(libs.coil.compose)
 
     testImplementation(libs.junit)

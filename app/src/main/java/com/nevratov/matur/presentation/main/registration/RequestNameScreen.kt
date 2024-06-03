@@ -85,7 +85,7 @@ fun RequestNameScreen(
 }
 
 @Composable
-fun FirstNameTextField(firstName: String, onFirstNameChange: (String) -> Unit, isError: Boolean) {
+private fun FirstNameTextField(firstName: String, onFirstNameChange: (String) -> Unit, isError: Boolean) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = firstName,
@@ -96,7 +96,7 @@ fun FirstNameTextField(firstName: String, onFirstNameChange: (String) -> Unit, i
 }
 
 @Composable
-fun LastNameTextField(lastName: String, onLastNameChange: (String) -> Unit, isError: Boolean) {
+private fun LastNameTextField(lastName: String, onLastNameChange: (String) -> Unit, isError: Boolean) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = lastName,

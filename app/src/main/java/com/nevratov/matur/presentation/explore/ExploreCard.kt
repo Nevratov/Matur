@@ -120,7 +120,7 @@ private fun ActionButton(
 
 @Preview
 @Composable
-private fun Preview() {
+private fun PreviewExploreCard() {
     MaturTheme(darkTheme = false) {
         ExploreCard()
     }

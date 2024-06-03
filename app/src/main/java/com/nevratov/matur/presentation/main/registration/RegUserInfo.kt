@@ -1,15 +1,23 @@
 package com.nevratov.matur.presentation.main.registration
 
 data class RegUserInfo(
-    var name: String = EMPTY,
-    var day: String = EMPTY,
-    var month: String = EMPTY,
-    var year: String = EMPTY,
-    var gender: String = EMPTY,
-    var email: String = EMPTY,
-    var city: City? = null
+    var name: String,
+    var day: String,
+    var month: String,
+    var year: String,
+    var gender: String,
+    var email: String,
+    var city: City?
 ) {
     companion object {
-        private const val EMPTY = ""
+        val initial = RegUserInfo(
+            name = "",
+            day = "",
+            month = "",
+            year = "",
+            gender = "",
+            email = "",
+            city = null
+        )
     }
 }

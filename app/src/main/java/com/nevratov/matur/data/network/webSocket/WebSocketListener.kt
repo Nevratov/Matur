@@ -2,7 +2,7 @@ package com.nevratov.matur.data.network.webSocket
 
 import android.util.Log
 import com.google.gson.Gson
-import com.nevratov.matur.presentation.message.UserId
+import com.nevratov.matur.presentation.chat.UserId
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener

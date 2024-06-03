@@ -12,6 +12,8 @@
     <string name="gender_label">Пол</string>
     <string name="messages_label">Сообщения</string>
     <string name="Matches_label">Совпадения</string>
+    <string name="login_button">Войти</string>
+    <string name="login_label">Вход</string>
 
     <array name="monthsOfYear">
         <item>Январь</item>
