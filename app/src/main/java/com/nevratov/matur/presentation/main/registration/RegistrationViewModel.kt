@@ -3,9 +3,8 @@ package com.nevratov.matur.presentation.main.registration
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nevratov.matur.data.repository.RepositoryImpl
+import com.nevratov.matur.data.repository.MaturRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.lang.RuntimeException
 import com.nevratov.matur.presentation.main.registration.RegistrationState.Initial
@@ -14,7 +13,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 class RegistrationViewModel(application: Application): AndroidViewModel(application) {
-    private val repository = RepositoryImpl(application)
+    private val repository = MaturRepositoryImpl(application)
 
     private val userInfo = RegUserInfo.initial
 

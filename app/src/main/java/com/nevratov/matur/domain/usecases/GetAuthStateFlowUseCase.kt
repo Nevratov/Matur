@@ -1,8 +1,9 @@
 package com.nevratov.matur.domain.usecases
 
-import com.nevratov.matur.domain.repoository.Repository
+import com.nevratov.matur.domain.repoository.MaturRepository
+import javax.inject.Inject
 
-class GetAuthStateFlowUseCase(private val repository: Repository) {
+class GetAuthStateFlowUseCase @Inject constructor(private val repository: MaturRepository) {
 
     operator fun invoke() = repository.getAuthStateFlow()
 }

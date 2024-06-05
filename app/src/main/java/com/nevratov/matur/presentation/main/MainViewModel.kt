@@ -1,34 +1,28 @@
 package com.nevratov.matur.presentation.main
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nevratov.matur.data.repository.RepositoryImpl
-import com.nevratov.matur.domain.repoository.Repository
 import com.nevratov.matur.domain.usecases.CheckAuthUseCase
 import com.nevratov.matur.domain.usecases.GetAuthStateFlowUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(application: Application): AndroidViewModel(application) {
-
-    private val repository = RepositoryImpl(application)
-    val checkAuthUseCase = CheckAuthUseCase(repository)
-    val getAuthStateFlowUseCase = GetAuthStateFlowUseCase(repository)
+class MainViewModel @Inject constructor(
+    val checkAuthUseCase: CheckAuthUseCase,
+    getAuthStateFlowUseCase: GetAuthStateFlowUseCase
+): ViewModel() {
 
     init {
-        checkAuth(delay = 0)
+        checkAuth()
     }
 
     val authState = getAuthStateFlowUseCase()
 
-    fun checkAuth(delay: Long = 1000) {
+    private fun checkAuth() {
         viewModelScope.launch {
-            delay(delay)
             checkAuthUseCase()
-            Log.d("RepositoryImpl", "authState in viewModelChecked")
         }
     }
 }

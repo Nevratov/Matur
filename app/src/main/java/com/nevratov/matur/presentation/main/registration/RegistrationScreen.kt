@@ -52,7 +52,7 @@ fun RegistrationScreen() {
         AppNavGraph(
             navHostController = navigationState.navHostController,
             loginScreenContent = {
-                LoginScreen(paddingValues = paddingValues, xxx = {})
+//                LoginScreen(viewModel = )
             },
             exploreScreenContent = {
                 ExploreCard()

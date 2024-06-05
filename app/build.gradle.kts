@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("kotlin-parcelize")
+    id ("kotlin-kapt")
 }
 
 android {
@@ -70,6 +71,9 @@ dependencies {
     implementation ("com.google.code.gson:gson:2.8.6")
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
     implementation(libs.coil.compose)
+
+    implementation ("com.google.dagger:dagger:2.51")
+    kapt ("com.google.dagger:dagger-compiler:2.51")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

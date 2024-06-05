@@ -35,21 +35,19 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nevratov.matur.R
 import com.nevratov.matur.ui.theme.MaturTheme
+import javax.inject.Inject
 
 @Composable
-fun LoginScreen(
-    paddingValues: PaddingValues,
-    xxx: () -> Unit
+fun LoginScreen (
+    viewModel: LoginViewModel
 ) {
     Log.d("LoginScreenRec", "REC")
-    val viewModel: LoginViewModel = viewModel()
     val state = viewModel.state.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(paddingValues)
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_m),
@@ -66,7 +64,7 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            ButtonLogin(state = state, viewModel = viewModel, xxx = xxx)
+            ButtonLogin(state = state, viewModel = viewModel)
         }
     }
 }
@@ -118,15 +116,11 @@ private fun ColumnScope.ShowProgressBar() {
 @Composable
 private fun ButtonLogin(
     state: State<LoginScreenState>,
-    viewModel: LoginViewModel,
-    xxx: () -> Unit
+    viewModel: LoginViewModel
 ) {
     Button(
         enabled = state.value !is LoginScreenState.Loading,
-        onClick = {
-            viewModel.login()
-            xxx()
-        },
+        onClick = { viewModel.login() },
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
     ) {
         Text(text = stringResource(R.string.login_button))
@@ -158,12 +152,3 @@ private fun PasswordRequest(
         label = { Text(text = "Пароль") }
     )
 }
-
-
-//@Preview
-//@Composable
-//fun PreviewAuthScreen() {
-//    MaturTheme(darkTheme = false) {
-//        LoginScreen(PaddingValues())
-//    }
-//}

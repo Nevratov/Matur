@@ -8,31 +8,37 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nevratov.matur.domain.entity.AuthState
+import com.nevratov.matur.getApplicationComponent
 import com.nevratov.matur.presentation.main.login.LoginScreen
+import com.nevratov.matur.presentation.main.login.LoginViewModel
 import com.nevratov.matur.ui.theme.MaturTheme
+import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var viewModel: MainViewModel
+
+    @Inject
+    lateinit var loginViewModel: LoginViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val viewModel: MainViewModel = viewModel()
-            val authState = viewModel.authState.collectAsState()
+            val component = getApplicationComponent()
+            component.inject(this)
 
+            val authState = viewModel.authState.collectAsState()
             MaturTheme {
-                Log.d("RepositoryImpl", "State in MainActivity = ${authState.value}")
                 when (authState.value) {
                     AuthState.Authorized -> {
                         MainScreen()
                     }
                     AuthState.NotAuthorized -> {
-                        LoginScreen(
-                            paddingValues = PaddingValues(),
-                            xxx = { viewModel.checkAuth() }
-                        )
+                        LoginScreen(viewModel = loginViewModel)
                     }
                     AuthState.Initial -> {}
                 }
-
             }
         }
     }

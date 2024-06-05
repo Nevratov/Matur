@@ -6,28 +6,26 @@ import android.util.Log
 import com.google.gson.Gson
 import com.nevratov.matur.data.Mapper
 import com.nevratov.matur.data.network.ApiFactory
+import com.nevratov.matur.di.ApplicationScope
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.domain.entity.User
-import com.nevratov.matur.domain.repoository.Repository
+import com.nevratov.matur.domain.repoository.MaturRepository
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.City
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
-class RepositoryImpl(application: Application): Repository {
+@ApplicationScope
+class MaturRepositoryImpl @Inject constructor(
+    application: Application
+): MaturRepository {
     private val apiService = ApiFactory.apiService
     private val mapper = Mapper()
 
@@ -43,7 +41,6 @@ class RepositoryImpl(application: Application): Repository {
     private val authStateFlow = flow {
         checkAuthStateEvents.emit(Unit)
         checkAuthStateEvents.collect {
-            Log.d("RepositoryImpl", "collect to Event")
             val user = getUser()
             val isLoggedIn = user != null
             if (isLoggedIn) emit(AuthState.Authorized) else emit(AuthState.NotAuthorized)
@@ -63,13 +60,6 @@ class RepositoryImpl(application: Application): Repository {
 //        }
 //    }
 
-    suspend fun login(loginData: LoginData) {
-        val loginResponse = apiService.login(mapper.loginDataToLoginDataDto(loginData))
-        if (!loginResponse.isSuccessful) return
-        val user = loginResponse.body()?.user ?: throw RuntimeException("user is null")
-        saveUser(mapper.userDtoToUser(user))
-    }
-
     suspend fun getCitiesByName(name: String): List<City> {
         return apiService.getCitiesByName(name)
     }
@@ -80,10 +70,7 @@ class RepositoryImpl(application: Application): Repository {
             putString(USER_KEY, userJson)
             apply()
         }
-        Log.d("RepositoryImpl", "UserSaved ${user}")
-        Log.d("RepositoryImpl", "To CheckAuthState")
-
-//       checkAuthState()
+       checkAuthState()
     }
 
     private fun getUser(): User? {
@@ -95,7 +82,15 @@ class RepositoryImpl(application: Application): Repository {
     override fun checkAuthState() {
         coroutineScope.launch {
             checkAuthStateEvents.emit(Unit)
-            Log.d("RepositoryImpl", "AuthStateCheckEvents emited!")
+        }
+    }
+
+    override fun login(loginData: LoginData) {
+        coroutineScope.launch {
+            val loginResponse = apiService.login(mapper.loginDataToLoginDataDto(loginData))
+            if (!loginResponse.isSuccessful) return@launch
+            val user = loginResponse.body()?.user ?: throw RuntimeException("user is null")
+            saveUser(mapper.userDtoToUser(user))
         }
     }
 
