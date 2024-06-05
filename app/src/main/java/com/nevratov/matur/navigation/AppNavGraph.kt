@@ -3,10 +3,15 @@ package com.nevratov.matur.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 
 @Composable
 fun AppNavGraph(
     navHostController: NavHostController,
+    loginScreenContent: @Composable () -> Unit,
+    exploreScreenContent: @Composable () -> Unit,
+    matchesScreenContent: @Composable () -> Unit,
+    messagesScreenContent: @Composable () -> Unit,
     requestNameScreenContent: @Composable () -> Unit,
     requestDateScreenContent: @Composable () -> Unit,
     requestCityScreenContent: @Composable () -> Unit,
@@ -15,7 +20,7 @@ fun AppNavGraph(
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = Screen.RegistrationContainer.route,
+        startDestination = Screen.Login.route,
         builder = {
             registrationScreenNavGraph(
                 requestNameScreenContent = requestNameScreenContent,
@@ -23,6 +28,22 @@ fun AppNavGraph(
                 requestCityScreenContent = requestCityScreenContent,
                 requestEmailScreenContent = requestEmailScreenContent,
                 registrationSuccessScreenContent = registrationSuccessScreenContent
+            )
+            composable(
+                route = Screen.Login.route,
+                content = { loginScreenContent() }
+            )
+            composable(
+                route = Screen.Explore.route,
+                content = { exploreScreenContent() }
+            )
+            composable(
+                route = Screen.Matches.route,
+                content = { matchesScreenContent() }
+            )
+            composable(
+                route = Screen.Messages.route,
+                content = { messagesScreenContent() }
             )
         }
     )

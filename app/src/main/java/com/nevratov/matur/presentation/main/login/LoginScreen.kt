@@ -1,9 +1,11 @@
 package com.nevratov.matur.presentation.main.login
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,13 +15,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,19 +37,13 @@ import com.nevratov.matur.R
 import com.nevratov.matur.ui.theme.MaturTheme
 
 @Composable
-fun AuthScreen(
+fun LoginScreen(
     paddingValues: PaddingValues,
-//    onLoginClicked: () -> Unit
+    xxx: () -> Unit
 ) {
+    Log.d("LoginScreenRec", "REC")
     val viewModel: LoginViewModel = viewModel()
-
-    val email = remember {
-        mutableStateOf("")
-    }
-
-    val password = remember {
-        mutableStateOf("")
-    }
+    val state = viewModel.state.collectAsState()
 
     Column(
         modifier = Modifier
@@ -60,46 +60,87 @@ fun AuthScreen(
         Spacer(modifier = Modifier.height(12.dp))
         Text(text = "Введите данные для входа в приложение", fontSize = 16.sp)
         Spacer(modifier = Modifier.height(22.dp))
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            EmailRequest(
-                emailState = email,
-                onEmailChanged = {
-                    email.value = it
-                }
-            )
-            PasswordRequest(
-                passwordState = password,
-                onPasswordChanged = {
-                    password.value = it
-                }
-            )
-        }
+        Fields(state = state, viewModel = viewModel)
         Spacer(modifier = Modifier.height(40.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            ButtonLogin(state = state, viewModel = viewModel, xxx = xxx)
+        }
+    }
+}
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Button(
-                onClick = {
-//                    onLoginClicked()
-                    viewModel.login(email.value, password = password.value)
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-            ) {
-                Text(text = stringResource(R.string.login_button))
+@Composable
+private fun Fields(
+    state: State<LoginScreenState>,
+    viewModel: LoginViewModel
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        when (val currentState = state.value) {
+            is LoginScreenState.Content -> {
+                EmailRequest(
+                    email = currentState.email,
+                    onEmailChanged = { viewModel.changeEmail(it) }
+                )
+                PasswordRequest(
+                    password = currentState.password,
+                    onPasswordChanged = { viewModel.changePassword(it) }
+                )
+            }
+
+            LoginScreenState.Initial -> {
+
+            }
+
+            LoginScreenState.Loading -> {
+                ShowProgressBar()
             }
         }
     }
 }
 
 @Composable
+private fun ColumnScope.ShowProgressBar() {
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun ButtonLogin(
+    state: State<LoginScreenState>,
+    viewModel: LoginViewModel,
+    xxx: () -> Unit
+) {
+    Button(
+        enabled = state.value !is LoginScreenState.Loading,
+        onClick = {
+            viewModel.login()
+            xxx()
+        },
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+    ) {
+        Text(text = stringResource(R.string.login_button))
+    }
+}
+
+@Composable
 private fun EmailRequest(
-    emailState: MutableState<String>,
+    email: String,
     onEmailChanged: (String) -> Unit
 ) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = emailState.value,
+        value = email,
         onValueChange = { onEmailChanged(it) },
         label = { Text(text = "Email") }
     )
@@ -107,22 +148,22 @@ private fun EmailRequest(
 
 @Composable
 private fun PasswordRequest(
-    passwordState: MutableState<String>,
+    password: String,
     onPasswordChanged: (String) -> Unit
 ) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = passwordState.value,
+        value = password,
         onValueChange = { onPasswordChanged(it) },
         label = { Text(text = "Пароль") }
     )
 }
 
 
-@Preview
-@Composable
-fun PreviewAuthScreen() {
-    MaturTheme(darkTheme = false) {
-        AuthScreen(PaddingValues())
-    }
-}
+//@Preview
+//@Composable
+//fun PreviewAuthScreen() {
+//    MaturTheme(darkTheme = false) {
+//        LoginScreen(PaddingValues())
+//    }
+//}
