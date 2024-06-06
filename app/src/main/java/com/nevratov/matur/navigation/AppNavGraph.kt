@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 @Composable
 fun AppNavGraph(
     navHostController: NavHostController,
+    startDestination: String,
     loginScreenContent: @Composable () -> Unit,
     exploreScreenContent: @Composable () -> Unit,
     matchesScreenContent: @Composable () -> Unit,
@@ -20,7 +21,7 @@ fun AppNavGraph(
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = Screen.Login.route,
+        startDestination = startDestination,
         builder = {
             registrationScreenNavGraph(
                 requestNameScreenContent = requestNameScreenContent,

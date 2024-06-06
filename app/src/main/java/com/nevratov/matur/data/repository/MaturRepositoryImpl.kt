@@ -33,10 +33,6 @@ class MaturRepositoryImpl @Inject constructor(
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
-    suspend fun registration(regUserInfo: RegUserInfo) {
-        apiService.registerUser(mapper.regUserInfoToRegUserInfoDto(regUserInfo))
-    }
-
     private val checkAuthStateEvents = MutableSharedFlow<Unit>(replay = 1)
     private val authStateFlow = flow {
         checkAuthStateEvents.emit(Unit)
@@ -60,10 +56,6 @@ class MaturRepositoryImpl @Inject constructor(
 //        }
 //    }
 
-    suspend fun getCitiesByName(name: String): List<City> {
-        return apiService.getCitiesByName(name)
-    }
-
     private fun saveUser(user: User) {
         sharedPreferences.edit().apply {
             val userJson = Gson().toJson(user)
@@ -78,7 +70,10 @@ class MaturRepositoryImpl @Inject constructor(
         return Gson().fromJson(userJson, User::class.java)
     }
 
-    // Implements
+    // Implementations
+
+    override fun getAuthStateFlow() = authStateFlow
+
     override fun checkAuthState() {
         coroutineScope.launch {
             checkAuthStateEvents.emit(Unit)
@@ -94,7 +89,13 @@ class MaturRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getAuthStateFlow() = authStateFlow
+    override suspend fun registration(regUserInfo: RegUserInfo) {
+        apiService.registerUser(mapper.regUserInfoToRegUserInfoDto(regUserInfo))
+    }
+
+    override suspend fun getCitiesByName(name: String): List<City> {
+        return apiService.getCitiesByName(name)
+    }
 
     companion object {
         private const val USER_KEY = "user_data"

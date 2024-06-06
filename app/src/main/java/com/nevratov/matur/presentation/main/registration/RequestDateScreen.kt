@@ -53,8 +53,7 @@ import com.nevratov.matur.ui.theme.MaturColorPrimary
 
 @Composable
 fun RequestDateScreen(
-    onNextClickListener: (day: String, month: String, year: String, gender: String) -> Unit,
-    paddingValues: PaddingValues
+    viewModel: RegistrationViewModel
 ) {
     var day by rememberSaveable { mutableStateOf("") }
     var month by rememberSaveable { mutableStateOf("") }
@@ -70,7 +69,6 @@ fun RequestDateScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(paddingValues)
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_m),
@@ -131,7 +129,7 @@ fun RequestDateScreen(
                     if (year.isEmpty() || year.toInt() !in 1900..2024) isErrorYear = true
                     if (gender.isEmpty()) isErrorGender = true
                     if (isErrorDay || isErrorYear || isErrorMonth || isErrorGender) return@Button
-                    onNextClickListener(day, month, year, gender)
+                    viewModel.setBirthdayAndGender(day, month, year, gender)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {

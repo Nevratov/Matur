@@ -35,16 +35,15 @@ import com.nevratov.matur.ui.theme.MaturTheme
 
 @Composable
 fun RequestEmailScreen(
-    onNextClickListener: (String) -> Unit,
-    paddingValues: PaddingValues
+    viewModel: RegistrationViewModel
 ) {
     var email by remember { mutableStateOf("") }
     var isErrorEmail by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(paddingValues)
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_m),
@@ -72,7 +71,7 @@ fun RequestEmailScreen(
                         isErrorEmail = true
                         return@Button
                     }
-                    onNextClickListener(email)
+                    viewModel.setEmail(email)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {

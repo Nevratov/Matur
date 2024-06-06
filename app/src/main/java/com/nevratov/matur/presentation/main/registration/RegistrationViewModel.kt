@@ -1,19 +1,20 @@
 package com.nevratov.matur.presentation.main.registration
 
-import android.app.Application
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nevratov.matur.data.repository.MaturRepositoryImpl
-import kotlinx.coroutines.flow.MutableStateFlow
-import java.lang.RuntimeException
+import com.nevratov.matur.domain.usecases.GetCitiesByNameUseCase
+import com.nevratov.matur.domain.usecases.RegistrationUseCase
 import com.nevratov.matur.presentation.main.registration.RegistrationState.Initial
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
+import javax.inject.Inject
 
-class RegistrationViewModel(application: Application): AndroidViewModel(application) {
-    private val repository = MaturRepositoryImpl(application)
+class RegistrationViewModel @Inject constructor(
+    val getCitiesByNameUseCase: GetCitiesByNameUseCase,
+    val registrationUseCase: RegistrationUseCase
+): ViewModel() {
 
     private val userInfo = RegUserInfo.initial
 
@@ -39,16 +40,14 @@ class RegistrationViewModel(application: Application): AndroidViewModel(applicat
     
     fun getCitiesByName(name: String) {
         viewModelScope.launch {
-            val cities = repository.getCitiesByName(name = name)
+            val cities = getCitiesByNameUseCase(name)
             _regState.value = RegistrationState.RequestCity(cities = cities)
-            Log.d("getCitiesByName", _regState.value.toString())
         }
     }
 
     fun setCity(city: City) {
         userInfo.city = city
     }
-
 
     private fun getMonthNumber(month: String): String {
         Months.entries.forEach {
@@ -60,9 +59,7 @@ class RegistrationViewModel(application: Application): AndroidViewModel(applicat
 
     private fun registration() {
         viewModelScope.launch {
-            repository.registration(userInfo)
-            Log.d("RegistrationViewModel", userInfo.toString())
+            registrationUseCase(userInfo)
         }
     }
-    
 }

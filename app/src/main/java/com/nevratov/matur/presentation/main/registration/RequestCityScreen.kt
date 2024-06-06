@@ -37,10 +37,8 @@ import com.nevratov.matur.R
 
 @Composable
 fun RequestCityScreen(
-    onCitySelected: (City) -> Unit,
-    paddingValues: PaddingValues
+    viewModel: RegistrationViewModel
 ) {
-    val viewModel: RegistrationViewModel = viewModel()
     val state = viewModel.regState.collectAsState()
 
     var city by remember { mutableStateOf("") }
@@ -50,7 +48,6 @@ fun RequestCityScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(paddingValues)
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_m),
@@ -78,9 +75,7 @@ fun RequestCityScreen(
         val cit = if (currentState is RegistrationState.RequestCity) currentState.cities else listOf()
         ShowCities(
             cities = cit,
-            onCitySelected = {
-                onCitySelected(it)
-            }
+            onCitySelected = { viewModel.setCity(it) }
         )
     }
 }

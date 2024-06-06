@@ -29,8 +29,7 @@ import com.nevratov.matur.R
 
 @Composable
 fun RequestNameScreen(
-    onNextOnClickListener: (name: String) -> Unit,
-    paddingValues: PaddingValues
+    viewModel: RegistrationViewModel
 ) {
     var firstName by rememberSaveable { mutableStateOf("") }
     var lastName by rememberSaveable { mutableStateOf("") }
@@ -41,7 +40,6 @@ fun RequestNameScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(paddingValues)
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_m),
@@ -75,7 +73,7 @@ fun RequestNameScreen(
                 if (firstName.isEmpty()) isErrorFirstName = true
                 if (lastName.isEmpty()) isErrorLastName = true
                 if (isErrorFirstName || isErrorLastName) return@Button
-                onNextOnClickListener(firstName)
+                viewModel.setName(firstName)
             }
             ) {
                 Text(text = stringResource(R.string.next_label))

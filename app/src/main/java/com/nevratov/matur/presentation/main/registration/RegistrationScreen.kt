@@ -22,86 +22,85 @@ import com.nevratov.matur.presentation.matches.MatchesScreen
 import com.nevratov.matur.presentation.messages.MessagesScreen
 
 
-@Composable
-fun RegistrationScreen() {
-    val mainScreenState = remember {
-        mutableStateOf<MainScreenState>(MainScreenState.Initial)
-    }
-
-    val navigationState = rememberNavigationState()
-    val viewModel: RegistrationViewModel = viewModel()
-
-    Scaffold(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        bottomBar = {
-            when (mainScreenState.value) {
-                MainScreenState.Home -> {
-                    BottomAppBar {
-                        Text(text = "1")
-                        Text(text = "2")
-                        Text(text = "3")
-                    }
-                }
-
-                else -> {}
-            }
-        }
-    ) { paddingValues ->
-        AppNavGraph(
-            navHostController = navigationState.navHostController,
-            loginScreenContent = {
-//                LoginScreen(viewModel = )
-            },
-            exploreScreenContent = {
-                ExploreCard()
-            },
-            matchesScreenContent = {
-                MatchesScreen()
-            },
-            messagesScreenContent = {
-                MessagesScreen()
-            },
-            requestNameScreenContent = {
-                RequestNameScreen(
-                    paddingValues = paddingValues,
-                    onNextOnClickListener = { firstName ->
-                        viewModel.setName(firstName)
-                        navigationState.navigateTo(Screen.RequestDate.route)
-                    }
-                )
-            },
-            requestDateScreenContent = {
-                RequestDateScreen(
-                    paddingValues = paddingValues,
-                    onNextClickListener = { day, month, year, gender ->
-                        viewModel.setBirthdayAndGender(day, month, year, gender)
-                        navigationState.navigateTo(Screen.RequestCity.route)
-                    }
-                )
-            },
-            requestCityScreenContent = {
-                RequestCityScreen(
-                    paddingValues = paddingValues,
-                    onCitySelected = {
-                        viewModel.setCity(it)
-                        navigationState.navigateTo(Screen.RequestEmail.route)
-                    }
-                )
-            },
-            requestEmailScreenContent = {
-                RequestEmailScreen(
-                    paddingValues = paddingValues,
-                    onNextClickListener = { email ->
-                        viewModel.setEmail(email)
-                        navigationState.navigateToRegistrationSuccess(Screen.RegistrationSuccess.route)
-                    },
-                )
-            },
-            registrationSuccessScreenContent = {
-                RegistrationSuccessScreen()
-            }
-        )
-    }
-}
+//@Composable
+//fun RegistrationScreen() {
+//    val mainScreenState = remember {
+//        mutableStateOf<MainScreenState>(MainScreenState.Initial)
+//    }
+//
+//    val navigationState = rememberNavigationState()
+//    val viewModel: RegistrationViewModel = viewModel()
+//
+//    Scaffold(
+//        modifier = Modifier
+//            .background(MaterialTheme.colorScheme.background)
+//            .padding(16.dp),
+//        bottomBar = {
+//            when (mainScreenState.value) {
+//                MainScreenState.Home -> {
+//                    BottomAppBar {
+//                        Text(text = "1")
+//                        Text(text = "2")
+//                        Text(text = "3")
+//                    }
+//                }
+//                else -> {}
+//            }
+//        }
+//    ) { paddingValues ->
+//        AppNavGraph(
+//            navHostController = navigationState.navHostController,
+//            loginScreenContent = {
+////                LoginScreen(viewModel = )
+//            },
+//            exploreScreenContent = {
+//                ExploreCard()
+//            },
+//            matchesScreenContent = {
+//                MatchesScreen()
+//            },
+//            messagesScreenContent = {
+//                MessagesScreen()
+//            },
+//            requestNameScreenContent = {
+//                RequestNameScreen(
+////                    paddingValues = paddingValues,
+//                    onNextOnClickListener = { firstName ->
+//                        viewModel.setName(firstName)
+//                        navigationState.navigateTo(Screen.RequestDate.route)
+//                    }
+//                )
+//            },
+//            requestDateScreenContent = {
+//                RequestDateScreen(
+//                    paddingValues = paddingValues,
+//                    onNextClickListener = { day, month, year, gender ->
+//                        viewModel.setBirthdayAndGender(day, month, year, gender)
+//                        navigationState.navigateTo(Screen.RequestCity.route)
+//                    }
+//                )
+//            },
+//            requestCityScreenContent = {
+//                RequestCityScreen(
+//                    paddingValues = paddingValues,
+//                    onCitySelected = {
+//                        viewModel.setCity(it)
+//                        navigationState.navigateTo(Screen.RequestEmail.route)
+//                    }
+//                )
+//            },
+//            requestEmailScreenContent = {
+//                RequestEmailScreen(
+//                    paddingValues = paddingValues,
+//                    onNextClickListener = { email ->
+//                        viewModel.setEmail(email)
+//                        navigationState.navigateToRegistrationSuccess(Screen.RegistrationSuccess.route)
+//                    },
+//                )
+//            },
+//            registrationSuccessScreenContent = {
+//                RegistrationSuccessScreen()
+//            }
+//        )
+//    }
+//}
