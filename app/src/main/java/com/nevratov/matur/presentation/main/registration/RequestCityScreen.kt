@@ -3,7 +3,6 @@ package com.nevratov.matur.presentation.main.registration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,12 +31,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nevratov.matur.R
+import com.nevratov.matur.domain.entity.City
 
 @Composable
 fun RequestCityScreen(
-    viewModel: RegistrationViewModel
+    viewModel: RegistrationViewModel,
+    onNextClicked: () -> Unit
 ) {
     val state = viewModel.regState.collectAsState()
 
@@ -75,7 +75,10 @@ fun RequestCityScreen(
         val cit = if (currentState is RegistrationState.RequestCity) currentState.cities else listOf()
         ShowCities(
             cities = cit,
-            onCitySelected = { viewModel.setCity(it) }
+            onCitySelected = {
+                viewModel.setCity(it)
+                onNextClicked()
+            }
         )
     }
 }

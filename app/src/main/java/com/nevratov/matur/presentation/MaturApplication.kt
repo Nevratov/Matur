@@ -1,4 +1,4 @@
-package com.nevratov.matur
+package com.nevratov.matur.presentation
 
 import android.app.Application
 import androidx.compose.runtime.Composable

@@ -3,6 +3,7 @@ package com.nevratov.matur.presentation.messages
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,11 +49,8 @@ fun MessagesScreen() {
         }
     }
 
-    LazyColumn(
-        modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item() {
+    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        item {
             Text(text = stringResource(R.string.messages_label), fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -106,10 +104,3 @@ fun MessageItem(
     }
 }
 
-@Preview
-@Composable
-private fun PreviewMessageItem() {
-    MaturTheme(darkTheme = false) {
-        MessagesScreen()
-    }
-}

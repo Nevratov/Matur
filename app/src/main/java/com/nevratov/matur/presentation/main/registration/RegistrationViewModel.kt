@@ -2,6 +2,7 @@ package com.nevratov.matur.presentation.main.registration
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nevratov.matur.domain.entity.City
 import com.nevratov.matur.domain.usecases.GetCitiesByNameUseCase
 import com.nevratov.matur.domain.usecases.RegistrationUseCase
 import com.nevratov.matur.presentation.main.registration.RegistrationState.Initial

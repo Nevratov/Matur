@@ -35,7 +35,8 @@ import com.nevratov.matur.ui.theme.MaturTheme
 
 @Composable
 fun RequestEmailScreen(
-    viewModel: RegistrationViewModel
+    viewModel: RegistrationViewModel,
+    onNextClicked: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var isErrorEmail by remember { mutableStateOf(false) }
@@ -72,6 +73,7 @@ fun RequestEmailScreen(
                         return@Button
                     }
                     viewModel.setEmail(email)
+                    onNextClicked()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {

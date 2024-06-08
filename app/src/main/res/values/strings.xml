@@ -14,6 +14,14 @@
     <string name="Matches_label">Совпадения</string>
     <string name="login_button">Войти</string>
     <string name="login_label">Вход</string>
+    <string name="explore_navigation_item">Поиск</string>
+    <string name="matches_navigation_item">Совпадения</string>
+    <string name="chat_navigation_item">Чат</string>
+    <string name="profile_navigation_item">Профиль</string>
+    <string name="explore_ico_description">Иконка поиска пары</string>
+    <string name="matches_description_ico">Иконка совпадений</string>
+    <string name="chat_description_ico">Иконка чата</string>
+    <string name="profile_description_ico">Иконка профиля</string>
 
     <array name="monthsOfYear">
         <item>Январь</item>

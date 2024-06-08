@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -16,11 +15,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,16 +37,47 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.ui.theme.MaturColorDark
-import com.nevratov.matur.ui.theme.MaturTheme
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExploreScreen(
+    viewModel: ExploreViewModel
+) {
+    val screenState = viewModel.state.collectAsState(initial = ExploreScreenState.Initial)
+
+    val dismissState = rememberDismissState()
+
+    when(val currentState = screenState.value) {
+        is ExploreScreenState.Content -> {
+
+            if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+                viewModel.like(currentState.exploreUser)
+            } else if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
+                viewModel.dislike(currentState.exploreUser)
+            }
+
+            SwipeToDismiss(
+                state = dismissState,
+                background = {},
+                dismissContent = {
+                    ExploreCard()
+                }
+            )
+        }
+        ExploreScreenState.ContentIsEmpty -> TODO()
+        ExploreScreenState.Initial -> TODO()
+        ExploreScreenState.Loading -> TODO()
+    }
+
+}
 
 @Composable
-fun ExploreCard() {
+private fun ExploreCard() {
     val uriState by remember {
         mutableStateOf("https://bipbap.ru/wp-content/uploads/2016/04/1566135836_devushka-v-shortah-na-pirone.jpg")
     }
@@ -50,16 +85,14 @@ fun ExploreCard() {
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         AsyncImage(
             modifier = Modifier
                 .weight(1f)
-                .clip(RoundedCornerShape(20.dp))
-            ,
+                .clip(RoundedCornerShape(20.dp)),
             model = uriState,
             contentScale = ContentScale.Crop,
             contentDescription = "person's photo"
@@ -114,14 +147,5 @@ private fun ActionButton(
             contentDescription = "like person",
             tint = colorIco
         )
-    }
-}
-
-
-@Preview
-@Composable
-private fun PreviewExploreCard() {
-    MaturTheme(darkTheme = false) {
-        ExploreCard()
     }
 }

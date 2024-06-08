@@ -2,6 +2,7 @@ package com.nevratov.matur.presentation.main.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,12 +28,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
-import com.nevratov.matur.getApplicationComponent
-import javax.inject.Inject
+import com.nevratov.matur.ui.theme.MaturColorDark
+import com.nevratov.matur.ui.theme.MaturColorPrimary
 
 @Composable
 fun LoginScreen (
-    viewModel: LoginViewModel
+    viewModel: LoginViewModel,
+    createAccountClicked:  () -> Unit
 ) {
 
     val state = viewModel.state.collectAsState()
@@ -54,8 +57,15 @@ fun LoginScreen (
         Spacer(modifier = Modifier.height(40.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Text(
+                modifier = Modifier.clickable { createAccountClicked() },
+                text = "Создать аккаунт",
+                fontSize = 14.sp,
+                color = MaturColorDark,
+            )
             ButtonLogin(state = state, viewModel = viewModel)
         }
     }

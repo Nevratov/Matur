@@ -11,7 +11,13 @@ class NavigationState(
 ) {
 
     fun navigateTo(route: String) {
-        navHostController.navigate(route)
+        navHostController.navigate(route) {
+            popUpTo(navHostController.graph.startDestinationId) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
     }
 
     fun navigateToRegistrationSuccess(route: String) {

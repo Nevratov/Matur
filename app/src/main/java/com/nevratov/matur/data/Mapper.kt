@@ -1,5 +1,7 @@
 package com.nevratov.matur.data
 
+import com.nevratov.matur.data.model.DislikedUserDto
+import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
 import com.nevratov.matur.data.model.RegUserInfoDto
@@ -40,6 +42,12 @@ class Mapper {
         )
     }
 
+    fun listUserDtoToListUser(listUserDto: List<UserDto>): List<User> {
+        val users = mutableListOf<User>()
+        listUserDto.forEach { users.add(userDtoToUser(it)) }
+        return users
+    }
+
     fun regUserInfoToRegUserInfoDto(regUserInfo: RegUserInfo): RegUserInfoDto {
         return RegUserInfoDto(
             name = regUserInfo.name,
@@ -66,6 +74,11 @@ class Mapper {
             password = loginData.password
         )
     }
+
+    fun userToDislikedUserDto(user: User) = DislikedUserDto(userId = user.id)
+
+    fun userToLikedUserDto(user: User) = LikedUserDto(userId = user.id)
+
 
     private fun getBirthday(day: String, month: String, year: String) = "$year-$month-$day"
 

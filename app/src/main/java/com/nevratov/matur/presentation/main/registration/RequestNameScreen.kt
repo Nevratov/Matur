@@ -29,7 +29,8 @@ import com.nevratov.matur.R
 
 @Composable
 fun RequestNameScreen(
-    viewModel: RegistrationViewModel
+    viewModel: RegistrationViewModel,
+    onNextClicked: () -> Unit
 ) {
     var firstName by rememberSaveable { mutableStateOf("") }
     var lastName by rememberSaveable { mutableStateOf("") }
@@ -74,6 +75,7 @@ fun RequestNameScreen(
                 if (lastName.isEmpty()) isErrorLastName = true
                 if (isErrorFirstName || isErrorLastName) return@Button
                 viewModel.setName(firstName)
+                onNextClicked()
             }
             ) {
                 Text(text = stringResource(R.string.next_label))

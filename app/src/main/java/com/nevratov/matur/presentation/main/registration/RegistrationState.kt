@@ -1,5 +1,7 @@
 package com.nevratov.matur.presentation.main.registration
 
+import com.nevratov.matur.domain.entity.City
+
 sealed class RegistrationState {
 
     data object Initial: RegistrationState()

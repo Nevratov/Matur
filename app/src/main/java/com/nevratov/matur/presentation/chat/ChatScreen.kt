@@ -69,11 +69,3 @@ fun ChatForm(
         })
     )
 }
-
-@Preview
-@Composable
-private fun PreviewChatScreen() {
-    ChatScreen()
-}
-
-

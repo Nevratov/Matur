@@ -1,4 +1,4 @@
-package com.nevratov.matur.presentation.main.registration
+package com.nevratov.matur.domain.entity
 
 import com.google.gson.annotations.SerializedName
 

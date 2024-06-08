@@ -53,7 +53,8 @@ import com.nevratov.matur.ui.theme.MaturColorPrimary
 
 @Composable
 fun RequestDateScreen(
-    viewModel: RegistrationViewModel
+    viewModel: RegistrationViewModel,
+    onNextClicked: () -> Unit
 ) {
     var day by rememberSaveable { mutableStateOf("") }
     var month by rememberSaveable { mutableStateOf("") }
@@ -130,6 +131,7 @@ fun RequestDateScreen(
                     if (gender.isEmpty()) isErrorGender = true
                     if (isErrorDay || isErrorYear || isErrorMonth || isErrorGender) return@Button
                     viewModel.setBirthdayAndGender(day, month, year, gender)
+                    onNextClicked()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {

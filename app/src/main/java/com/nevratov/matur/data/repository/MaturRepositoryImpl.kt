@@ -11,7 +11,8 @@ import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
 import com.nevratov.matur.presentation.main.login.LoginData
-import com.nevratov.matur.presentation.main.registration.City
+import com.nevratov.matur.domain.entity.City
+import com.nevratov.matur.extentions.mergeWith
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +34,8 @@ class MaturRepositoryImpl @Inject constructor(
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
+    // AuthState
+
     private val checkAuthStateEvents = MutableSharedFlow<Unit>(replay = 1)
     private val authStateFlow = flow {
         checkAuthStateEvents.emit(Unit)
@@ -48,13 +51,34 @@ class MaturRepositoryImpl @Inject constructor(
         initialValue = AuthState.Initial
     )
 
-//    private val userChangedEvents = MutableSharedFlow<Unit>(replay = 1)
-//    val userFlow: Flow<User> = flow {
-//        userChangedEvents.collect {
-//            val user = getUser()
-//            emit(user)
-//        }
-//    }
+    // ExploreUsers
+
+    private var _exploreUsers = mutableListOf<User>()
+    private val exploreUsers = _exploreUsers.toList()
+
+    private val refreshExploreUsersEvents = MutableSharedFlow<List<User>>()
+    private val checkExploreUsersEvents = MutableSharedFlow<Unit>(replay = 1)
+
+    private val loadedExploreUsers = flow {
+        checkAuthStateEvents.emit(Unit)
+        checkExploreUsersEvents.collect {
+            val usersDto = apiService.getUsersToExplore(token = getToken())
+            val users = mapper.listUserDtoToListUser(usersDto)
+            _exploreUsers.apply {
+                clear()
+                addAll(users)
+            }
+            emit(exploreUsers)
+        }
+    }
+        .mergeWith(refreshExploreUsersEvents)
+        .stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = listOf()
+    )
+
+    // Save User in cache with SharedPreferences
 
     private fun saveUser(user: User) {
         sharedPreferences.edit().apply {
@@ -68,6 +92,10 @@ class MaturRepositoryImpl @Inject constructor(
     private fun getUser(): User? {
         val userJson = sharedPreferences.getString(USER_KEY, null)
         return Gson().fromJson(userJson, User::class.java)
+    }
+
+    private fun getToken(): String {
+        return getUser()?.authKey ?: throw RuntimeException("authKey == null")
     }
 
     // Implementations
@@ -84,9 +112,29 @@ class MaturRepositoryImpl @Inject constructor(
         coroutineScope.launch {
             val loginResponse = apiService.login(mapper.loginDataToLoginDataDto(loginData))
             if (!loginResponse.isSuccessful) return@launch
-            val user = loginResponse.body()?.user ?: throw RuntimeException("user is null")
-            saveUser(mapper.userDtoToUser(user))
+            val userDto = loginResponse.body()?.user ?: throw RuntimeException("user is null")
+            saveUser(mapper.userDtoToUser(userDto))
         }
+    }
+
+    override fun getUsersToExplore() = loadedExploreUsers
+
+    override suspend fun dislike(dislikedUser: User) {
+        apiService.dislike(
+            token = getToken(),
+            dislikedUser = mapper.userToDislikedUserDto(dislikedUser)
+        )
+        _exploreUsers.remove(dislikedUser)
+        refreshExploreUsersEvents.emit(exploreUsers)
+    }
+
+    override suspend fun like(likedUser: User) {
+        apiService.like(
+            token = getToken(),
+            likedUser = mapper.userToLikedUserDto(likedUser)
+        )
+        _exploreUsers.remove(likedUser)
+        refreshExploreUsersEvents.emit(exploreUsers)
     }
 
     override suspend fun registration(regUserInfo: RegUserInfo) {
