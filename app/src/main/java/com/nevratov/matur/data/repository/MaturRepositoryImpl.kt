@@ -60,10 +60,15 @@ class MaturRepositoryImpl @Inject constructor(
     private val checkExploreUsersEvents = MutableSharedFlow<Unit>(replay = 1)
 
     private val loadedExploreUsers = flow {
-        checkAuthStateEvents.emit(Unit)
+        checkExploreUsersEvents.emit(Unit)
         checkExploreUsersEvents.collect {
-            val usersDto = apiService.getUsersToExplore(token = getToken())
+            val token = getToken()
+            Log.d("ExploreScreen", "token = $token")
+            Log.d("ExploreScreen", "до запроса лайков")
+            val usersDto = apiService.getUsersToExplore(token = token)
+            Log.d("ExploreScreen", "после запроса лайков")
             val users = mapper.listUserDtoToListUser(usersDto)
+            Log.d("ExploreScreen", users.toString())
             _exploreUsers.apply {
                 clear()
                 addAll(users)
@@ -71,7 +76,7 @@ class MaturRepositoryImpl @Inject constructor(
             emit(exploreUsers)
         }
     }
-        .mergeWith(refreshExploreUsersEvents)
+//        .mergeWith(refreshExploreUsersEvents)
         .stateIn(
         scope = coroutineScope,
         started = SharingStarted.Lazily,
@@ -80,10 +85,11 @@ class MaturRepositoryImpl @Inject constructor(
 
     // Save User in cache with SharedPreferences
 
-    private fun saveUser(user: User) {
+    private fun saveUserAndToken(user: User, token: String) {
         sharedPreferences.edit().apply {
             val userJson = Gson().toJson(user)
             putString(USER_KEY, userJson)
+            putString(TOKEN_KEY, token)
             apply()
         }
        checkAuthState()
@@ -95,7 +101,8 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     private fun getToken(): String {
-        return getUser()?.authKey ?: throw RuntimeException("authKey == null")
+        return sharedPreferences.getString(TOKEN_KEY, null)
+            ?: throw RuntimeException("authKey == null")
     }
 
     // Implementations
@@ -113,7 +120,8 @@ class MaturRepositoryImpl @Inject constructor(
             val loginResponse = apiService.login(mapper.loginDataToLoginDataDto(loginData))
             if (!loginResponse.isSuccessful) return@launch
             val userDto = loginResponse.body()?.user ?: throw RuntimeException("user is null")
-            saveUser(mapper.userDtoToUser(userDto))
+            val token = loginResponse.body()?.token ?: throw RuntimeException("token is null")
+            saveUserAndToken(user = mapper.userDtoToUser(userDto), token = token)
         }
     }
 
@@ -147,5 +155,6 @@ class MaturRepositoryImpl @Inject constructor(
 
     companion object {
         private const val USER_KEY = "user_data"
+        private const val TOKEN_KEY = "token"
     }
 }

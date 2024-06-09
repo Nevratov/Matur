@@ -12,6 +12,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -27,6 +28,7 @@ interface ApiService {
     @GET("city/get-by-name")
     suspend fun getCitiesByName(@Query("q") name: String): List<City>
 
+    @Headers("Content-Type: application/json")
     @GET("like/user-list")
     suspend fun getUsersToExplore(@Header("Authorization") token: String): List<UserDto>
 

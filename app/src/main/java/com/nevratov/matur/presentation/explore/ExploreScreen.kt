@@ -1,5 +1,6 @@
 package com.nevratov.matur.presentation.explore
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,6 +53,8 @@ fun ExploreScreen(
 
     val dismissState = rememberDismissState()
 
+    Log.d("ExploreScreen", screenState.toString())
+
     when(val currentState = screenState.value) {
         is ExploreScreenState.Content -> {
 
@@ -65,19 +68,31 @@ fun ExploreScreen(
                 state = dismissState,
                 background = {},
                 dismissContent = {
-                    ExploreCard()
+                    ExploreCard(
+                        name = currentState.exploreUser.name,
+                        aboutMe = currentState.exploreUser.aboutMe
+                    )
                 }
             )
         }
-        ExploreScreenState.ContentIsEmpty -> TODO()
-        ExploreScreenState.Initial -> TODO()
-        ExploreScreenState.Loading -> TODO()
+        ExploreScreenState.ContentIsEmpty -> {
+
+        }
+        ExploreScreenState.Initial -> {
+
+        }
+        ExploreScreenState.Loading -> {
+
+        }
     }
 
 }
 
 @Composable
-private fun ExploreCard() {
+private fun ExploreCard(
+    name: String,
+    aboutMe: String
+) {
     val uriState by remember {
         mutableStateOf("https://bipbap.ru/wp-content/uploads/2016/04/1566135836_devushka-v-shortah-na-pirone.jpg")
     }
@@ -99,14 +114,14 @@ private fun ExploreCard() {
         )
         Spacer(modifier = Modifier.height(32.dp))
         Text(
-            text = "Kate Jhonson",
+            text = name,
             fontSize = 32.sp,
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Full-time Traveller. Globe Trotter. Occasional Photographer. Prt time Singer / Dancer",
+            text = aboutMe,
             fontSize = 18.sp,
             color = Color.Gray,
             textAlign = TextAlign.Center

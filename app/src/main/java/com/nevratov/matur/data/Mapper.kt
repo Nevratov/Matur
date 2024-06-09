@@ -18,10 +18,8 @@ class Mapper {
         return User(
             id = userDto.id,
             name = userDto.name,
-            email = userDto.email,
             gender = getGenderByNumber(userDto.gender),
             birthday = userDto.birthday,
-            authKey = userDto.authKey,
             cityId = userDto.cityId,
             aboutMe = userDto.aboutMe,
             height = userDto.height,
