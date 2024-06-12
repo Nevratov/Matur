@@ -9,5 +9,5 @@ class GetUsersToExploreUseCase @Inject constructor(
     private val repository: MaturRepository
 ) {
 
-    operator fun invoke(): StateFlow<List<User>> = repository.getUsersToExplore()
+    operator fun invoke(): StateFlow<User?> = repository.getUsersToExplore()
 }

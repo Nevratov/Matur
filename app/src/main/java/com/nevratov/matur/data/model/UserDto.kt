@@ -25,5 +25,6 @@ data class UserDto(
     @SerializedName("drinking") val drinking: Int,
     @SerializedName("smoking") val smoking: Int,
     @SerializedName("city") val city: CityDto,
-    @SerializedName("interests") val interests: List<InterestDto>
+    @SerializedName("interests") val interests: List<InterestDto>,
+    @SerializedName("images") val images: List<ImagesSizeDto>
 )

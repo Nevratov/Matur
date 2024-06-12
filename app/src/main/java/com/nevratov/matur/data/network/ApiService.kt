@@ -6,7 +6,7 @@ import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.LoginResponseDto
 import com.nevratov.matur.data.model.MessageDto
 import com.nevratov.matur.data.model.RegUserInfoDto
-import com.nevratov.matur.data.model.UserDto
+import com.nevratov.matur.data.model.UsersToExploreResponseDto
 import com.nevratov.matur.domain.entity.City
 import retrofit2.Response
 import retrofit2.http.Body
@@ -30,7 +30,7 @@ interface ApiService {
 
     @Headers("Content-Type: application/json")
     @GET("like/user-list")
-    suspend fun getUsersToExplore(@Header("Authorization") token: String): List<UserDto>
+    suspend fun getUsersToExplore(@Header("Authorization") token: String): UsersToExploreResponseDto
 
     @POST("dislike/create")
     suspend fun dislike(

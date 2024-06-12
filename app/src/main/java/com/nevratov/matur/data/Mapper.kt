@@ -15,9 +15,11 @@ import com.nevratov.matur.presentation.main.registration.RegUserInfo
 class Mapper {
 
     fun userDtoToUser(userDto: UserDto): User {
+
         return User(
             id = userDto.id,
             name = userDto.name,
+            logoUrl = userDto.images.first().urlSquare1024,
             gender = getGenderByNumber(userDto.gender),
             birthday = userDto.birthday,
             cityId = userDto.cityId,

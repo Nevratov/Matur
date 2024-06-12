@@ -16,8 +16,13 @@ import com.nevratov.matur.extentions.mergeWith
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -26,7 +31,7 @@ import javax.inject.Inject
 @ApplicationScope
 class MaturRepositoryImpl @Inject constructor(
     application: Application
-): MaturRepository {
+) : MaturRepository {
     private val apiService = ApiFactory.apiService
     private val mapper = Mapper()
 
@@ -42,8 +47,9 @@ class MaturRepositoryImpl @Inject constructor(
         checkAuthStateEvents.collect {
             val user = getUser()
             val isLoggedIn = user != null
-            if (isLoggedIn) emit(AuthState.Authorized) else emit(AuthState.NotAuthorized)
-            Log.d("RepositoryImpl", "isLoggedIn = $isLoggedIn")
+//            if (isLoggedIn) emit(AuthState.Authorized) else emit(AuthState.NotAuthorized)
+            emit(AuthState.Authorized) // delete, for test
+
         }
     }.stateIn(
         scope = coroutineScope,
@@ -53,35 +59,69 @@ class MaturRepositoryImpl @Inject constructor(
 
     // ExploreUsers
 
-    private var _exploreUsers = mutableListOf<User>()
-    private val exploreUsers = _exploreUsers.toList()
-
-    private val refreshExploreUsersEvents = MutableSharedFlow<List<User>>()
-    private val checkExploreUsersEvents = MutableSharedFlow<Unit>(replay = 1)
-
-    private val loadedExploreUsers = flow {
-        checkExploreUsersEvents.emit(Unit)
-        checkExploreUsersEvents.collect {
-            val token = getToken()
-            Log.d("ExploreScreen", "token = $token")
-            Log.d("ExploreScreen", "до запроса лайков")
-            val usersDto = apiService.getUsersToExplore(token = token)
-            Log.d("ExploreScreen", "после запроса лайков")
-            val users = mapper.listUserDtoToListUser(usersDto)
-            Log.d("ExploreScreen", users.toString())
-            _exploreUsers.apply {
-                clear()
-                addAll(users)
-            }
-            emit(exploreUsers)
+    private val _testListExploreUsers = mutableListOf<User>().apply {
+        repeat(19) {
+            add(
+                User(
+                    id = it,
+                    name = "Надя $it",
+                    gender = "",
+                    birthday = "",
+                    cityId = 1,
+                    aboutMe = "Очень красивая девушка твоей мечты. Шлю $it воздушных поцелуев",
+                    height = 160,
+                    weight = 50,
+                    bodyType = "",
+                    education = "",
+                    job = "",
+                    maritalStatus = "",
+                    children = "",
+                    house = "1",
+                    nationality = "",
+                    languageSkills = "",
+                    religion = "",
+                    religiosityLevel = "",
+                    expectations = "",
+                    drinking = "",
+                    smoking = "",
+                    logoUrl = "https://celes.club/uploads/posts/2021-11/1638298686_53-celes-club-p-malenkii-barashek-zhivotnie-krasivo-foto-58.jpg"
+                )
+            )
         }
     }
-//        .mergeWith(refreshExploreUsersEvents)
+    private val testListExploreUsers: List<User>
+        get() = _testListExploreUsers
+
+
+//    private var _exploreUsers = mutableListOf<User>()
+//    private val exploreUsers: List<User>
+//        get() = _exploreUsers
+
+    private val refreshExploreUsersEvents = MutableSharedFlow<Unit>(replay = 1)
+    private val loadedExploreUsers = flow {
+//            val token = getToken()
+//            val usersResponse = apiService.getUsersToExplore(token = token)
+//            val usersDto = usersResponse.listUsers
+//            val users = mapper.listUserDtoToListUser(usersDto)
+//            _exploreUsers.apply {
+//                clear()
+//                addAll(users)
+//            }
+//            emit(exploreUsers)
+        refreshExploreUsersEvents.emit(Unit)
+        refreshExploreUsersEvents.collect{
+//            emit(listOf())
+//            delay(10)
+
+            emit(testListExploreUsers.firstOrNull())
+            Log.d("ExploreScreen", "Emitted: $testListExploreUsers")
+        }
+    }
         .stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.Lazily,
-        initialValue = listOf()
-    )
+            scope = coroutineScope,
+            started = SharingStarted.Lazily,
+            initialValue = null
+        )
 
     // Save User in cache with SharedPreferences
 
@@ -92,7 +132,7 @@ class MaturRepositoryImpl @Inject constructor(
             putString(TOKEN_KEY, token)
             apply()
         }
-       checkAuthState()
+        checkAuthState()
     }
 
     private fun getUser(): User? {
@@ -128,21 +168,27 @@ class MaturRepositoryImpl @Inject constructor(
     override fun getUsersToExplore() = loadedExploreUsers
 
     override suspend fun dislike(dislikedUser: User) {
-        apiService.dislike(
-            token = getToken(),
-            dislikedUser = mapper.userToDislikedUserDto(dislikedUser)
-        )
-        _exploreUsers.remove(dislikedUser)
-        refreshExploreUsersEvents.emit(exploreUsers)
+//        apiService.dislike(
+//            token = getToken(),
+//            dislikedUser = mapper.userToDislikedUserDto(dislikedUser)
+//        )
+//        _exploreUsers.remove(dislikedUser)
+//        refreshExploreUsersEvents.emit(exploreUsers)
+        _testListExploreUsers.remove(dislikedUser)
+        refreshExploreUsersEvents.emit(Unit)
     }
 
     override suspend fun like(likedUser: User) {
-        apiService.like(
-            token = getToken(),
-            likedUser = mapper.userToLikedUserDto(likedUser)
-        )
-        _exploreUsers.remove(likedUser)
-        refreshExploreUsersEvents.emit(exploreUsers)
+//        apiService.like(
+//            token = getToken(),
+//            likedUser = mapper.userToLikedUserDto(likedUser)
+//        )
+//        _exploreUsers.remove(likedUser)
+//        refreshExploreUsersEvents.emit(exploreUsers)
+
+
+        _testListExploreUsers.remove(likedUser)
+        refreshExploreUsersEvents.emit(Unit)
     }
 
     override suspend fun registration(regUserInfo: RegUserInfo) {

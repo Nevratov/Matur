@@ -1,6 +1,7 @@
 package com.nevratov.matur.presentation.main
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -44,17 +45,9 @@ fun MainScreen(
 ) {
     val navigationState = rememberNavigationState()
     val startDestination = when (authState.value) {
-        AuthState.Authorized -> {
-            Screen.Explore.route
-        }
-
-        AuthState.NotAuthorized -> {
-            Screen.Login.route
-        }
-
-        AuthState.Initial -> {
-            return
-        }
+        AuthState.Authorized -> { Screen.Explore.route }
+        AuthState.NotAuthorized -> { Screen.Login.route }
+        AuthState.Initial -> { return }
     }
 
     Scaffold(
@@ -64,6 +57,7 @@ fun MainScreen(
     ) { paddingValues ->
         Box(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {

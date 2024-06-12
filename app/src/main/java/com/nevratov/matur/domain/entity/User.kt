@@ -7,6 +7,7 @@ import kotlinx.parcelize.Parcelize
 data class User(
     val id: Int,
     val name: String,
+    val logoUrl: String,
     val gender: String,
     val birthday: String,
     val cityId: Int,
@@ -15,7 +16,7 @@ data class User(
     val weight: Int,
     val bodyType : String,
     val education: String,
-    val job: String,
+    val job: String?,
     val maritalStatus: String,
     val children: String,
     val house: String,
@@ -23,7 +24,7 @@ data class User(
     val languageSkills: String,
     val religion: String,
     val religiosityLevel: String,
-    val expectations: String,
+    val expectations: String?,
     val drinking: String,
     val smoking: String
 ): Parcelable

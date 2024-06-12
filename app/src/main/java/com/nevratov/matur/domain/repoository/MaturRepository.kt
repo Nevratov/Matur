@@ -23,5 +23,5 @@ interface MaturRepository {
 
     suspend fun like(likedUser: User)
 
-    fun getUsersToExplore(): StateFlow<List<User>>
+    fun getUsersToExplore(): StateFlow<User?>
 }
