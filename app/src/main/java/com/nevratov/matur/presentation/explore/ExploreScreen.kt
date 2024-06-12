@@ -1,7 +1,5 @@
 package com.nevratov.matur.presentation.explore
 
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,10 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -32,22 +26,18 @@ import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,8 +46,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.ui.theme.MaturColorDark
-import com.nevratov.matur.ui.theme.MaturColorLight
-import com.nevratov.matur.ui.theme.MaturColorPrimary
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,12 +82,7 @@ fun ExploreScreenContent(
         }
 
         ExploreScreenState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+
         }
     }
 }
@@ -114,39 +97,34 @@ fun ShowPostCard(
     val dismissState = rememberDismissState()
 
     if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-        LaunchedEffect(key1 = Unit) {
-            dismissState.reset()
-            viewModel.like(user)
-        }
+        viewModel.like(user)
     } else if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
-        LaunchedEffect(key1 = Unit) {
-            viewModel.dislike(user)
-            dismissState.reset()
-
-        }
+        viewModel.dislike(user)
     }
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item(key = user.id) {
-            SwipeToDismiss(
-                state = dismissState,
-                background = { },
-                dismissContent = {
-                    ExploreCard(
-                        name = user.name,
-                        aboutMe = user.aboutMe,
-                        logoUrl = user.logoUrl,
-                        onLikeClicked = { viewModel.like(user) }
-                    )
-                }
+
+//    LazyColumn(modifier = Modifier.fillMaxSize()) {
+//        item(key = user.id) {
+    SwipeToDismiss(
+        state = dismissState,
+        background = { },
+        dismissContent = {
+            ExploreCard(
+                name = user.name,
+                aboutMe = user.aboutMe,
+                logoUrl = user.logoUrl,
+                onLikeClicked = { viewModel.like(user) }
             )
         }
-    }
+    )
+//        }
+//    }
 }
 
 @Composable
 private fun EmptyContentScreen() {
-    Column(modifier = Modifier
-        .fillMaxSize(),
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -175,12 +153,14 @@ private fun ExploreCard(
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         AsyncImage(
             modifier = Modifier
+                .weight(1f)
                 .clip(RoundedCornerShape(20.dp)),
             model = uriState,
             contentScale = ContentScale.Crop,
