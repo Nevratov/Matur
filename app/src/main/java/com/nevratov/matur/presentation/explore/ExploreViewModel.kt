@@ -36,12 +36,14 @@ class ExploreViewModel @Inject constructor(
     fun like(likedUser: User) {
         viewModelScope.launch {
             actionEvent.emit(ExploreScreenState.Loading)
+            delay(500)
             likeUseCase(likedUser)
         }
     }
 
     fun dislike(dislikedUser: User) {
         viewModelScope.launch {
+            actionEvent.emit(ExploreScreenState.Loading)
             dislikeUseCase(dislikedUser)
         }
     }

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,6 +48,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,6 +56,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.ui.theme.MaturColorDark
+import com.nevratov.matur.ui.theme.MaturColorLight
+import com.nevratov.matur.ui.theme.MaturColorPrimary
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,7 +86,7 @@ fun ExploreScreenContent(
             )
 
         ExploreScreenState.ContentIsEmpty -> {
-
+            EmptyContentScreen()
         }
 
         ExploreScreenState.Initial -> {
@@ -90,7 +94,12 @@ fun ExploreScreenContent(
         }
 
         ExploreScreenState.Loading -> {
-
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
     }
 }
@@ -111,8 +120,9 @@ fun ShowPostCard(
         }
     } else if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
         LaunchedEffect(key1 = Unit) {
-            dismissState.reset()
             viewModel.dislike(user)
+            dismissState.reset()
+
         }
     }
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -130,6 +140,23 @@ fun ShowPostCard(
                 }
             )
         }
+    }
+}
+
+@Composable
+private fun EmptyContentScreen() {
+    Column(modifier = Modifier
+        .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Вы попытались познакомиться со всеми возможными людьми",
+            textAlign = TextAlign.Center,
+            fontSize = 22.sp,
+            fontFamily = FontFamily.Cursive,
+            color = MaturColorDark
+        )
     }
 }
 
