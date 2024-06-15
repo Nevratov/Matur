@@ -1,10 +1,12 @@
 package com.nevratov.matur.domain.repoository
 
 import com.nevratov.matur.domain.entity.AuthState
-import com.nevratov.matur.domain.entity.User
-import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.domain.entity.City
+import com.nevratov.matur.domain.entity.User
+import com.nevratov.matur.presentation.chat.Message
+import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface MaturRepository {
@@ -24,4 +26,8 @@ interface MaturRepository {
     suspend fun like(likedUser: User)
 
     fun getUsersToExplore(): StateFlow<User?>
+
+    fun getMessagesByUserId(id: Int): Flow<List<Message>>
+
+    suspend fun sendMessage(message: Message)
 }

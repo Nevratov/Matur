@@ -12,21 +12,18 @@ import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.domain.entity.City
-import com.nevratov.matur.extentions.mergeWith
+import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.random.Random
 
 @ApplicationScope
 class MaturRepositoryImpl @Inject constructor(
@@ -60,7 +57,15 @@ class MaturRepositoryImpl @Inject constructor(
     // ExploreUsers
 
     private val _testListExploreUsers = mutableListOf<User>().apply {
+
         repeat(19) {
+
+            val url = if(Random.nextBoolean()) {
+                "https://i.pinimg.com/736x/e8/45/14/e84514699a36c54b570359d52b0ef83f.jpg"
+            } else {
+                "https://celes.club/uploads/posts/2021-11/1638298686_53-celes-club-p-malenkii-barashek-zhivotnie-krasivo-foto-58.jpg"
+            }
+
             add(
                 User(
                     id = it,
@@ -84,7 +89,7 @@ class MaturRepositoryImpl @Inject constructor(
                     expectations = "",
                     drinking = "",
                     smoking = "",
-                    logoUrl = "https://celes.club/uploads/posts/2021-11/1638298686_53-celes-club-p-malenkii-barashek-zhivotnie-krasivo-foto-58.jpg"
+                    logoUrl = url
                 )
             )
         }
@@ -122,6 +127,14 @@ class MaturRepositoryImpl @Inject constructor(
             started = SharingStarted.Lazily,
             initialValue = null
         )
+
+    // Get Messages for Chat Screen
+
+    private val _chatMessages = mutableListOf<Message>()
+    val chatMessages: List<Message>
+        get() = _chatMessages.toList()
+
+    private val refreshMessagesEvents = MutableSharedFlow<Unit>()
 
     // Save User in cache with SharedPreferences
 
@@ -189,6 +202,29 @@ class MaturRepositoryImpl @Inject constructor(
 
         _testListExploreUsers.remove(likedUser)
         refreshExploreUsersEvents.emit(Unit)
+    }
+
+    override fun getMessagesByUserId(id: Int) = flow {
+        _chatMessages.clear()
+        val messagesDto = apiService.getMessages(
+            token = getToken(),
+            messagesOptions = mapper.toMessagesOptionsDto(id)
+        )
+        val messages = mutableListOf<Message>()
+        messagesDto.forEach { messages.add(mapper.messageDtoToMessage(it)) }
+        _chatMessages.addAll(messages)
+        emit(chatMessages)
+        refreshMessagesEvents.collect {
+            emit(chatMessages)
+        }
+    }
+
+
+
+    override suspend fun sendMessage(message: Message) {
+        _chatMessages.add(message)
+        refreshMessagesEvents.emit(Unit)
+        apiService.sendMessage(mapper.messageToMessageDto(message))
     }
 
     override suspend fun registration(regUserInfo: RegUserInfo) {

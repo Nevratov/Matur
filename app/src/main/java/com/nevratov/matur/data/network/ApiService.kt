@@ -1,6 +1,7 @@
 package com.nevratov.matur.data.network
 
 import com.nevratov.matur.data.model.DislikedUserDto
+import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.LoginResponseDto
@@ -14,7 +15,6 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -47,6 +47,10 @@ interface ApiService {
     @POST("im/create")
     suspend fun sendMessage(@Body message: MessageDto)
 
-    @GET("messages/{userId}")
-    suspend fun getMessages(@Path("userId") userId: String): List<MessageDto>
+    @Headers("Content-Type: application/json")
+    @POST("/im/messages")
+    suspend fun getMessages(
+        @Header("Authorization") token: String,
+        @Body messagesOptions: MessagesOptionsDto
+    ): List<MessageDto>
 }

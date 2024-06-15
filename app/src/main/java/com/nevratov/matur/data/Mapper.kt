@@ -1,6 +1,7 @@
 package com.nevratov.matur.data
 
 import com.nevratov.matur.data.model.DislikedUserDto
+import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
@@ -64,7 +65,19 @@ class Mapper {
             senderId = message.senderId,
             receiverId = message.receiverId,
             content = message.content,
-            timestamp = message.timestamp
+            timestamp = message.timestamp,
+            isRead = message.isRead
+        )
+    }
+
+    fun messageDtoToMessage(message: MessageDto): Message {
+        return Message(
+            id = message.id,
+            senderId = message.senderId,
+            receiverId = message.receiverId,
+            content = message.content,
+            timestamp = message.timestamp,
+            isRead = message.isRead
         )
     }
 
@@ -79,6 +92,12 @@ class Mapper {
 
     fun userToLikedUserDto(user: User) = LikedUserDto(userId = user.id)
 
+
+    fun toMessagesOptionsDto(messagesWithUserId: Int) = MessagesOptionsDto(
+        messagesWithUserId = messagesWithUserId.toString(),
+        pageSize = "100",
+        page = "1"
+    )
 
     private fun getBirthday(day: String, month: String, year: String) = "$year-$month-$day"
 

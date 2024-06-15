@@ -47,8 +47,6 @@ import coil.compose.AsyncImage
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.ui.theme.MaturColorDark
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreScreen(
     viewModel: ExploreViewModel
@@ -102,8 +100,6 @@ fun ShowPostCard(
         viewModel.dislike(user)
     }
 
-//    LazyColumn(modifier = Modifier.fillMaxSize()) {
-//        item(key = user.id) {
     SwipeToDismiss(
         state = dismissState,
         background = { },
@@ -112,12 +108,11 @@ fun ShowPostCard(
                 name = user.name,
                 aboutMe = user.aboutMe,
                 logoUrl = user.logoUrl,
-                onLikeClicked = { viewModel.like(user) }
+                onLikeClicked = { viewModel.like(user) },
+                onDislikeClicked = { viewModel.dislike(user) }
             )
         }
     )
-//        }
-//    }
 }
 
 @Composable
@@ -144,7 +139,8 @@ private fun ExploreCard(
     name: String,
     aboutMe: String,
     logoUrl: String,
-    onLikeClicked: () -> Unit
+    onLikeClicked: () -> Unit,
+    onDislikeClicked: () -> Unit
 ) {
     val uriState by remember {
         mutableStateOf(logoUrl)
@@ -184,7 +180,10 @@ private fun ExploreCard(
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            ActionButton(ico = Icons.Rounded.Close, onClick = {})
+            ActionButton(
+                ico = Icons.Rounded.Close,
+                onClick = { onDislikeClicked() }
+            )
             Spacer(modifier = Modifier.width(64.dp))
             ActionButton(
                 ico = Icons.Rounded.Favorite,

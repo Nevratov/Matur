@@ -8,7 +8,7 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 
 
-class WebSocketListener(
+class WebSocketListener (
     private val onMessageReceived: (String) -> Unit
 ): WebSocketListener() {
 
