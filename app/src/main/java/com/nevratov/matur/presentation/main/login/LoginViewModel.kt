@@ -15,7 +15,7 @@ class LoginViewModel @Inject constructor(
     val state = _state
 
     init {
-        _state.value = LoginScreenState.Content("59aksai59@mail.ru", "nL8Uh9")
+        _state.value = LoginScreenState.Content("59aksai59@mail.ru", "123123")
     }
 
     fun login() {

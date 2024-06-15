@@ -16,7 +16,6 @@ import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
@@ -42,10 +41,10 @@ class MaturRepositoryImpl @Inject constructor(
     private val authStateFlow = flow {
         checkAuthStateEvents.emit(Unit)
         checkAuthStateEvents.collect {
-            val user = getUser()
+            val user = getUserOrNull()
             val isLoggedIn = user != null
-//            if (isLoggedIn) emit(AuthState.Authorized) else emit(AuthState.NotAuthorized)
-            emit(AuthState.Authorized) // delete, for test
+            if (isLoggedIn) emit(AuthState.Authorized) else emit(AuthState.NotAuthorized)
+//            emit(AuthState.Authorized) // delete, for test
 
         }
     }.stateIn(
@@ -139,6 +138,7 @@ class MaturRepositoryImpl @Inject constructor(
     // Save User in cache with SharedPreferences
 
     private fun saveUserAndToken(user: User, token: String) {
+        Log.d("User", user.toString())
         sharedPreferences.edit().apply {
             val userJson = Gson().toJson(user)
             putString(USER_KEY, userJson)
@@ -148,7 +148,7 @@ class MaturRepositoryImpl @Inject constructor(
         checkAuthState()
     }
 
-    private fun getUser(): User? {
+    private fun getUserOrNull(): User? {
         val userJson = sharedPreferences.getString(USER_KEY, null)
         return Gson().fromJson(userJson, User::class.java)
     }
@@ -219,8 +219,6 @@ class MaturRepositoryImpl @Inject constructor(
         }
     }
 
-
-
     override suspend fun sendMessage(message: Message) {
         _chatMessages.add(message)
         refreshMessagesEvents.emit(Unit)
@@ -234,6 +232,8 @@ class MaturRepositoryImpl @Inject constructor(
     override suspend fun getCitiesByName(name: String): List<City> {
         return apiService.getCitiesByName(name)
     }
+
+    override fun getUser(): User = getUserOrNull() ?: throw RuntimeException("User == null")
 
     companion object {
         private const val USER_KEY = "user_data"

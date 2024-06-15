@@ -30,4 +30,6 @@ interface MaturRepository {
     fun getMessagesByUserId(id: Int): Flow<List<Message>>
 
     suspend fun sendMessage(message: Message)
+
+    fun getUser(): User
 }

@@ -1,5 +1,6 @@
 package com.nevratov.matur.data
 
+import android.util.Log
 import com.nevratov.matur.data.model.DislikedUserDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.LikedUserDto
@@ -16,11 +17,11 @@ import com.nevratov.matur.presentation.main.registration.RegUserInfo
 class Mapper {
 
     fun userDtoToUser(userDto: UserDto): User {
-
+        Log.d("User", userDto.toString())
         return User(
             id = userDto.id,
             name = userDto.name,
-            logoUrl = userDto.images.first().urlSquare1024,
+            logoUrl = userDto.images.first().sizes.urlSquare1024,
             gender = getGenderByNumber(userDto.gender),
             birthday = userDto.birthday,
             cityId = userDto.cityId,
@@ -61,8 +62,8 @@ class Mapper {
 
     fun messageToMessageDto(message: Message): MessageDto {
         return MessageDto(
-            id = message.id,
-            senderId = message.senderId,
+            id = message.id.toString(),
+            senderId = message.senderId.toString(),
             receiverId = message.receiverId,
             content = message.content,
             timestamp = message.timestamp,
@@ -72,8 +73,8 @@ class Mapper {
 
     fun messageDtoToMessage(message: MessageDto): Message {
         return Message(
-            id = message.id,
-            senderId = message.senderId,
+            id = message.id.toInt(),
+            senderId = message.senderId.toInt(),
             receiverId = message.receiverId,
             content = message.content,
             timestamp = message.timestamp,

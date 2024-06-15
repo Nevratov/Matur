@@ -22,6 +22,7 @@
     <string name="matches_description_ico">Иконка совпадений</string>
     <string name="chat_description_ico">Иконка чата</string>
     <string name="profile_description_ico">Иконка профиля</string>
+    <string name="message_placeholer_chat">Сообщение</string>
 
     <array name="monthsOfYear">
         <item>Январь</item>

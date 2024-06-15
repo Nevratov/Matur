@@ -6,8 +6,8 @@ import java.util.Date
 import java.util.Locale
 
 data class Message(
-    val id: String,
-    val senderId: String,
+    val id: Int,
+    val senderId: Int,
     val receiverId: String,
     val content: String,
     val timestamp: Long,
