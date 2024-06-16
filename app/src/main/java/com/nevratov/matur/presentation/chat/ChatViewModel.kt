@@ -20,9 +20,9 @@ class ChatViewModel @Inject constructor(
     private val webSocketClient = WebSocketClient
 
     private val userId = getUserUseCase().id
-    private val interlocutorId = 4
+    private val interlocutorId = 2
 
-    val chatScreenState = getMessagesByUserIdUseCase(id = 2)
+    val chatScreenState = getMessagesByUserIdUseCase(id = interlocutorId)
         .map { ChatScreenState.Content(messages = it, userId = userId) }
 
     init {

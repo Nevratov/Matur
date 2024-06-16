@@ -1,11 +1,13 @@
-package com.nevratov.matur.presentation.messages
+package com.nevratov.matur.presentation.chat_list
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,8 +18,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,77 +31,114 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
-import com.nevratov.matur.ui.theme.MaturTheme
 
 @Composable
-fun MessagesScreen(
-    onMessageItemClicked: (UserProfile) -> Unit
+fun ChatListScreen(
+    viewModel: ChatListViewModel,
+    onMessageItemClicked: (ChatListItem) -> Unit
 ) {
 
-    val testListMessageItems = mutableListOf<UserProfile>().apply {
-        repeat(20) {
-            add(UserProfile(
-                id = it,
-                firstName = "Kate",
-                lastName = "Jhonson $it",
-                logoUri = "https://bipbap.ru/wp-content/uploads/2016/04/1566135836_devushka-v-shortah-na-pirone.jpg",
-                lastMessage = "I love you baby, go to sex on next night? I really like to vizit you!"
+    val screenState = viewModel.state.collectAsState(initial = ChatListScreenState.Initial)
 
-            ))
+    ChatListContent(
+        state = screenState,
+        onMessageItemClicked = onMessageItemClicked
+    )
+}
+
+@Composable
+private fun ChatListContent(
+    state: State<ChatListScreenState>,
+    onMessageItemClicked: (ChatListItem) -> Unit
+) {
+
+    when (val currentState = state.value) {
+        is ChatListScreenState.Content -> {
+            ChatList(
+                chatList = currentState.chatList,
+                onMessageItemClicked = onMessageItemClicked
+            )
+        }
+        ChatListScreenState.Initial -> {
+
+        }
+        ChatListScreenState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
     }
+}
+
+@Composable
+private fun ChatList(
+    chatList: List<ChatListItem>,
+    onMessageItemClicked: (ChatListItem) -> Unit
+) {
 
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item {
-            Text(text = stringResource(R.string.messages_label), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = stringResource(R.string.messages_label),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
             Spacer(modifier = Modifier.height(8.dp))
         }
-       items(items = testListMessageItems, key = { it.id }) {userProfile ->
-           MessageItem(userMessageProfile = userProfile)
-       }
+        items(items = chatList, key = { it.user.id }) {chatListItem ->
+            MessageItem(
+                chatListItem = chatListItem,
+                onMessageItemClicked = onMessageItemClicked
+            )
+        }
     }
 
 }
 
 @Composable
 fun MessageItem(
-    userMessageProfile: UserProfile
+    chatListItem: ChatListItem,
+    onMessageItemClicked: (ChatListItem) -> Unit
 ) {
-    
+
     Row(modifier = Modifier
         .clip(RoundedCornerShape(8.dp))
         .fillMaxWidth()
-        .clickable {  }
+        .clickable { onMessageItemClicked(chatListItem) }
         .wrapContentHeight()
-        .padding(8.dp)
-        ,
+        .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        
+
+        Log.d("MessageItem", "id = ${chatListItem.user.id}, url = ${chatListItem.user.logoUrl}")
+
+
         AsyncImage(
             modifier = Modifier
                 .size(55.dp)
-                .clip(CircleShape)
-            ,
-            model = userMessageProfile.logoUri,
+                .clip(CircleShape),
+            model = chatListItem.user.logoUrl,
             contentScale = ContentScale.Crop,
             contentDescription = "person's photo"
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column() {
             Text(
-                text = "${userMessageProfile.firstName} ${userMessageProfile.lastName}",
+                text = chatListItem.user.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = userMessageProfile.lastMessage,
+                text = chatListItem.message,
                 fontSize = 12.sp,
                 color = Color.Gray,
                 maxLines = 1,

@@ -107,7 +107,7 @@ fun ShowPostCard(
             ExploreCard(
                 name = user.name,
                 aboutMe = user.aboutMe,
-                logoUrl = user.logoUrl,
+                logoUrl = user.logoUrl ?: throw RuntimeException("logo == null"),
                 onLikeClicked = { viewModel.like(user) },
                 onDislikeClicked = { viewModel.dislike(user) }
             )
@@ -137,7 +137,7 @@ private fun EmptyContentScreen() {
 @Composable
 private fun ExploreCard(
     name: String,
-    aboutMe: String,
+    aboutMe: String?,
     logoUrl: String,
     onLikeClicked: () -> Unit,
     onDislikeClicked: () -> Unit
@@ -171,7 +171,7 @@ private fun ExploreCard(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = aboutMe,
+            text = aboutMe.toString(),
             fontSize = 18.sp,
             color = Color.Gray,
             textAlign = TextAlign.Center

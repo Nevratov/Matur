@@ -1,4 +1,4 @@
-package com.nevratov.matur.presentation.messages
+package com.nevratov.matur.presentation.chat_list
 
 data class UserProfile(
     val id: Int,

@@ -4,6 +4,7 @@ import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.domain.entity.City
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.chat.Message
+import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
 import kotlinx.coroutines.flow.Flow
@@ -32,4 +33,6 @@ interface MaturRepository {
     suspend fun sendMessage(message: Message)
 
     fun getUser(): User
+
+    fun getChatList(): StateFlow<List<ChatListItem>>
 }

@@ -13,11 +13,13 @@ import com.nevratov.matur.domain.repoository.MaturRepository
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.domain.entity.City
 import com.nevratov.matur.presentation.chat.Message
+import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -206,12 +208,24 @@ class MaturRepositoryImpl @Inject constructor(
 
     override fun getMessagesByUserId(id: Int) = flow {
         _chatMessages.clear()
-        val messagesDto = apiService.getMessages(
+        val messagesOptions = mapper.toMessagesOptionsDto(id)
+
+        val messagesDto = apiService.getChatMessages(
             token = getToken(),
-            messagesOptions = mapper.toMessagesOptionsDto(id)
-        )
+            messagesOptions = messagesOptions
+        ).chatMessages
+
+
         val messages = mutableListOf<Message>()
-        messagesDto.forEach { messages.add(mapper.messageDtoToMessage(it)) }
+        Log.d("getMessagesByUserId", "dtoMes = ${messagesDto}")
+
+        for (indexMessage in messagesDto.lastIndex downTo  0) {
+            val message = messagesDto[indexMessage]
+            messages.add(mapper.messageDtoToMessage(message))
+        }
+
+        Log.d("getMessagesByUserId", "mes = $messages")
+
         _chatMessages.addAll(messages)
         emit(chatMessages)
         refreshMessagesEvents.collect {
@@ -222,8 +236,20 @@ class MaturRepositoryImpl @Inject constructor(
     override suspend fun sendMessage(message: Message) {
         _chatMessages.add(message)
         refreshMessagesEvents.emit(Unit)
-        apiService.sendMessage(mapper.messageToMessageDto(message))
+        apiService.sendMessage(
+            token = getToken(),
+            message = mapper.messageToCreateMessageDto(message)
+        )
     }
+
+    override fun getChatList(): StateFlow<List<ChatListItem>> = flow {
+        val chatListDto = apiService.getChatList(token = getToken()).chatList
+        emit(mapper.chatListDtoToChatList(chatListDto))
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = listOf()
+    )
 
     override suspend fun registration(regUserInfo: RegUserInfo) {
         apiService.registerUser(mapper.regUserInfoToRegUserInfoDto(regUserInfo))

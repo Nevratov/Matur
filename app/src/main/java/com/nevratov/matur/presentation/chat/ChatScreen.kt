@@ -1,5 +1,6 @@
 package com.nevratov.matur.presentation.chat
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -103,6 +104,7 @@ private fun Chat(
     userId: Int,
     onSend: (Message) -> Unit
 ) {
+    Log.d("Chat", "REC")
     val lazyListState = rememberLazyListState()
     Column(
         modifier = Modifier
@@ -135,23 +137,25 @@ private fun Chat(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
             keyboardActions = KeyboardActions(
                 onSend = {
+                    if (message.isEmpty()) return@KeyboardActions
+                    onSend(
+                        Message(
+                            id = 0,
+                            senderId = userId,
+                            receiverId = "2",
+                            content = message,
+                            timestamp = System.currentTimeMillis(),
+                            isRead = false
+                        )
+                    )
                     message = ""
-                    onSend(Message(
-                        id = 0,
-                        senderId = userId,
-                        receiverId = "2",
-                        content = message,
-                        timestamp = System.currentTimeMillis(),
-                        isRead = false
-                    )
-                    )
                 }
             ),
             value = message,
             onValueChange = { message = it },
         )
 
-        LaunchedEffect(key1 = Unit) {
+        LaunchedEffect(key1 = messages.size) {
             lazyListState.scrollToItem(messages.lastIndex)
         }
     }
@@ -196,171 +200,6 @@ private fun MessageItem(
                 text = message.time,
                 fontSize = 11.sp,
                 color = Color.Gray
-            )
-        }
-    }
-
-
-}
-
-@Preview
-@Composable
-private fun MessageItemPreview() {
-
-    val testListMessages = mutableListOf<Message>().apply {
-        add(
-            Message(
-                id = 3, senderId = 2, receiverId = "4",
-                content = "Привет, как дела?  Что делаешь? Пойдём гулять вечером?",
-                timestamp = 1718208768, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 4, senderId = 4, receiverId = "2",
-                content = "Да, ок",
-                timestamp = 1718318799, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 5, senderId = 4, receiverId = "2",
-                content = "А то у меня дела есть некоторые",
-                timestamp = 1718528822, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 6, senderId = 2, receiverId = "4",
-                content = "Понял, хорошо, зайду тогда за тобой к восьми, до встречи, и не опаздывай, как всегда!",
-                timestamp = 1718748822, isRead = false,
-            ),
-        )
-        //
-        add(
-            Message(
-                id = 7, senderId = 2, receiverId = "4",
-                content = "Привет, как дела?  Что делаешь? Пойдём гулять вечером?",
-                timestamp = 1718208768, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 8, senderId = 4, receiverId = "2",
-                content = "Привет, всё хорошо.  Да, давай, только после 20.00",
-                timestamp = 1718318799, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 9, senderId = 4, receiverId = "2",
-                content = "А то у меня дела есть некоторые",
-                timestamp = 1718528822, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 10, senderId = 2, receiverId = "4",
-                content = "Понял, хорошо",
-                timestamp = 1718748822, isRead = false,
-            ),
-        )
-        //
-        add(
-            Message(
-                id = 11, senderId = 2, receiverId = "4",
-                content = "Привет, как дела?  Что делаешь? Пойдём гулять вечером?",
-                timestamp = 1718208768, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 12, senderId = 4, receiverId = "2",
-                content = "Давай, только после 18.30",
-                timestamp = 1718318799, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 13, senderId = 4, receiverId = "2",
-                content = "А то у меня дела есть некоторые",
-                timestamp = 1718528822, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 14, senderId = 2, receiverId = "4",
-                content = "Ладно",
-                timestamp = 1718748822, isRead = false,
-            ),
-        )
-        //
-        add(
-            Message(
-                id = 15, senderId = 2, receiverId = "4",
-                content = "Привет, как дела?  Что делаешь? Пойдём гулять вечером?",
-                timestamp = 1718208768, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 16, senderId = 4, receiverId = "2",
-                content = "Привет, всё хорошо.  Да, давай, только после 20.00",
-                timestamp = 1718318799, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 17, senderId = 4, receiverId = "2",
-                content = "А то у меня дела есть некоторые",
-                timestamp = 1718528822, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 18, senderId = 2, receiverId = "4",
-                content = "Как скажешь!",
-                timestamp = 1718748822, isRead = false,
-            ),
-        )
-        //
-        add(
-            Message(
-                id = 19, senderId = 2, receiverId = "4",
-                content = "Привет, как дела?  Что делаешь? Пойдём гулять вечером?",
-                timestamp = 1718308768, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 20, senderId = 4, receiverId = "2",
-                content = "Да, ок",
-                timestamp = 1718418799, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 21, senderId = 4, receiverId = "2",
-                content = "А то у меня дела есть некоторые",
-                timestamp = 1718528822, isRead = false,
-            ),
-        )
-        add(
-            Message(
-                id = 22, senderId = 2, receiverId = "4",
-                content = "Понял, хорошо, зайду тогда за тобой к восьми, до встречи, и не опаздывай, как всегда!",
-                timestamp = 1718748822, isRead = false,
-            ),
-        )
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        MaturTheme(darkTheme = false) {
-            Chat(
-                messages = testListMessages,
-                maxWidthItem = 300.05002.dp,
-                userId = 2,
-                onSend = {}
             )
         }
     }

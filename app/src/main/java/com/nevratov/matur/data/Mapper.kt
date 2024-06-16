@@ -1,6 +1,8 @@
 package com.nevratov.matur.data
 
 import android.util.Log
+import com.nevratov.matur.data.model.ChatListItemDto
+import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.DislikedUserDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.LikedUserDto
@@ -10,6 +12,7 @@ import com.nevratov.matur.data.model.RegUserInfoDto
 import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.chat.Message
+import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.Genders
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
@@ -21,7 +24,7 @@ class Mapper {
         return User(
             id = userDto.id,
             name = userDto.name,
-            logoUrl = userDto.images.first().sizes.urlSquare1024,
+            logoUrl = userDto.images.firstOrNull()?.sizes?.urlSquare1024,
             gender = getGenderByNumber(userDto.gender),
             birthday = userDto.birthday,
             cityId = userDto.cityId,
@@ -67,19 +70,41 @@ class Mapper {
             receiverId = message.receiverId,
             content = message.content,
             timestamp = message.timestamp,
-            isRead = message.isRead
+            isRead = if (message.isRead) 1 else 0
         )
     }
 
     fun messageDtoToMessage(message: MessageDto): Message {
+        Log.d("getMessagesByUserId", message.toString())
         return Message(
             id = message.id.toInt(),
             senderId = message.senderId.toInt(),
             receiverId = message.receiverId,
             content = message.content,
             timestamp = message.timestamp,
-            isRead = message.isRead
+            isRead = message.isRead == 1
         )
+    }
+
+    fun messageToCreateMessageDto(message: Message): CreateMessageDto {
+        return CreateMessageDto(
+            receiverId = message.receiverId,
+            message = message.content
+        )
+    }
+
+    fun chatListDtoToChatList(chatListDto: List<ChatListItemDto>): List<ChatListItem> {
+        val chatList = mutableListOf<ChatListItem>()
+        chatListDto.forEach { chatListItem ->
+            chatList.add(
+                ChatListItem(
+                    message = chatListItem.message,
+                    timestamp = chatListItem.timestamp,
+                    user = userDtoToUser(chatListItem.user)
+                )
+            )
+        }
+        return chatList
     }
 
     fun loginDataToLoginDataDto(loginData: LoginData): LoginDataDto {

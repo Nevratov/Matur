@@ -1,11 +1,13 @@
 package com.nevratov.matur.data.network
 
+import com.nevratov.matur.data.model.ChatListResponseDto
+import com.nevratov.matur.data.model.ChatMessagesResponse
+import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.DislikedUserDto
-import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.LoginResponseDto
-import com.nevratov.matur.data.model.MessageDto
+import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RegUserInfoDto
 import com.nevratov.matur.data.model.UsersToExploreResponseDto
 import com.nevratov.matur.domain.entity.City
@@ -44,13 +46,23 @@ interface ApiService {
         @Body likedUser: LikedUserDto
     )
 
+    @Headers("Content-Type: application/json")
     @POST("im/create")
-    suspend fun sendMessage(@Body message: MessageDto)
+    suspend fun sendMessage(
+        @Header("Authorization") token: String,
+        @Body message: CreateMessageDto
+    )
 
     @Headers("Content-Type: application/json")
-    @POST("/im/messages")
-    suspend fun getMessages(
+    @POST("im/messages")
+    suspend fun getChatMessages(
         @Header("Authorization") token: String,
         @Body messagesOptions: MessagesOptionsDto
-    ): List<MessageDto>
+    ): ChatMessagesResponse
+
+    @Headers("Content-Type: application/json")
+    @GET("im")
+    suspend fun getChatList(
+        @Header("Authorization") token: String
+    ) : ChatListResponseDto
 }

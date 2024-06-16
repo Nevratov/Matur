@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
+import com.nevratov.matur.presentation.chat.ChatViewModel
+import com.nevratov.matur.presentation.chat_list.ChatListViewModel
 import com.nevratov.matur.presentation.explore.ExploreViewModel
 import com.nevratov.matur.presentation.getApplicationComponent
 import com.nevratov.matur.presentation.main.login.LoginViewModel
@@ -25,6 +27,12 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var exploreViewModel: ExploreViewModel
 
+    @Inject
+    lateinit var chatListViewModel: ChatListViewModel
+
+    @Inject
+    lateinit var chatViewModel: ChatViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -38,7 +46,9 @@ class MainActivity : ComponentActivity() {
                     authState = authState,
                     exploreViewModel = exploreViewModel,
                     loginViewModel = loginViewModel,
-                    registrationViewModel = registrationViewModel
+                    registrationViewModel = registrationViewModel,
+                    chatListViewModel = chatListViewModel,
+                    chatViewModel = chatViewModel
                 )
             }
         }

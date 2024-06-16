@@ -32,7 +32,8 @@ class WebSocketListener (
         val gson = Gson()
         val json = gson.toJson(UserId(4))
 //        webSocket.send(json)
-        Log.d("webSocketTest", "webSocket onOpen - connected")
+        outOut("webSocket onOpen - connected")
+
 //        Log.d("webSocketTest", "webSocket onOpen - send $json")
     }
 

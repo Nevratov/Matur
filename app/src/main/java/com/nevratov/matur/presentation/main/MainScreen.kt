@@ -1,5 +1,6 @@
 package com.nevratov.matur.presentation.main
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.navigation.AppNavGraph
 import com.nevratov.matur.navigation.NavigationState
@@ -37,7 +39,8 @@ import com.nevratov.matur.presentation.main.registration.RequestDateScreen
 import com.nevratov.matur.presentation.main.registration.RequestEmailScreen
 import com.nevratov.matur.presentation.main.registration.RequestNameScreen
 import com.nevratov.matur.presentation.matches.MatchesScreen
-import com.nevratov.matur.presentation.messages.MessagesScreen
+import com.nevratov.matur.presentation.chat_list.ChatListScreen
+import com.nevratov.matur.presentation.chat_list.ChatListViewModel
 
 @Composable
 fun MainScreen(
@@ -45,7 +48,11 @@ fun MainScreen(
     exploreViewModel: ExploreViewModel,
     loginViewModel: LoginViewModel,
     registrationViewModel: RegistrationViewModel,
+    chatListViewModel: ChatListViewModel,
+    chatViewModel: ChatViewModel,
 ) {
+    Log.d("MainScreen", "REC")
+
     val navigationState = rememberNavigationState()
     val startDestination = when (authState.value) {
         AuthState.Authorized -> { Screen.Explore.route }
@@ -55,7 +62,11 @@ fun MainScreen(
 
     Scaffold(
         bottomBar = {
-            if (authState.value == AuthState.Authorized) BottomNavigationBar(navigationState)
+            val navBacStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
+            val currentRoute = navBacStackEntry?.destination?.route
+            if (authState.value == AuthState.Authorized && currentRoute != Screen.Chat.route) {
+                BottomNavigationBar(navigationState)
+            }
         }
     ) { paddingValues ->
         Box(
@@ -75,10 +86,12 @@ fun MainScreen(
                 },
                 exploreScreenContent = { ExploreScreen( viewModel = exploreViewModel ) },
                 matchesScreenContent = { MatchesScreen() },
-                chatListScreenContent = { MessagesScreen( onMessageItemClicked = {
+                chatListScreenContent = { ChatListScreen(
+                    viewModel = chatListViewModel,
+                    onMessageItemClicked = {
                     navigationState.navigateTo(Screen.Chat.route)
                 } ) },
-                chatScreenContent = { ChatScreen(viewModel = viewModel(modelClass = ChatViewModel::class.java)) },
+                chatScreenContent = { ChatScreen(viewModel = chatViewModel) },
                 profileScreenContent = { },
                 requestNameScreenContent = {
                     RequestNameScreen(
