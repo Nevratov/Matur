@@ -17,12 +17,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.navigation.AppNavGraph
 import com.nevratov.matur.navigation.NavigationState
 import com.nevratov.matur.navigation.Screen
 import com.nevratov.matur.navigation.rememberNavigationState
 import com.nevratov.matur.presentation.NavigationItem
+import com.nevratov.matur.presentation.chat.ChatScreen
+import com.nevratov.matur.presentation.chat.ChatViewModel
 import com.nevratov.matur.presentation.explore.ExploreScreen
 import com.nevratov.matur.presentation.explore.ExploreViewModel
 import com.nevratov.matur.presentation.main.login.LoginScreen
@@ -41,7 +44,7 @@ fun MainScreen(
     authState: State<AuthState>,
     exploreViewModel: ExploreViewModel,
     loginViewModel: LoginViewModel,
-    registrationViewModel: RegistrationViewModel
+    registrationViewModel: RegistrationViewModel,
 ) {
     val navigationState = rememberNavigationState()
     val startDestination = when (authState.value) {
@@ -72,7 +75,10 @@ fun MainScreen(
                 },
                 exploreScreenContent = { ExploreScreen( viewModel = exploreViewModel ) },
                 matchesScreenContent = { MatchesScreen() },
-                chatScreenContent = { MessagesScreen() },
+                chatListScreenContent = { MessagesScreen( onMessageItemClicked = {
+                    navigationState.navigateTo(Screen.Chat.route)
+                } ) },
+                chatScreenContent = { ChatScreen(viewModel = viewModel(modelClass = ChatViewModel::class.java)) },
                 profileScreenContent = { },
                 requestNameScreenContent = {
                     RequestNameScreen(

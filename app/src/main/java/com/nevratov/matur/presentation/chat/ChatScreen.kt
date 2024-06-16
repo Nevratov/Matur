@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,11 +22,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
 import com.nevratov.matur.ui.theme.Beige
 import com.nevratov.matur.ui.theme.MaturTheme
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -99,6 +103,7 @@ private fun Chat(
     userId: Int,
     onSend: (Message) -> Unit
 ) {
+    val lazyListState = rememberLazyListState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -108,7 +113,8 @@ private fun Chat(
                 .weight(1f)
                 .background(Color.Gray)
                 .padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            state = lazyListState
         ) {
             items(messages, key = { it.id }) { message ->
                 MessageItem(
@@ -144,9 +150,11 @@ private fun Chat(
             value = message,
             onValueChange = { message = it },
         )
+
+        LaunchedEffect(key1 = Unit) {
+            lazyListState.scrollToItem(messages.lastIndex)
+        }
     }
-
-
 }
 
 @Composable
@@ -312,6 +320,35 @@ private fun MessageItemPreview() {
             Message(
                 id = 18, senderId = 2, receiverId = "4",
                 content = "Как скажешь!",
+                timestamp = 1718748822, isRead = false,
+            ),
+        )
+        //
+        add(
+            Message(
+                id = 19, senderId = 2, receiverId = "4",
+                content = "Привет, как дела?  Что делаешь? Пойдём гулять вечером?",
+                timestamp = 1718308768, isRead = false,
+            ),
+        )
+        add(
+            Message(
+                id = 20, senderId = 4, receiverId = "2",
+                content = "Да, ок",
+                timestamp = 1718418799, isRead = false,
+            ),
+        )
+        add(
+            Message(
+                id = 21, senderId = 4, receiverId = "2",
+                content = "А то у меня дела есть некоторые",
+                timestamp = 1718528822, isRead = false,
+            ),
+        )
+        add(
+            Message(
+                id = 22, senderId = 2, receiverId = "4",
+                content = "Понял, хорошо, зайду тогда за тобой к восьми, до встречи, и не опаздывай, как всегда!",
                 timestamp = 1718748822, isRead = false,
             ),
         )

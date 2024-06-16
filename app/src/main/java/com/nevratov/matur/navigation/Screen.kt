@@ -20,6 +20,10 @@ sealed class Screen(val route: String) {
 
     data object Matches: Screen(MATCHES_ROUTE)
 
+    data object ChatContainer: Screen(CHAT_CONTAINER_ROUTE)
+
+    data object ChatList: Screen(CHAT_LIST_ROUTE)
+
     data object Chat: Screen(CHAT_ROUTE)
 
     data object Profile: Screen(PROFILE_ROUTE)
@@ -34,6 +38,8 @@ sealed class Screen(val route: String) {
         private const val REGISTRATION_SUCCESS_ROUTE = "registration_success"
         private const val EXPLORE_ROUTE = "explore"
         private const val MATCHES_ROUTE = "matches"
+        private const val CHAT_CONTAINER_ROUTE = "chat_container"
+        private const val CHAT_LIST_ROUTE = "chat_list"
         private const val CHAT_ROUTE = "chat"
         private const val PROFILE_ROUTE = "profile"
     }

@@ -34,7 +34,9 @@ import com.nevratov.matur.R
 import com.nevratov.matur.ui.theme.MaturTheme
 
 @Composable
-fun MessagesScreen() {
+fun MessagesScreen(
+    onMessageItemClicked: (UserProfile) -> Unit
+) {
 
     val testListMessageItems = mutableListOf<UserProfile>().apply {
         repeat(20) {

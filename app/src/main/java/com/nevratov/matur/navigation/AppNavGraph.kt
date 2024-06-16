@@ -12,6 +12,7 @@ fun AppNavGraph(
     loginScreenContent: @Composable () -> Unit,
     exploreScreenContent: @Composable () -> Unit,
     matchesScreenContent: @Composable () -> Unit,
+    chatListScreenContent: @Composable () -> Unit,
     chatScreenContent: @Composable () -> Unit,
     profileScreenContent: @Composable () -> Unit,
     requestNameScreenContent: @Composable () -> Unit,
@@ -31,7 +32,6 @@ fun AppNavGraph(
                 requestEmailScreenContent = requestEmailScreenContent,
                 registrationSuccessScreenContent = registrationSuccessScreenContent
             )
-
             composable(
                 route = Screen.Login.route,
                 content = { loginScreenContent() }
@@ -45,9 +45,9 @@ fun AppNavGraph(
                 route = Screen.Matches.route,
                 content = { matchesScreenContent() }
             )
-            composable(
-                route = Screen.Chat.route,
-                content = { chatScreenContent() }
+            chatScreenNavGraph(
+                chatListScreenContent = chatListScreenContent,
+                chatScreenContent = chatScreenContent
             )
             composable(
                 route = Screen.Profile.route,
