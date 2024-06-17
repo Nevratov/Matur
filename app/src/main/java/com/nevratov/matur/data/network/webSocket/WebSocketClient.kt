@@ -29,7 +29,7 @@ object WebSocketClient {
     }
 
 
-    private const val URL_SERVER = "wss://test.matur.app/ws"
+    private const val URL_SERVER = "wss://test.matur.app/chat"
 
 }
 

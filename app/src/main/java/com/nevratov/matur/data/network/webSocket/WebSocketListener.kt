@@ -2,6 +2,9 @@ package com.nevratov.matur.data.network.webSocket
 
 import android.util.Log
 import com.google.gson.Gson
+import com.nevratov.matur.data.Mapper
+import com.nevratov.matur.data.model.ReceivedMessageDto
+import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.presentation.chat.UserId
 import okhttp3.Response
 import okhttp3.WebSocket
@@ -9,8 +12,10 @@ import okhttp3.WebSocketListener
 
 
 class WebSocketListener (
-    private val onMessageReceived: (String) -> Unit
+    private val onMessageReceived: (Message) -> Unit
 ): WebSocketListener() {
+
+    private val mapper = Mapper()
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
         webSocket.close(NORMAL_CLOSURE_STATUS, null)
@@ -22,7 +27,9 @@ class WebSocketListener (
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
-        onMessageReceived(text)
+        val receivedMessageDto = Gson().fromJson(text, ReceivedMessageDto::class.java)
+        val message = mapper.receivedMessageDtoToMessage(receivedMessageDto)
+        onMessageReceived(message)
         outOut("Received: $text")
     }
 
@@ -30,9 +37,10 @@ class WebSocketListener (
         super.onOpen(webSocket, response)
 
         val gson = Gson()
-        val json = gson.toJson(UserId(4))
-//        webSocket.send(json)
+        val json = gson.toJson(UserId(sender_id = 1, receiver_id = 4))
+        webSocket.send(json)
         outOut("webSocket onOpen - connected")
+        outOut(json)
 
 //        Log.d("webSocketTest", "webSocket onOpen - send $json")
     }

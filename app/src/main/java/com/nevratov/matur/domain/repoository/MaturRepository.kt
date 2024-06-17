@@ -35,4 +35,6 @@ interface MaturRepository {
     fun getUser(): User
 
     fun getChatList(): StateFlow<List<ChatListItem>>
+
+    fun receiveMessage(message: Message)
 }

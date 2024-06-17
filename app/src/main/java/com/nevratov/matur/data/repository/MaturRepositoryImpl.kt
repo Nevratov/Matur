@@ -147,6 +147,7 @@ class MaturRepositoryImpl @Inject constructor(
             putString(TOKEN_KEY, token)
             apply()
         }
+        Log.d("User", "auth = ${getToken()}")
         checkAuthState()
     }
 
@@ -234,12 +235,19 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sendMessage(message: Message) {
-        _chatMessages.add(message)
-        refreshMessagesEvents.emit(Unit)
         apiService.sendMessage(
             token = getToken(),
             message = mapper.messageToCreateMessageDto(message)
         )
+        _chatMessages.add(message)
+        refreshMessagesEvents.emit(Unit)
+    }
+
+    override fun receiveMessage(message: Message) {
+        coroutineScope.launch {
+            _chatMessages.add(message)
+            refreshMessagesEvents.emit(Unit)
+        }
     }
 
     override fun getChatList(): StateFlow<List<ChatListItem>> = flow {

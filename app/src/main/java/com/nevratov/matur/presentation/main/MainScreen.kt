@@ -73,7 +73,7 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+//                .padding(16.dp)
         ) {
             AppNavGraph(
                 navHostController = navigationState.navHostController,

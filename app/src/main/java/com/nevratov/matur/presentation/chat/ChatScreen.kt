@@ -57,14 +57,13 @@ fun ChatScreen(
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val maxWidthItem = screenWidth * 0.85f
+    val maxWidthItem = screenWidth * 0.80f
 
     ChatScreenContent(
         screenState = screenState,
         maxWidthItem = maxWidthItem,
         viewModel = viewModel
     )
-
 }
 
 @Composable
@@ -142,7 +141,7 @@ private fun Chat(
                         Message(
                             id = 0,
                             senderId = userId,
-                            receiverId = "2",
+                            receiverId = "4",
                             content = message,
                             timestamp = System.currentTimeMillis(),
                             isRead = false

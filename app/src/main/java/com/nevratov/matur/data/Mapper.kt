@@ -1,5 +1,6 @@
 package com.nevratov.matur.data
 
+import android.icu.util.Calendar
 import android.util.Log
 import com.nevratov.matur.data.model.ChatListItemDto
 import com.nevratov.matur.data.model.CreateMessageDto
@@ -8,6 +9,7 @@ import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
+import com.nevratov.matur.data.model.ReceivedMessageDto
 import com.nevratov.matur.data.model.RegUserInfoDto
 import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.domain.entity.User
@@ -16,6 +18,10 @@ import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.Genders
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlin.random.Random
 
 class Mapper {
 
@@ -105,6 +111,20 @@ class Mapper {
             )
         }
         return chatList
+    }
+
+    fun receivedMessageDtoToMessage(receivedMessageDto: ReceivedMessageDto): Message {
+        val timestamp = System.currentTimeMillis()
+
+        return Message(
+            id = Random.nextInt(100, 1000000),
+            senderId = receivedMessageDto.senderId,
+            receiverId = receivedMessageDto.receiverId.toString(),
+            content = receivedMessageDto.message,
+            timestamp = timestamp,
+            isRead = false
+
+        )
     }
 
     fun loginDataToLoginDataDto(loginData: LoginData): LoginDataDto {
