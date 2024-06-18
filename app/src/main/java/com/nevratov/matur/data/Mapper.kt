@@ -1,6 +1,5 @@
 package com.nevratov.matur.data
 
-import android.icu.util.Calendar
 import android.util.Log
 import com.nevratov.matur.data.model.ChatListItemDto
 import com.nevratov.matur.data.model.CreateMessageDto
@@ -9,8 +8,9 @@ import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
-import com.nevratov.matur.data.model.ReceivedMessageDto
+import com.nevratov.matur.data.model.ReceivedMessageWSDto
 import com.nevratov.matur.data.model.RegUserInfoDto
+import com.nevratov.matur.data.model.SendMessageWSDto
 import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.chat.Message
@@ -18,9 +18,6 @@ import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.Genders
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlin.random.Random
 
 class Mapper {
@@ -113,7 +110,7 @@ class Mapper {
         return chatList
     }
 
-    fun receivedMessageDtoToMessage(receivedMessageDto: ReceivedMessageDto): Message {
+    fun receivedMessageDtoToMessage(receivedMessageDto: ReceivedMessageWSDto): Message {
         val timestamp = System.currentTimeMillis()
 
         return Message(
@@ -124,6 +121,14 @@ class Mapper {
             timestamp = timestamp,
             isRead = false
 
+        )
+    }
+
+    fun messageToSendMessageDto(message: Message): SendMessageWSDto {
+        return SendMessageWSDto(
+            senderId = message.senderId,
+            receiverId = message.receiverId.toInt(),
+            message = message.content
         )
     }
 

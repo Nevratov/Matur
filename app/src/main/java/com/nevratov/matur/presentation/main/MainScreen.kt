@@ -16,18 +16,20 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.navigation.AppNavGraph
 import com.nevratov.matur.navigation.NavigationState
 import com.nevratov.matur.navigation.Screen
 import com.nevratov.matur.navigation.rememberNavigationState
+import com.nevratov.matur.presentation.MaturApplication
 import com.nevratov.matur.presentation.NavigationItem
 import com.nevratov.matur.presentation.chat.ChatScreen
 import com.nevratov.matur.presentation.chat.ChatViewModel
+import com.nevratov.matur.presentation.chat_list.ChatListScreen
+import com.nevratov.matur.presentation.chat_list.ChatListViewModel
 import com.nevratov.matur.presentation.explore.ExploreScreen
 import com.nevratov.matur.presentation.explore.ExploreViewModel
 import com.nevratov.matur.presentation.main.login.LoginScreen
@@ -39,8 +41,8 @@ import com.nevratov.matur.presentation.main.registration.RequestDateScreen
 import com.nevratov.matur.presentation.main.registration.RequestEmailScreen
 import com.nevratov.matur.presentation.main.registration.RequestNameScreen
 import com.nevratov.matur.presentation.matches.MatchesScreen
-import com.nevratov.matur.presentation.chat_list.ChatListScreen
-import com.nevratov.matur.presentation.chat_list.ChatListViewModel
+
+lateinit var chatViewModel: ChatViewModel
 
 @Composable
 fun MainScreen(
@@ -48,17 +50,26 @@ fun MainScreen(
     exploreViewModel: ExploreViewModel,
     loginViewModel: LoginViewModel,
     registrationViewModel: RegistrationViewModel,
-    chatListViewModel: ChatListViewModel,
-    chatViewModel: ChatViewModel,
+    chatListViewModel: ChatListViewModel
 ) {
     Log.d("MainScreen", "REC")
 
     val navigationState = rememberNavigationState()
     val startDestination = when (authState.value) {
-        AuthState.Authorized -> { Screen.Explore.route }
-        AuthState.NotAuthorized -> { Screen.Login.route }
-        AuthState.Initial -> { return }
+        AuthState.Authorized -> {
+            Screen.Explore.route
+        }
+
+        AuthState.NotAuthorized -> {
+            Screen.Login.route
+        }
+
+        AuthState.Initial -> {
+            return
+        }
     }
+
+    val component = (LocalContext.current.applicationContext as MaturApplication).component
 
     Scaffold(
         bottomBar = {
@@ -84,14 +95,18 @@ fun MainScreen(
                         createAccountClicked = { navigationState.navigateTo(Screen.RequestName.route) }
                     )
                 },
-                exploreScreenContent = { ExploreScreen( viewModel = exploreViewModel ) },
+                exploreScreenContent = { ExploreScreen(viewModel = exploreViewModel) },
                 matchesScreenContent = { MatchesScreen() },
-                chatListScreenContent = { ChatListScreen(
-                    viewModel = chatListViewModel,
-                    onMessageItemClicked = {
-                    navigationState.navigateTo(Screen.Chat.route)
-                } ) },
-                chatScreenContent = { ChatScreen(viewModel = chatViewModel) },
+                chatListScreenContent = {
+                    ChatListScreen(
+                        viewModel = chatListViewModel,
+                        onMessageItemClicked = {
+                            chatViewModel = component.chatListComponentFactory().create(it.user.id)
+                                .getViewModel()
+                            navigationState.navigateTo(Screen.Chat.route)
+                        })
+                },
+                chatScreenContent = { ChatScreen(chatViewModel) },
                 profileScreenContent = { },
                 requestNameScreenContent = {
                     RequestNameScreen(

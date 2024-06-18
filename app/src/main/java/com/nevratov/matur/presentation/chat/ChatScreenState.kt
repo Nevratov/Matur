@@ -6,5 +6,9 @@ sealed class ChatScreenState {
 
     data object Loading: ChatScreenState()
 
-    data class Content(val messages: List<Message>, val userId: Int): ChatScreenState()
+    data class Content(
+        val messages: List<Message>,
+        val userId: Int,
+        val receiverId: Int
+    ): ChatScreenState()
 }

@@ -2,7 +2,6 @@ package com.nevratov.matur.presentation.chat
 
 //Test class / to delete
 data class UserId(
-    val sender_id: Int,
-    val receiver_id: Int
+    val sender_id: Int
 
 )

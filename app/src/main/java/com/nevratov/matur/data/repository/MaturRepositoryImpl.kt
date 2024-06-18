@@ -6,6 +6,8 @@ import android.util.Log
 import com.google.gson.Gson
 import com.nevratov.matur.data.Mapper
 import com.nevratov.matur.data.network.ApiFactory
+import com.nevratov.matur.data.network.webSocket.WebSocketClient
+import com.nevratov.matur.data.network.webSocket.WebSocketListener
 import com.nevratov.matur.di.ApplicationScope
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.domain.entity.User
@@ -20,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,9 +48,12 @@ class MaturRepositoryImpl @Inject constructor(
         checkAuthStateEvents.collect {
             val user = getUserOrNull()
             val isLoggedIn = user != null
-            if (isLoggedIn) emit(AuthState.Authorized) else emit(AuthState.NotAuthorized)
-//            emit(AuthState.Authorized) // delete, for test
-
+            if (isLoggedIn) {
+                connectToWS()
+                emit(AuthState.Authorized)
+            } else {
+                emit(AuthState.NotAuthorized)
+            }
         }
     }.stateIn(
         scope = coroutineScope,
@@ -129,6 +135,14 @@ class MaturRepositoryImpl @Inject constructor(
             initialValue = null
         )
 
+    // ChatList Screen Items
+
+    private val _chatList = mutableListOf<ChatListItem>()
+    private val chatList: List<ChatListItem>
+        get() = _chatList.toList()
+
+    private val chatListRefreshEvents = MutableSharedFlow<Unit>()
+
     // Get Messages for Chat Screen
 
     private val _chatMessages = mutableListOf<Message>()
@@ -136,6 +150,17 @@ class MaturRepositoryImpl @Inject constructor(
         get() = _chatMessages.toList()
 
     private val refreshMessagesEvents = MutableSharedFlow<Unit>()
+
+    // WebSocket
+
+    private val webSocketClient = WebSocketClient
+
+    private fun receiveMessage(message: Message) {
+        coroutineScope.launch {
+            _chatMessages.add(message)
+            refreshMessagesEvents.emit(Unit)
+        }
+    }
 
     // Save User in cache with SharedPreferences
 
@@ -239,25 +264,35 @@ class MaturRepositoryImpl @Inject constructor(
             token = getToken(),
             message = mapper.messageToCreateMessageDto(message)
         )
-        _chatMessages.add(message)
-        refreshMessagesEvents.emit(Unit)
-    }
 
-    override fun receiveMessage(message: Message) {
-        coroutineScope.launch {
-            _chatMessages.add(message)
-            refreshMessagesEvents.emit(Unit)
-        }
+        val messageToSend = mapper.messageToSendMessageDto(message)
+        val messageJson = Gson().toJson(messageToSend)
+        webSocketClient.send(messageJson)
+
+        _chatMessages.add(message.copy(id = _chatMessages.size))
+        refreshMessagesEvents.emit(Unit)
     }
 
     override fun getChatList(): StateFlow<List<ChatListItem>> = flow {
         val chatListDto = apiService.getChatList(token = getToken()).chatList
         emit(mapper.chatListDtoToChatList(chatListDto))
+        chatListRefreshEvents.collect {
+
+        }
     }.stateIn(
         scope = coroutineScope,
         started = SharingStarted.Lazily,
         initialValue = listOf()
     )
+
+    override fun connectToWS() {
+        webSocketClient.connect(listener = WebSocketListener(
+            onMessageReceived = {
+                receiveMessage(message = it)
+            },
+            senderId = getUserOrNull()?.id ?: throw RuntimeException("User == null")
+        ))
+    }
 
     override suspend fun registration(regUserInfo: RegUserInfo) {
         apiService.registerUser(mapper.regUserInfoToRegUserInfoDto(regUserInfo))

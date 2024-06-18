@@ -30,9 +30,6 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var chatListViewModel: ChatListViewModel
 
-    @Inject
-    lateinit var chatViewModel: ChatViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -47,8 +44,7 @@ class MainActivity : ComponentActivity() {
                     exploreViewModel = exploreViewModel,
                     loginViewModel = loginViewModel,
                     registrationViewModel = registrationViewModel,
-                    chatListViewModel = chatListViewModel,
-                    chatViewModel = chatViewModel
+                    chatListViewModel = chatListViewModel
                 )
             }
         }

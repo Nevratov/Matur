@@ -4,9 +4,9 @@ import com.nevratov.matur.domain.repoository.MaturRepository
 import com.nevratov.matur.presentation.chat.Message
 import javax.inject.Inject
 
-class ReceiveMessageUseCase @Inject constructor(
-    private val repository: MaturRepository
-) {
-
-    operator fun invoke(message: Message) = repository.receiveMessage(message)
-}
+//class ReceiveMessageUseCase @Inject constructor(
+//    private val repository: MaturRepository
+//) {
+//
+//    operator fun invoke(message: Message) = repository.receiveMessage(message)
+//}

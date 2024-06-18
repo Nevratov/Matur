@@ -36,5 +36,7 @@ interface MaturRepository {
 
     fun getChatList(): StateFlow<List<ChatListItem>>
 
-    fun receiveMessage(message: Message)
+//    fun receiveMessage(message: Message)
+
+    fun connectToWS()
 }
