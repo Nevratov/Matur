@@ -22,7 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -67,7 +66,7 @@ class MaturRepositoryImpl @Inject constructor(
 
         repeat(19) {
 
-            val url = if(Random.nextBoolean()) {
+            val url = if (Random.nextBoolean()) {
                 "https://i.pinimg.com/736x/e8/45/14/e84514699a36c54b570359d52b0ef83f.jpg"
             } else {
                 "https://celes.club/uploads/posts/2021-11/1638298686_53-celes-club-p-malenkii-barashek-zhivotnie-krasivo-foto-58.jpg"
@@ -121,7 +120,7 @@ class MaturRepositoryImpl @Inject constructor(
 //            }
 //            emit(exploreUsers)
         refreshExploreUsersEvents.emit(Unit)
-        refreshExploreUsersEvents.collect{
+        refreshExploreUsersEvents.collect {
 //            emit(listOf())
 //            delay(10)
 
@@ -141,7 +140,7 @@ class MaturRepositoryImpl @Inject constructor(
     private val chatList: List<ChatListItem>
         get() = _chatList.toList()
 
-    private val chatListRefreshEvents = MutableSharedFlow<Unit>()
+    private val chatListRefreshEvents = MutableSharedFlow<Message>()
 
     // Get Messages for Chat Screen
 
@@ -159,6 +158,8 @@ class MaturRepositoryImpl @Inject constructor(
         coroutineScope.launch {
             _chatMessages.add(message)
             refreshMessagesEvents.emit(Unit)
+
+            chatListRefreshEvents.emit(message)
         }
     }
 
@@ -245,7 +246,7 @@ class MaturRepositoryImpl @Inject constructor(
         val messages = mutableListOf<Message>()
         Log.d("getMessagesByUserId", "dtoMes = ${messagesDto}")
 
-        for (indexMessage in messagesDto.lastIndex downTo  0) {
+        for (indexMessage in messagesDto.lastIndex downTo 0) {
             val message = messagesDto[indexMessage]
             messages.add(mapper.messageDtoToMessage(message))
         }
@@ -275,9 +276,21 @@ class MaturRepositoryImpl @Inject constructor(
 
     override fun getChatList(): StateFlow<List<ChatListItem>> = flow {
         val chatListDto = apiService.getChatList(token = getToken()).chatList
-        emit(mapper.chatListDtoToChatList(chatListDto))
-        chatListRefreshEvents.collect {
+        val downloadedChatList = mapper.chatListDtoToChatList(chatListDto)
+        _chatList.addAll(downloadedChatList)
+        emit(downloadedChatList)
 
+        chatListRefreshEvents.collect { newMessage ->
+            _chatList.apply {
+                val chatListItem = find { it.user.id == newMessage.senderId }
+                val newChatListItem = chatListItem?.copy(
+                    message = newMessage.content,
+                    timestamp = newMessage.timestamp
+                )
+                remove(chatListItem)
+                newChatListItem?.let { add(it) }
+            }
+            emit(chatList.sortedByDescending { it.timestamp })
         }
     }.stateIn(
         scope = coroutineScope,
@@ -286,12 +299,14 @@ class MaturRepositoryImpl @Inject constructor(
     )
 
     override fun connectToWS() {
-        webSocketClient.connect(listener = WebSocketListener(
-            onMessageReceived = {
-                receiveMessage(message = it)
-            },
-            senderId = getUserOrNull()?.id ?: throw RuntimeException("User == null")
-        ))
+        webSocketClient.connect(
+            listener = WebSocketListener(
+                onMessageReceived = {
+                    receiveMessage(message = it)
+                },
+                senderId = getUserOrNull()?.id ?: throw RuntimeException("User == null")
+            )
+        )
     }
 
     override suspend fun registration(regUserInfo: RegUserInfo) {

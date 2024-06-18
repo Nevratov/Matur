@@ -1,5 +1,6 @@
 package com.nevratov.matur.presentation.chat_list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.nevratov.matur.domain.usecases.GetChatListUseCase
 import kotlinx.coroutines.flow.map
@@ -11,6 +12,9 @@ class ChatListViewModel @Inject constructor(
 ): ViewModel() {
 
     val state = getChatListUseCase()
-        .map { ChatListScreenState.Content(chatList = it) }
+        .map {
+            Log.d("webSocketTest", "map = $it")
+            ChatListScreenState.Content(chatList = it)
+        }
         .onStart { ChatListScreenState.Loading }
 }
