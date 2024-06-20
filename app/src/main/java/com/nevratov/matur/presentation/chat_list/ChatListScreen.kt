@@ -84,7 +84,9 @@ private fun ChatList(
     onMessageItemClicked: (ChatListItem) -> Unit
 ) {
 
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    LazyColumn(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item {
             Text(
                 text = stringResource(R.string.messages_label),

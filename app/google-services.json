@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1080271862546",
+    "project_id": "matur-app",
+    "storage_bucket": "matur-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1080271862546:android:e466f990ac49cd745911cb",
+        "android_client_info": {
+          "package_name": "com.nevratov.matur"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfo5_yMS_pIlUAilO0osaG3xXCknnxZbE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

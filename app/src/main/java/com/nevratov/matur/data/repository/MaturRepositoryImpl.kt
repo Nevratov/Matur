@@ -3,6 +3,8 @@ package com.nevratov.matur.data.repository
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.nevratov.matur.data.Mapper
 import com.nevratov.matur.data.network.ApiFactory
@@ -50,6 +52,10 @@ class MaturRepositoryImpl @Inject constructor(
             if (isLoggedIn) {
                 connectToWS()
                 emit(AuthState.Authorized)
+
+                //Test FCM
+                firebaseGetInstance()
+
             } else {
                 emit(AuthState.NotAuthorized)
             }
@@ -145,10 +151,24 @@ class MaturRepositoryImpl @Inject constructor(
     // Get Messages for Chat Screen
 
     private val _chatMessages = mutableListOf<Message>()
-    val chatMessages: List<Message>
+    private val chatMessages: List<Message>
         get() = _chatMessages.toList()
 
     private val refreshMessagesEvents = MutableSharedFlow<Unit>()
+
+    // Firebase Messaging
+
+    private fun firebaseGetInstance() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+            val token = task.result
+            Log.d("FCM", "token = $token")
+        })
+    }
+
 
     // WebSocket
 
@@ -244,14 +264,11 @@ class MaturRepositoryImpl @Inject constructor(
 
 
         val messages = mutableListOf<Message>()
-        Log.d("getMessagesByUserId", "dtoMes = ${messagesDto}")
 
         for (indexMessage in messagesDto.lastIndex downTo 0) {
             val message = messagesDto[indexMessage]
             messages.add(mapper.messageDtoToMessage(message))
         }
-
-        Log.d("getMessagesByUserId", "mes = $messages")
 
         _chatMessages.addAll(messages)
         emit(chatMessages)
