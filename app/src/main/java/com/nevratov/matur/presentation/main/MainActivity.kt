@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
-import com.nevratov.matur.presentation.chat.ChatViewModel
 import com.nevratov.matur.presentation.chat_list.ChatListViewModel
 import com.nevratov.matur.presentation.explore.ExploreViewModel
 import com.nevratov.matur.presentation.getApplicationComponent

@@ -7,6 +7,6 @@ data class MessageDto(
     @SerializedName("sender_id") val senderId: String,
     @SerializedName("receiver_id") val receiverId: String,
     @SerializedName("content") val content: String,
-    @SerializedName("created_at") val timestamp: Long,
+    @SerializedName("created_at") val timestampSec: Long,
     @SerializedName("is_read") val isRead: Int
 )

@@ -18,6 +18,6 @@ data class Message(
         time = Date(timestamp)
     }
     private val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-    val time = dateFormat.format(calendar.time)
+    val time: String = dateFormat.format(calendar.time)
 }
 

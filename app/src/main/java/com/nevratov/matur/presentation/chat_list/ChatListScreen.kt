@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -28,14 +29,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
+import com.nevratov.matur.presentation.chat.Message
 
 @Composable
 fun ChatListScreen(
@@ -47,26 +49,31 @@ fun ChatListScreen(
 
     ChatListContent(
         state = screenState,
-        onMessageItemClicked = onMessageItemClicked
+        onMessageItemClicked = onMessageItemClicked,
+        userId = viewModel.getUser().id
     )
 }
 
 @Composable
 private fun ChatListContent(
     state: State<ChatListScreenState>,
-    onMessageItemClicked: (ChatListItem) -> Unit
+    onMessageItemClicked: (ChatListItem) -> Unit,
+    userId: Int
 ) {
 
     when (val currentState = state.value) {
         is ChatListScreenState.Content -> {
             ChatList(
                 chatList = currentState.chatList,
-                onMessageItemClicked = onMessageItemClicked
+                onMessageItemClicked = onMessageItemClicked,
+                userId = userId
             )
         }
+
         ChatListScreenState.Initial -> {
 
         }
+
         ChatListScreenState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -81,12 +88,14 @@ private fun ChatListContent(
 @Composable
 private fun ChatList(
     chatList: List<ChatListItem>,
-    onMessageItemClicked: (ChatListItem) -> Unit
+    onMessageItemClicked: (ChatListItem) -> Unit,
+    userId: Int
 ) {
 
     LazyColumn(
         modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         item {
             Text(
                 text = stringResource(R.string.messages_label),
@@ -95,10 +104,11 @@ private fun ChatList(
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
-        items(items = chatList, key = { it.user.id }) {chatListItem ->
+        items(items = chatList, key = { it.user.id }) { chatListItem ->
             MessageItem(
                 chatListItem = chatListItem,
-                onMessageItemClicked = onMessageItemClicked
+                onMessageItemClicked = onMessageItemClicked,
+                userId = userId
             )
         }
     }
@@ -108,7 +118,8 @@ private fun ChatList(
 @Composable
 fun MessageItem(
     chatListItem: ChatListItem,
-    onMessageItemClicked: (ChatListItem) -> Unit
+    onMessageItemClicked: (ChatListItem) -> Unit,
+    userId: Int
 ) {
 
     Row(modifier = Modifier
@@ -140,13 +151,42 @@ fun MessageItem(
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = chatListItem.message,
+                text = chatListItem.message.content,
                 fontSize = 12.sp,
                 color = Color.Gray,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            MessageTimeAndIsRead(message = chatListItem.message, userId = userId)
+        }
     }
 }
+
+@Composable
+private fun MessageTimeAndIsRead(
+    message: Message,
+    userId: Int
+) {
+    val icoId = if (message.isRead) R.drawable.check_mark_double else R.drawable.check_mark
+    if (userId == message.senderId) {
+        Icon(
+            modifier = Modifier.size(22.dp).padding(end = 4.dp),
+            painter = painterResource(id = icoId),
+            contentDescription = null
+        )
+    }
+    Text(
+        text = message.time,
+        fontSize = 11.sp,
+        color = Color.Gray
+    )
+}
+
+
 

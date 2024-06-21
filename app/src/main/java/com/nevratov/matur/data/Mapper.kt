@@ -72,7 +72,7 @@ class Mapper {
             senderId = message.senderId.toString(),
             receiverId = message.receiverId,
             content = message.content,
-            timestamp = message.timestamp,
+            timestampSec = message.timestamp,
             isRead = if (message.isRead) 1 else 0
         )
     }
@@ -84,7 +84,7 @@ class Mapper {
             senderId = message.senderId.toInt(),
             receiverId = message.receiverId,
             content = message.content,
-            timestamp = message.timestamp,
+            timestamp = message.timestampSec * 1000,
             isRead = message.isRead == 1
         )
     }
@@ -101,8 +101,7 @@ class Mapper {
         chatListDto.forEach { chatListItem ->
             chatList.add(
                 ChatListItem(
-                    message = chatListItem.message,
-                    timestamp = chatListItem.timestamp,
+                    message = messageDtoToMessage(chatListItem.message),
                     user = userDtoToUser(chatListItem.user)
                 )
             )

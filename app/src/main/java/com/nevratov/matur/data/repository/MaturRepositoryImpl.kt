@@ -295,19 +295,20 @@ class MaturRepositoryImpl @Inject constructor(
         val chatListDto = apiService.getChatList(token = getToken()).chatList
         val downloadedChatList = mapper.chatListDtoToChatList(chatListDto)
         _chatList.addAll(downloadedChatList)
+        Log.d("getChatList", downloadedChatList.toString())
         emit(downloadedChatList)
 
         chatListRefreshEvents.collect { newMessage ->
             _chatList.apply {
                 val chatListItem = find { it.user.id == newMessage.senderId }
                 val newChatListItem = chatListItem?.copy(
-                    message = newMessage.content,
-                    timestamp = newMessage.timestamp
+                    message = newMessage,
                 )
                 remove(chatListItem)
                 newChatListItem?.let { add(it) }
             }
-            emit(chatList.sortedByDescending { it.timestamp })
+
+            emit(chatList.sortedByDescending { it.message.timestamp })
         }
     }.stateIn(
         scope = coroutineScope,
