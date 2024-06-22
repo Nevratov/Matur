@@ -9,6 +9,8 @@ sealed class ChatScreenState {
     data class Content(
         val messages: List<Message>,
         val userId: Int,
-        val receiverId: Int
+        val receiverId: Int,
+        val loadNextMessages: Boolean = false,
+        val isNextMessages: Boolean = true
     ): ChatScreenState()
 }

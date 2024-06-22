@@ -1,6 +1,8 @@
 package com.nevratov.matur.presentation.chat
 
 import android.util.Log
+import android.view.Gravity
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,31 +23,37 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
 import com.nevratov.matur.ui.theme.Beige
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatScreen(
@@ -77,8 +85,11 @@ private fun ChatScreenContent(
                 maxWidthItem = maxWidthItem,
                 userId = currentState.userId,
                 receiverId = currentState.receiverId,
-                onSend = { viewModel.sendMessage(it) }
+                loadNextMessages = currentState.loadNextMessages,
+                viewModel = viewModel
             )
+            if (!currentState.isNextMessages) viewModel.showToast()
+            Log.d("getMessagesByUserId", currentState.isNextMessages.toString())
         }
 
         ChatScreenState.Initial -> {
@@ -87,6 +98,7 @@ private fun ChatScreenContent(
 
         ChatScreenState.Loading -> {
             Box(
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -101,7 +113,8 @@ private fun Chat(
     maxWidthItem: Dp,
     userId: Int,
     receiverId: Int,
-    onSend: (Message) -> Unit
+    loadNextMessages: Boolean,
+    viewModel: ChatViewModel
 ) {
     Log.d("Chat", "REC")
     val lazyListState = rememberLazyListState()
@@ -110,6 +123,7 @@ private fun Chat(
             .fillMaxSize()
     ) {
         LazyColumn(
+            reverseLayout = true,
             modifier = Modifier
                 .weight(1f)
                 .background(Color.Gray)
@@ -124,6 +138,29 @@ private fun Chat(
                     userId = userId
                 )
             }
+            item {
+                if (loadNextMessages) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator() }
+                } else {
+                    SideEffect {
+                        Log.d("getMessagesByUserId", "SideEffect")
+                        viewModel.loadNextMessages()
+                    }
+                }
+            }
+        }
+
+
+        LaunchedEffect(key1 = messages.size) {
+                Log.d("Chat", messages.size.toString())
+                lazyListState.scrollToItem(0)
+
         }
 
         var message by remember {
@@ -137,7 +174,7 @@ private fun Chat(
             keyboardActions = KeyboardActions(
                 onSend = {
                     if (message.isEmpty()) return@KeyboardActions
-                    onSend(
+                    viewModel.sendMessage( message =
                         Message(
                             id = 0,
                             senderId = userId,
@@ -153,11 +190,9 @@ private fun Chat(
             value = message,
             onValueChange = { message = it },
         )
-
-        LaunchedEffect(key1 = messages.size) {
-            lazyListState.scrollToItem(messages.lastIndex)
-        }
     }
+
+
 }
 
 @Composable
@@ -213,10 +248,11 @@ private fun MessageTimeAndIsRead(
     )
     if (userId == message.senderId) {
         Icon(
-            modifier = Modifier.size(18.dp).padding(start = 4.dp),
+            modifier = Modifier
+                .size(18.dp)
+                .padding(start = 4.dp),
             painter = painterResource(id = icoId),
             contentDescription = null
         )
     }
 }
-

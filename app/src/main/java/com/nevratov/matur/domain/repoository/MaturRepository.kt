@@ -37,4 +37,6 @@ interface MaturRepository {
     fun getChatList(): StateFlow<List<ChatListItem>>
 
     fun connectToWS()
+
+    suspend fun loadNextMessages(messagesWithId: Int): Boolean
 }

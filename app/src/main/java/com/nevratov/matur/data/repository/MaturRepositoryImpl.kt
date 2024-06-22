@@ -154,9 +154,16 @@ class MaturRepositoryImpl @Inject constructor(
     private val chatMessages: List<Message>
         get() = _chatMessages.toList()
 
-    private val refreshMessagesEvents = MutableSharedFlow<Unit>()
+    private val refreshMessagesEvents = MutableSharedFlow<Unit>(replay = 1)
 
-    // Firebase Messaging
+    private var dialogPage = DEFAULT_PAGE
+
+    private fun resetSettings() {
+        _chatMessages.clear()
+        dialogPage = DEFAULT_PAGE
+    }
+
+    // Firebase Cloud Messaging
 
     private fun firebaseGetInstance() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -176,9 +183,8 @@ class MaturRepositoryImpl @Inject constructor(
 
     private fun receiveMessage(message: Message) {
         coroutineScope.launch {
-            _chatMessages.add(message)
+            _chatMessages.add(index = 0, element = message)
             refreshMessagesEvents.emit(Unit)
-
             chatListRefreshEvents.emit(message)
         }
     }
@@ -254,27 +260,35 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     override fun getMessagesByUserId(id: Int) = flow {
-        _chatMessages.clear()
-        val messagesOptions = mapper.toMessagesOptionsDto(id)
+        resetSettings()
 
-        val messagesDto = apiService.getChatMessages(
-            token = getToken(),
-            messagesOptions = messagesOptions
-        ).chatMessages
-
-
-        val messages = mutableListOf<Message>()
-
-        for (indexMessage in messagesDto.lastIndex downTo 0) {
-            val message = messagesDto[indexMessage]
-            messages.add(mapper.messageDtoToMessage(message))
-        }
-
-        _chatMessages.addAll(messages)
-        emit(chatMessages)
+        loadNextMessages(messagesWithId = id)
         refreshMessagesEvents.collect {
             emit(chatMessages)
         }
+    }
+
+    override suspend fun loadNextMessages(messagesWithId: Int): Boolean {
+        val options = mapper.toMessagesOptionsDto(
+            messagesWithUserId = messagesWithId,
+            page = dialogPage++
+        )
+
+        val messagesDto = apiService.getChatMessages(
+            token = getToken(),
+            messagesOptions = options
+        ).chatMessages
+
+        if (messagesDto.isEmpty()) return false
+
+        val messages = mutableListOf<Message>()
+        messagesDto.forEach {
+            messages.add(mapper.messageDtoToMessage(it))
+        }
+        _chatMessages.addAll(messages)
+
+        refreshMessagesEvents.emit(Unit)
+        return true
     }
 
     override suspend fun sendMessage(message: Message) {
@@ -287,7 +301,7 @@ class MaturRepositoryImpl @Inject constructor(
         val messageJson = Gson().toJson(messageToSend)
         webSocketClient.send(messageJson)
 
-        _chatMessages.add(message.copy(id = _chatMessages.size))
+        _chatMessages.add(index = 0, element = message.copy(id = _chatMessages.size + 100))
         refreshMessagesEvents.emit(Unit)
     }
 
@@ -340,5 +354,6 @@ class MaturRepositoryImpl @Inject constructor(
     companion object {
         private const val USER_KEY = "user_data"
         private const val TOKEN_KEY = "token"
+        private const val DEFAULT_PAGE = 1
     }
 }

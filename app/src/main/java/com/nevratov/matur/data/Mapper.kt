@@ -78,7 +78,6 @@ class Mapper {
     }
 
     fun messageDtoToMessage(message: MessageDto): Message {
-        Log.d("getMessagesByUserId", message.toString())
         return Message(
             id = message.id.toInt(),
             senderId = message.senderId.toInt(),
@@ -143,10 +142,10 @@ class Mapper {
     fun userToLikedUserDto(user: User) = LikedUserDto(userId = user.id)
 
 
-    fun toMessagesOptionsDto(messagesWithUserId: Int) = MessagesOptionsDto(
+    fun toMessagesOptionsDto(messagesWithUserId: Int, page: Int) = MessagesOptionsDto(
         messagesWithUserId = messagesWithUserId.toString(),
         pageSize = "100",
-        page = "1"
+        page = page.toString()
     )
 
     private fun getBirthday(day: String, month: String, year: String) = "$year-$month-$day"
