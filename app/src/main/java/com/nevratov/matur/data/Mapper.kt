@@ -112,7 +112,7 @@ class Mapper {
         val timestamp = System.currentTimeMillis()
 
         return Message(
-            id = Random.nextInt(100, 1000000),
+            id = Random.nextInt(10000, 1000000),
             senderId = receivedMessageDto.senderId,
             receiverId = receivedMessageDto.receiverId.toString(),
             content = receivedMessageDto.message,

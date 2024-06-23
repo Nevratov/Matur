@@ -33,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -118,6 +119,9 @@ private fun Chat(
 ) {
     Log.d("Chat", "REC")
     val lazyListState = rememberLazyListState()
+    var lastMessage by remember {
+        mutableStateOf(messages.first())
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -132,6 +136,7 @@ private fun Chat(
             state = lazyListState
         ) {
             items(messages, key = { it.id }) { message ->
+                Log.d("LazyColumnId", "message = ${message.content}, messageId = ${message.id}")
                 MessageItem(
                     message = message,
                     maxWidthItem = maxWidthItem,
@@ -149,7 +154,7 @@ private fun Chat(
                     ) { CircularProgressIndicator() }
                 } else {
                     SideEffect {
-                        Log.d("getMessagesByUserId", "SideEffect")
+                        Log.d("messageId", "SideEffect")
                         viewModel.loadNextMessages()
                     }
                 }
@@ -157,9 +162,14 @@ private fun Chat(
         }
 
 
+
         LaunchedEffect(key1 = messages.size) {
-                Log.d("Chat", messages.size.toString())
-                lazyListState.scrollToItem(0)
+                Log.d("Chat", "lastMessage = $lastMessage")
+                if (lastMessage != messages.first()) {
+                    lazyListState.scrollToItem(FIRST_ELEMENT)
+                }
+            lastMessage = messages.first()
+            Log.d("Chat", "lastMessage = $lastMessage")
 
         }
 
@@ -256,3 +266,5 @@ private fun MessageTimeAndIsRead(
         )
     }
 }
+
+private const val FIRST_ELEMENT = 0

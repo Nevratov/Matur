@@ -40,7 +40,6 @@ class ChatViewModel @Inject constructor(
         )
 
     private val userId = getUserUseCase().id
-    private var toast: Toast? = null
 
     fun sendMessage(message: Message) {
         viewModelScope.launch {
@@ -50,6 +49,7 @@ class ChatViewModel @Inject constructor(
 
     fun loadNextMessages() {
         val currentState = chatScreenState.value as ChatScreenState.Content
+        if (!currentState.isNextMessages) return
         viewModelScope.launch {
             loadNextMessagesFlow.emit(currentState.copy(loadNextMessages = true, isNextMessages = true))
             val isNextMessages = loadNextMessagesUseCase(messagesWithId = receiverId)
@@ -61,9 +61,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun showToast() {
-        toast?.cancel()
-        toast = Toast.makeText(application, "Вы достигли конца диалога", Toast.LENGTH_LONG).apply {
-            show()
-        }
+        Toast.makeText(application, "Вы достигли конца диалога", Toast.LENGTH_LONG).show()
     }
+
 }
