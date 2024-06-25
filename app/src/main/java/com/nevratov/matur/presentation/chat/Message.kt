@@ -8,7 +8,7 @@ import java.util.Locale
 data class Message(
     val id: Int,
     val senderId: Int,
-    val receiverId: String,
+    val receiverId: Int,
     val content: String,
     val timestamp: Long,
     val isRead: Boolean

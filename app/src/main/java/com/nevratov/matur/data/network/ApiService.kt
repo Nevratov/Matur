@@ -9,6 +9,7 @@ import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.LoginResponseDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RegUserInfoDto
+import com.nevratov.matur.data.model.SendMessageResponse
 import com.nevratov.matur.data.model.UsersToExploreResponseDto
 import com.nevratov.matur.domain.entity.City
 import retrofit2.Response
@@ -51,7 +52,7 @@ interface ApiService {
     suspend fun sendMessage(
         @Header("Authorization") token: String,
         @Body message: CreateMessageDto
-    )
+    ) : SendMessageResponse
 
     @Headers("Content-Type: application/json")
     @POST("im/messages")

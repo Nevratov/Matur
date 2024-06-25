@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.Gravity
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,16 +19,26 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -82,15 +93,10 @@ private fun ChatScreenContent(
     when (val currentState = screenState.value) {
         is ChatScreenState.Content -> {
             Chat(
-                messages = currentState.messages,
+                screenState = currentState,
                 maxWidthItem = maxWidthItem,
-                userId = currentState.userId,
-                receiverId = currentState.receiverId,
-                loadNextMessages = currentState.loadNextMessages,
                 viewModel = viewModel
             )
-            if (!currentState.isNextMessages) viewModel.showToast()
-            Log.d("getMessagesByUserId", currentState.isNextMessages.toString())
         }
 
         ChatScreenState.Initial -> {
@@ -110,17 +116,14 @@ private fun ChatScreenContent(
 
 @Composable
 private fun Chat(
-    messages: List<Message>,
+    screenState: ChatScreenState.Content,
     maxWidthItem: Dp,
-    userId: Int,
-    receiverId: Int,
-    loadNextMessages: Boolean,
     viewModel: ChatViewModel
 ) {
-    Log.d("Chat", "REC")
+    Log.d("Chat", "loadMessages = ${screenState.loadNextMessages}, isNextMessages = ${screenState.isNextMessages}")
     val lazyListState = rememberLazyListState()
     var lastMessage by remember {
-        mutableStateOf(messages.first())
+        mutableStateOf(screenState.messages.first())
     }
     Column(
         modifier = Modifier
@@ -135,16 +138,17 @@ private fun Chat(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = lazyListState
         ) {
-            items(messages, key = { it.id }) { message ->
+            items(screenState.messages, key = { it.id }) { message ->
                 Log.d("LazyColumnId", "message = ${message.content}, messageId = ${message.id}")
                 MessageItem(
                     message = message,
                     maxWidthItem = maxWidthItem,
-                    userId = userId
+                    userId = screenState.userId
                 )
             }
             item {
-                if (loadNextMessages) {
+                Log.d("Chat", screenState.loadNextMessages.toString())
+                if (screenState.loadNextMessages) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -152,6 +156,8 @@ private fun Chat(
                             .padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) { CircularProgressIndicator() }
+                } else if (!screenState.isNextMessages) {
+                    viewModel.showToast()
                 } else {
                     SideEffect {
                         Log.d("messageId", "SideEffect")
@@ -163,12 +169,12 @@ private fun Chat(
 
 
 
-        LaunchedEffect(key1 = messages.size) {
-                Log.d("Chat", "lastMessage = $lastMessage")
-                if (lastMessage != messages.first()) {
-                    lazyListState.scrollToItem(FIRST_ELEMENT)
-                }
-            lastMessage = messages.first()
+        LaunchedEffect(key1 = screenState.messages.size) {
+            Log.d("Chat", "lastMessage = $lastMessage")
+            if (lastMessage != screenState.messages.first()) {
+                lazyListState.scrollToItem(FIRST_ELEMENT)
+            }
+            lastMessage = screenState.messages.first()
             Log.d("Chat", "lastMessage = $lastMessage")
 
         }
@@ -177,29 +183,71 @@ private fun Chat(
             mutableStateOf("")
         }
 
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = stringResource(R.string.message_placeholer_chat)) },
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
-            keyboardActions = KeyboardActions(
-                onSend = {
-                    if (message.isEmpty()) return@KeyboardActions
-                    viewModel.sendMessage( message =
-                        Message(
-                            id = 0,
-                            senderId = userId,
-                            receiverId = receiverId.toString(),
-                            content = message,
-                            timestamp = System.currentTimeMillis(),
-                            isRead = false
-                        )
-                    )
-                    message = ""
-                }
-            ),
-            value = message,
-            onValueChange = { message = it },
-        )
+        fun getMessage(): Message {
+            val result = Message(
+                id = 0,
+                senderId = screenState.userId,
+                receiverId = screenState.receiverId,
+                content = message,
+                timestamp = System.currentTimeMillis(),
+                isRead = false
+            )
+            message = ""
+            return result
+        }
+
+
+        var showEmojiPicker by remember {
+            mutableStateOf(false)
+        }
+
+        if (showEmojiPicker) {
+            EmojiPicker { emoji ->
+                message += emoji
+                showEmojiPicker = false
+            }
+        }
+
+
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                modifier = Modifier.weight(1f),
+                placeholder = { Text(text = stringResource(R.string.message_placeholer_chat)) },
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.White,
+                    focusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.White,
+                    unfocusedIndicatorColor = Color.White
+
+                ),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
+                keyboardActions = KeyboardActions(
+                    onSend = {
+                        if (message.isEmpty()) return@KeyboardActions
+                        viewModel.sendMessage(message = getMessage())
+                    }
+                ),
+                value = message,
+                onValueChange = { message = it },
+            )
+
+            IconButton(
+                onClick = { showEmojiPicker = !showEmojiPicker }
+            ) {
+                Icon(imageVector = Icons.Filled.Face, contentDescription = null)
+            }
+
+            IconButton(
+                colors = IconButtonDefaults.iconButtonColors(),
+                onClick = { viewModel.sendMessage(getMessage()) }
+            ) {
+                Icon(imageVector = Icons.Filled.Send, contentDescription = "send message")
+            }
+        }
+
     }
 
 
@@ -241,6 +289,31 @@ private fun MessageItem(
                 )
             }
             MessageTimeAndIsRead(message = message, userId = userId)
+        }
+    }
+}
+
+@Composable
+private fun EmojiPicker(
+    onEmojiClicked: (String) -> Unit
+) {
+    val emojis = listOf("😊", "😂", "😍", "😢", "😎", "😡", "👍", "🙏", "🎉", "❤️")
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.DarkGray)
+            .padding(8.dp)
+    ) {
+        LazyVerticalGrid(columns = GridCells.Adaptive(40.dp)) {
+             items(items = emojis) { emoji ->
+                 Text(
+                     modifier = Modifier
+                         .clickable { onEmojiClicked(emoji) },
+                     text = emoji,
+                     fontSize = 28.sp
+                 )
+             }
         }
     }
 }

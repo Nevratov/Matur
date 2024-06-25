@@ -3,7 +3,8 @@ package com.nevratov.matur.data.network.webSocket
 import android.util.Log
 import com.google.gson.Gson
 import com.nevratov.matur.data.Mapper
-import com.nevratov.matur.data.model.ReceivedMessageWSDto
+import com.nevratov.matur.data.model.ResponseWSDto
+import com.nevratov.matur.domain.entity.NetworkStatus
 import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.presentation.chat.UserId
 import okhttp3.Response
@@ -13,6 +14,8 @@ import okhttp3.WebSocketListener
 
 class WebSocketListener (
     private val onMessageReceived: (Message) -> Unit,
+    private val onStatusReceived: (NetworkStatus) -> Unit,
+    private val onUserIdReadAllMessages: (Int) -> Unit,
     private val senderId: Int
 ): WebSocketListener() {
 
@@ -28,9 +31,18 @@ class WebSocketListener (
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
-        val receivedMessageDto = Gson().fromJson(text, ReceivedMessageWSDto::class.java)
-        val message = mapper.receivedMessageDtoToMessage(receivedMessageDto)
-        onMessageReceived(message)
+        val responseDto = Gson().fromJson(text, ResponseWSDto::class.java)
+        when(responseDto.type) {
+            WebSocketConst.MESSAGE_TYPE -> {
+                onMessageReceived(mapper.responseWSDtoToMessage(responseDto))
+            }
+            WebSocketConst.STATUS_TYPE -> {
+                onStatusReceived(mapper.responseWSDtoToNetworkStatus(responseDto))
+            }
+            WebSocketConst.READ_ALL_TYPE -> {
+                onUserIdReadAllMessages(responseDto.id)
+            }
+        }
         logWebSocket("Received: $text")
     }
 

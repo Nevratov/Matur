@@ -285,6 +285,7 @@ class MaturRepositoryImpl @Inject constructor(
         messagesDto.forEach {
             messages.add(mapper.messageDtoToMessage(it))
         }
+        _chatMessages.clear()
         _chatMessages.addAll(messages)
 
         refreshMessagesEvents.emit(Unit)
@@ -292,13 +293,17 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sendMessage(message: Message) {
-        apiService.sendMessage(
+        val response = apiService.sendMessage(
             token = getToken(),
             message = mapper.messageToCreateMessageDto(message)
         )
 
-        val messageToSend = mapper.messageToSendMessageDto(message)
+        // TODO Catch server error response
+        val messageToSend = mapper.messageDtoToSendMessageWSDto(response.message)
+
+
         val messageJson = Gson().toJson(messageToSend)
+        Log.d("sendMessage", messageJson)
         webSocketClient.send(messageJson)
 
         _chatMessages.add(index = 0, element = message.copy(id = _chatMessages.size + 100))
@@ -335,6 +340,12 @@ class MaturRepositoryImpl @Inject constructor(
             listener = WebSocketListener(
                 onMessageReceived = {
                     receiveMessage(message = it)
+                },
+                onStatusReceived = {
+
+                },
+                onUserIdReadAllMessages = {
+
                 },
                 senderId = getUserOrNull()?.id ?: throw RuntimeException("User == null")
             )

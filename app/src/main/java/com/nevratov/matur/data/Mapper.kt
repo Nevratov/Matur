@@ -8,17 +8,18 @@ import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
-import com.nevratov.matur.data.model.ReceivedMessageWSDto
+import com.nevratov.matur.data.model.ResponseWSDto
 import com.nevratov.matur.data.model.RegUserInfoDto
 import com.nevratov.matur.data.model.SendMessageWSDto
 import com.nevratov.matur.data.model.UserDto
+import com.nevratov.matur.data.network.webSocket.WebSocketConst
+import com.nevratov.matur.domain.entity.NetworkStatus
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.Genders
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
-import kotlin.random.Random
 
 class Mapper {
 
@@ -68,11 +69,12 @@ class Mapper {
 
     fun messageToMessageDto(message: Message): MessageDto {
         return MessageDto(
-            id = message.id.toString(),
-            senderId = message.senderId.toString(),
+            id = message.id,
+            senderId = message.senderId,
             receiverId = message.receiverId,
             content = message.content,
-            timestampSec = message.timestamp,
+            timestampCreateSec = message.timestamp / 1000,
+            timestampUpdateSec = message.timestamp / 1000,
             isRead = if (message.isRead) 1 else 0
         )
     }
@@ -83,7 +85,7 @@ class Mapper {
             senderId = message.senderId.toInt(),
             receiverId = message.receiverId,
             content = message.content,
-            timestamp = message.timestampSec * 1000,
+            timestamp = message.timestampCreateSec * 1000,
             isRead = message.isRead == 1
         )
     }
@@ -108,27 +110,37 @@ class Mapper {
         return chatList
     }
 
-    fun receivedMessageDtoToMessage(receivedMessageDto: ReceivedMessageWSDto): Message {
-        val timestamp = System.currentTimeMillis()
+    fun responseWSDtoToMessage(responseWSDto: ResponseWSDto): Message = Message(
+        id = responseWSDto.id,
+        senderId = responseWSDto.senderId,
+        receiverId = responseWSDto.receiverId,
+        content = responseWSDto.content,
+        timestamp = responseWSDto.timestamp * 1000,
+        isRead = false
+    )
 
-        return Message(
-            id = Random.nextInt(10000, 1000000),
-            senderId = receivedMessageDto.senderId,
-            receiverId = receivedMessageDto.receiverId.toString(),
-            content = receivedMessageDto.message,
-            timestamp = timestamp,
-            isRead = false
+    fun responseWSDtoToNetworkStatus(responseWSDto: ResponseWSDto): NetworkStatus = NetworkStatus (
+        userId = responseWSDto.senderId,
+        isOnline = responseWSDto.content == WebSocketConst.IS_ONLINE
+    )
 
-        )
-    }
+    // Now, we get MessageDTO in ResponseSendMessage, this method no actual
+//    fun messageToSendMessageDto(message: Message): SendMessageWSDto {
+//        return SendMessageWSDto(
+//            senderId = message.senderId,
+//            receiverId = message.receiverId,
+//            message = message.content,
+//
+//        )
+//    }
 
-    fun messageToSendMessageDto(message: Message): SendMessageWSDto {
-        return SendMessageWSDto(
-            senderId = message.senderId,
-            receiverId = message.receiverId.toInt(),
-            message = message.content
-        )
-    }
+    fun messageDtoToSendMessageWSDto(message: MessageDto): SendMessageWSDto = SendMessageWSDto(
+        senderId = message.senderId,
+        receiverId = message.receiverId,
+        message = message.content,
+        id = message.id,
+        timestamp = message.timestampCreateSec
+    )
 
     fun loginDataToLoginDataDto(loginData: LoginData): LoginDataDto {
         return LoginDataDto(
@@ -144,8 +156,8 @@ class Mapper {
 
     fun toMessagesOptionsDto(messagesWithUserId: Int, page: Int) = MessagesOptionsDto(
         messagesWithUserId = messagesWithUserId.toString(),
-        pageSize = "100",
-        page = page.toString()
+        pageSize = (100 * page).toString(),
+        page = "1"
     )
 
     private fun getBirthday(day: String, month: String, year: String) = "$year-$month-$day"
