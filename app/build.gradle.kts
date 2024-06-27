@@ -74,11 +74,16 @@ dependencies {
     implementation(libs.coil.compose)
 
     implementation ("com.google.dagger:dagger:2.51")
+    implementation(libs.androidx.emoji2.bundled)
     kapt ("com.google.dagger:dagger-compiler:2.51")
 
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-messaging")
+
+    implementation ("androidx.emoji2:emoji2:1.4.0")
+
+    implementation ("androidx.emoji2:emoji2-emojipicker:1.4.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -29,7 +29,7 @@ sealed class NavigationItem(
         icon = Icons.Outlined.FavoriteBorder
     )
     data object Chat: NavigationItem(
-        screen = Screen.ChatList,
+        screen = Screen.ChatContainer,
         titleResId = R.string.chat_navigation_item,
         descriptionResId = R.string.chat_description_ico,
         icon = Icons.Outlined.MailOutline

@@ -2,6 +2,7 @@ package com.nevratov.matur.presentation.chat
 
 import android.util.Log
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -63,6 +65,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.emoji2.emojipicker.EmojiPickerView
+import androidx.emoji2.emojipicker.EmojiViewItem
+import androidx.emoji2.text.EmojiCompat
 import com.nevratov.matur.R
 import com.nevratov.matur.ui.theme.Beige
 import kotlinx.coroutines.launch
@@ -120,7 +126,10 @@ private fun Chat(
     maxWidthItem: Dp,
     viewModel: ChatViewModel
 ) {
-    Log.d("Chat", "loadMessages = ${screenState.loadNextMessages}, isNextMessages = ${screenState.isNextMessages}")
+    Log.d(
+        "Chat",
+        "loadMessages = ${screenState.loadNextMessages}, isNextMessages = ${screenState.isNextMessages}"
+    )
     val lazyListState = rememberLazyListState()
     var lastMessage by remember {
         mutableStateOf(screenState.messages.first())
@@ -146,8 +155,8 @@ private fun Chat(
                     userId = screenState.userId
                 )
             }
+            // Load next messages
             item {
-                Log.d("Chat", screenState.loadNextMessages.toString())
                 if (screenState.loadNextMessages) {
                     Box(
                         modifier = Modifier
@@ -202,10 +211,16 @@ private fun Chat(
         }
 
         if (showEmojiPicker) {
-            EmojiPicker { emoji ->
-                message += emoji
+
+            EmojiPicker2 {
+                message += it
                 showEmojiPicker = false
             }
+
+//            EmojiPicker { emoji ->
+//                message += emoji
+//                showEmojiPicker = false
+//            }
         }
 
 
@@ -249,9 +264,30 @@ private fun Chat(
         }
 
     }
+}
+
+@Composable
+private fun EmojiPicker2(
+    onEmClicked: (String) -> Unit
+) {
+
+    Column {
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                EmojiPickerView(context).apply {
+                    emojiGridColumns = 9
+                    emojiGridRows = 6f
+
+                    setOnEmojiPickedListener { onEmClicked(it.emoji) }
+                }
+            },
+        )
+    }
 
 
 }
+
 
 @Composable
 private fun MessageItem(
@@ -293,30 +329,30 @@ private fun MessageItem(
     }
 }
 
-@Composable
-private fun EmojiPicker(
-    onEmojiClicked: (String) -> Unit
-) {
-    val emojis = listOf("😊", "😂", "😍", "😢", "😎", "😡", "👍", "🙏", "🎉", "❤️")
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.DarkGray)
-            .padding(8.dp)
-    ) {
-        LazyVerticalGrid(columns = GridCells.Adaptive(40.dp)) {
-             items(items = emojis) { emoji ->
-                 Text(
-                     modifier = Modifier
-                         .clickable { onEmojiClicked(emoji) },
-                     text = emoji,
-                     fontSize = 28.sp
-                 )
-             }
-        }
-    }
-}
+//@Composable
+//private fun EmojiPicker(
+//    onEmojiClicked: (String) -> Unit
+//) {
+//    val emojis = listOf("😊", "😂", "😍", "😢", "😎", "😡", "👍", "🙏", "🎉", "❤️")
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .background(Color.DarkGray)
+//            .padding(8.dp)
+//    ) {
+//        LazyVerticalGrid(columns = GridCells.Adaptive(40.dp)) {
+//             items(items = emojis) { emoji ->
+//                 Text(
+//                     modifier = Modifier
+//                         .clickable { onEmojiClicked(emoji) },
+//                     text = emoji,
+//                     fontSize = 28.sp
+//                 )
+//             }
+//        }
+//    }
+//}
 
 @Composable
 private fun MessageTimeAndIsRead(

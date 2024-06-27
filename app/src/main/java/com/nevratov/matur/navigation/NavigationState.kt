@@ -20,6 +20,12 @@ class NavigationState(
         }
     }
 
+    fun navigateToChat(route: String) {
+        navHostController.navigate(route) {
+            launchSingleTop = true
+        }
+    }
+
     fun navigateToRegistrationSuccess(route: String) {
         navHostController.navigate(route) {
             popUpTo(0)

@@ -16,6 +16,7 @@ lottieCompose = "2.8.0"
 lottieComposeVersion = "6.1.0"
 picasso = "2.71828"
 stompAndroid = "0.9.0"
+emoji2BundledVersion = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,7 @@ lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "
 lottie-compose-v610 = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieComposeVersion" }
 picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
 stomp-android = { module = "com.github.naichuan:stomp-android", version.ref = "stompAndroid" }
+androidx-emoji2-bundled = { group = "androidx.emoji2", name = "emoji2-bundled", version.ref = "emoji2BundledVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

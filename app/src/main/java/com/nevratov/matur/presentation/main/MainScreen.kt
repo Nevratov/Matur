@@ -103,7 +103,7 @@ fun MainScreen(
                         onMessageItemClicked = {
                             chatViewModel = component.chatListComponentFactory().create(it.user.id)
                                 .getViewModel()
-                            navigationState.navigateTo(Screen.Chat.route)
+                            navigationState.navigateToChat(Screen.Chat.route)
                         })
                 },
                 chatScreenContent = { ChatScreen(chatViewModel) },
