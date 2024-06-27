@@ -49,14 +49,20 @@ class ChatViewModel @Inject constructor(
 
     fun loadNextMessages() {
         val currentState = chatScreenState.value as ChatScreenState.Content
-        if (!currentState.isNextMessages) return
+        if (!currentState.isNextMessages) {
+            showToast()
+            return
+        }
 
         viewModelScope.launch {
             loadNextMessagesFlow.emit(currentState.copy(loadNextMessages = true))
             val isNextMessages = loadNextMessagesUseCase(messagesWithId = receiverId)
             when (isNextMessages) {
                 true -> {}
-                false -> { loadNextMessagesFlow.emit(currentState.copy(isNextMessages = false)) }
+                false -> {
+                    val newState = chatScreenState.value as ChatScreenState.Content
+                    loadNextMessagesFlow.emit(newState.copy(loadNextMessages = false, isNextMessages = false))
+                }
             }
         }
     }

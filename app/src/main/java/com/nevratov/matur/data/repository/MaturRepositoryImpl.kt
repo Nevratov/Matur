@@ -279,7 +279,7 @@ class MaturRepositoryImpl @Inject constructor(
             messagesOptions = options
         ).chatMessages
 
-        if (messagesDto.isEmpty()) return false
+        if (messagesDto.size == _chatMessages.size) return false
 
         val messages = mutableListOf<Message>()
         messagesDto.forEach {
