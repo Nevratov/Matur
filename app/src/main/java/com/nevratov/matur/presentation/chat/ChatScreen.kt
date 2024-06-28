@@ -1,28 +1,20 @@
 package com.nevratov.matur.presentation.chat
 
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,11 +23,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -45,33 +35,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.emoji2.emojipicker.EmojiPickerView
-import androidx.emoji2.emojipicker.EmojiViewItem
-import androidx.emoji2.text.EmojiCompat
 import com.nevratov.matur.R
 import com.nevratov.matur.ui.theme.Beige
-import kotlinx.coroutines.launch
 
 @Composable
 fun ChatScreen(
@@ -126,14 +108,15 @@ private fun Chat(
     maxWidthItem: Dp,
     viewModel: ChatViewModel
 ) {
-    Log.d(
-        "Chat",
-        "loadMessages = ${screenState.loadNextMessages}, isNextMessages = ${screenState.isNextMessages}"
-    )
+
     val lazyListState = rememberLazyListState()
     var lastMessage by remember {
         mutableStateOf(screenState.messages.first())
     }
+
+    var message by remember { mutableStateOf(TextFieldValue("")) }
+    var showEmojiPicker by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -176,8 +159,6 @@ private fun Chat(
             }
         }
 
-
-
         LaunchedEffect(key1 = screenState.messages.size) {
             Log.d("Chat", "lastMessage = $lastMessage")
             if (lastMessage != screenState.messages.first()) {
@@ -188,41 +169,18 @@ private fun Chat(
 
         }
 
-        var message by remember {
-            mutableStateOf("")
-        }
-
         fun getMessage(): Message {
             val result = Message(
                 id = 0,
                 senderId = screenState.userId,
                 receiverId = screenState.receiverId,
-                content = message,
+                content = message.text,
                 timestamp = System.currentTimeMillis(),
                 isRead = false
             )
-            message = ""
+            message = message.copy(text = "", selection = TextRange(0))
             return result
         }
-
-
-        var showEmojiPicker by remember {
-            mutableStateOf(false)
-        }
-
-        if (showEmojiPicker) {
-
-            EmojiPicker2 {
-                message += it
-                showEmojiPicker = false
-            }
-
-//            EmojiPicker { emoji ->
-//                message += emoji
-//                showEmojiPicker = false
-//            }
-        }
-
 
 
         Row(
@@ -241,12 +199,17 @@ private fun Chat(
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(
                     onSend = {
-                        if (message.isEmpty()) return@KeyboardActions
+                        if (message.text.isEmpty()) return@KeyboardActions
                         viewModel.sendMessage(message = getMessage())
                     }
                 ),
                 value = message,
-                onValueChange = { message = it },
+                onValueChange = { newValue ->
+                    message = newValue.copy(
+                        text = newValue.text,
+                        selection = TextRange(newValue.text.length)
+                    )
+                },
             )
 
             IconButton(
@@ -263,31 +226,20 @@ private fun Chat(
             }
         }
 
+
+        if (showEmojiPicker) {
+            Column(Modifier.height(200.dp)) {
+                EmojiPicker(onEmojiClicked = {
+                    message = message.copy(
+                        text = message.text + it,
+                        selection = TextRange(message.text.length + 1)
+                    )
+                })
+            }
+
+        }
     }
 }
-
-@Composable
-private fun EmojiPicker2(
-    onEmClicked: (String) -> Unit
-) {
-
-    Column {
-        AndroidView(
-            modifier = Modifier.fillMaxWidth(),
-            factory = { context ->
-                EmojiPickerView(context).apply {
-                    emojiGridColumns = 9
-                    emojiGridRows = 6f
-
-                    setOnEmojiPickedListener { onEmClicked(it.emoji) }
-                }
-            },
-        )
-    }
-
-
-}
-
 
 @Composable
 private fun MessageItem(
