@@ -32,6 +32,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -108,14 +109,13 @@ private fun Chat(
     maxWidthItem: Dp,
     viewModel: ChatViewModel
 ) {
+    Log.d("Chat", "REC")
+    val message = remember { mutableStateOf(TextFieldValue("")) }
+    val showEmojiPicker = remember { mutableStateOf(false) }
+
+    var lastMessage by remember { mutableStateOf(screenState.messages.first()) }
 
     val lazyListState = rememberLazyListState()
-    var lastMessage by remember {
-        mutableStateOf(screenState.messages.first())
-    }
-
-    var message by remember { mutableStateOf(TextFieldValue("")) }
-    var showEmojiPicker by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -131,7 +131,6 @@ private fun Chat(
             state = lazyListState
         ) {
             items(screenState.messages, key = { it.id }) { message ->
-                Log.d("LazyColumnId", "message = ${message.content}, messageId = ${message.id}")
                 MessageItem(
                     message = message,
                     maxWidthItem = maxWidthItem,
@@ -160,85 +159,134 @@ private fun Chat(
         }
 
         LaunchedEffect(key1 = screenState.messages.size) {
-            Log.d("Chat", "lastMessage = $lastMessage")
             if (lastMessage != screenState.messages.first()) {
                 lazyListState.scrollToItem(FIRST_ELEMENT)
             }
             lastMessage = screenState.messages.first()
-            Log.d("Chat", "lastMessage = $lastMessage")
 
         }
 
-        fun getMessage(): Message {
-            val result = Message(
-                id = 0,
-                senderId = screenState.userId,
-                receiverId = screenState.receiverId,
-                content = message.text,
-                timestamp = System.currentTimeMillis(),
-                isRead = false
-            )
-            message = message.copy(text = "", selection = TextRange(0))
-            return result
-        }
+        Typing(
+            screenState = screenState,
+            messageState = message,
+            viewModel = viewModel,
+            onValueChanged = { newValue ->
+                message.value = newValue.copy(
+                    text = newValue.text,
+                    selection = TextRange(newValue.text.length)
+                )
+            },
+            onEmojiIcoClicked = { showEmojiPicker.value = !showEmojiPicker.value },
+            messageReset = { message.value = TextFieldValue("") }
+        )
 
+        ShowEmojiPicker(
+            showEmojiPickerState = showEmojiPicker,
+            onEmojiClicked = { emoji ->
+                val newMessage = StringBuilder().append(message.value.text).append(emoji)
+                message.value = message.value.copy(
+                    text = newMessage.toString(),
+                    selection = TextRange(newMessage.length)
+                )
+            }
+        )
+    }
+}
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+@Composable
+private fun ShowEmojiPicker(
+    showEmojiPickerState: MutableState<Boolean>,
+    onEmojiClicked: (String) -> Unit
+) {
+    val showEmojiPicker = showEmojiPickerState.value
+    if (!showEmojiPicker) return
+
+    Column(Modifier.height(200.dp)) {
+        EmojiPicker(onEmojiClicked = { onEmojiClicked(it) })
+    }
+}
+
+@Composable
+private fun Typing(
+    screenState: ChatScreenState.Content,
+    messageState: MutableState<TextFieldValue>,
+    viewModel: ChatViewModel,
+    onValueChanged: (TextFieldValue) -> Unit,
+    onEmojiIcoClicked: () -> Unit,
+    messageReset: () -> Unit
+) {
+    val message = messageState.value
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextField(
+            modifier = Modifier.weight(1f),
+            placeholder = { Text(text = stringResource(R.string.message_placeholer_chat)) },
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White,
+                focusedIndicatorColor = Color.White,
+                unfocusedIndicatorColor = Color.White
+
+            ),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
+            keyboardActions = KeyboardActions(
+                onSend = {
+                    if (message.text.isEmpty()) return@KeyboardActions
+                    viewModel.sendMessage(message =
+                        getMessage(
+                            screenState = screenState,
+                            messageState = messageState,
+                            messageReset = messageReset
+                        )
+                    )
+                }
+            ),
+            value = message,
+            onValueChange = { onValueChanged(it) },
+        )
+
+        IconButton(
+            onClick = { onEmojiIcoClicked() }
         ) {
-            TextField(
-                modifier = Modifier.weight(1f),
-                placeholder = { Text(text = stringResource(R.string.message_placeholer_chat)) },
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.White,
-                    unfocusedIndicatorColor = Color.White
-
-                ),
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
-                keyboardActions = KeyboardActions(
-                    onSend = {
-                        if (message.text.isEmpty()) return@KeyboardActions
-                        viewModel.sendMessage(message = getMessage())
-                    }
-                ),
-                value = message,
-                onValueChange = { newValue ->
-                    message = newValue.copy(
-                        text = newValue.text,
-                        selection = TextRange(newValue.text.length)
-                    )
-                },
-            )
-
-            IconButton(
-                onClick = { showEmojiPicker = !showEmojiPicker }
-            ) {
-                Icon(imageVector = Icons.Filled.Face, contentDescription = null)
-            }
-
-            IconButton(
-                colors = IconButtonDefaults.iconButtonColors(),
-                onClick = { viewModel.sendMessage(getMessage()) }
-            ) {
-                Icon(imageVector = Icons.Filled.Send, contentDescription = "send message")
-            }
+            Icon(imageVector = Icons.Filled.Face, contentDescription = null)
         }
 
-
-        if (showEmojiPicker) {
-            Column(Modifier.height(200.dp)) {
-                EmojiPicker(onEmojiClicked = {
-                    message = message.copy(
-                        text = message.text + it,
-                        selection = TextRange(message.text.length + 1)
+        IconButton(
+            colors = IconButtonDefaults.iconButtonColors(),
+            onClick = {
+                viewModel.sendMessage(message =
+                    getMessage(
+                        screenState = screenState,
+                        messageState = messageState,
+                        messageReset = messageReset
                     )
-                })
+                )
             }
-
+        ) {
+            Icon(imageVector = Icons.Filled.Send, contentDescription = "send message")
         }
     }
+}
+
+fun getMessage(
+    screenState: ChatScreenState.Content,
+    messageState: MutableState<TextFieldValue>,
+    messageReset: () -> Unit
+): Message {
+    val message = messageState.value
+
+    val result = Message(
+        id = 0,
+        senderId = screenState.userId,
+        receiverId = screenState.receiverId,
+        content = message.text,
+        timestamp = System.currentTimeMillis(),
+        isRead = false
+    )
+    messageReset()
+    return result
 }
 
 @Composable
@@ -280,31 +328,6 @@ private fun MessageItem(
         }
     }
 }
-
-//@Composable
-//private fun EmojiPicker(
-//    onEmojiClicked: (String) -> Unit
-//) {
-//    val emojis = listOf("😊", "😂", "😍", "😢", "😎", "😡", "👍", "🙏", "🎉", "❤️")
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(Color.DarkGray)
-//            .padding(8.dp)
-//    ) {
-//        LazyVerticalGrid(columns = GridCells.Adaptive(40.dp)) {
-//             items(items = emojis) { emoji ->
-//                 Text(
-//                     modifier = Modifier
-//                         .clickable { onEmojiClicked(emoji) },
-//                     text = emoji,
-//                     fontSize = 28.sp
-//                 )
-//             }
-//        }
-//    }
-//}
 
 @Composable
 private fun MessageTimeAndIsRead(

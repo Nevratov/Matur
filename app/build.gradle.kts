@@ -68,22 +68,18 @@ dependencies {
     implementation ("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation(libs.lottie.compose.v610)
-
     implementation ("com.google.code.gson:gson:2.8.6")
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
     implementation(libs.coil.compose)
-
     implementation ("com.google.dagger:dagger:2.51")
-    implementation(libs.androidx.emoji2.bundled)
     kapt ("com.google.dagger:dagger-compiler:2.51")
-
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-messaging")
 
     implementation ("androidx.emoji2:emoji2:1.4.0")
-
     implementation ("androidx.emoji2:emoji2-emojipicker:1.4.0")
+    implementation(libs.androidx.emoji2.bundled)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
