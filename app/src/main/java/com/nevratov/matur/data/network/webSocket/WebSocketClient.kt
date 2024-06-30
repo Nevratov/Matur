@@ -1,7 +1,5 @@
 package com.nevratov.matur.data.network.webSocket
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket

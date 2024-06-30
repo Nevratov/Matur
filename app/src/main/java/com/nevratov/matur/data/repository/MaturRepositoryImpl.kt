@@ -21,10 +21,12 @@ import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -52,10 +54,8 @@ class MaturRepositoryImpl @Inject constructor(
             if (isLoggedIn) {
                 connectToWS()
                 emit(AuthState.Authorized)
-
                 //Test FCM
                 firebaseGetInstance()
-
             } else {
                 emit(AuthState.NotAuthorized)
             }
@@ -329,7 +329,13 @@ class MaturRepositoryImpl @Inject constructor(
 
             emit(chatList.sortedByDescending { it.message.timestamp })
         }
-    }.stateIn(
+    }
+        .retry {
+            Log.d("okhttp", "ERROR - ${it.message} - toRetry - 1 SEC")
+            delay(RETRY_TIMEOUT_MILLIS)
+            true
+        }
+        .stateIn(
         scope = coroutineScope,
         started = SharingStarted.Lazily,
         initialValue = listOf()
@@ -366,5 +372,6 @@ class MaturRepositoryImpl @Inject constructor(
         private const val USER_KEY = "user_data"
         private const val TOKEN_KEY = "token"
         private const val DEFAULT_PAGE = 1
+        private const val RETRY_TIMEOUT_MILLIS = 1000L
     }
 }

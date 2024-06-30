@@ -62,10 +62,12 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.squareup.okhttp3:logging-interceptor:4.7.2")
-    implementation ("com.squareup.okhttp3:okhttp:4.10.0")
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation (libs.logging.interceptor)
+    implementation (libs.okhttp)
+
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation(libs.lottie.compose.v610)
     implementation ("com.google.code.gson:gson:2.8.6")
@@ -77,9 +79,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-messaging")
 
-    implementation ("androidx.emoji2:emoji2:1.4.0")
-    implementation ("androidx.emoji2:emoji2-emojipicker:1.4.0")
-    implementation(libs.androidx.emoji2.bundled)
+    implementation (libs.androidx.emoji2.emojipicker)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
