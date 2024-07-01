@@ -66,11 +66,16 @@ fun ChatScreen(
     val screenWidth = configuration.screenWidthDp.dp
     val maxWidthItem = screenWidth * 0.70f
 
-    ChatScreenContent(
-        screenState = screenState,
-        maxWidthItem = maxWidthItem,
-        viewModel = viewModel
-    )
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        ChatScreenContent(
+            screenState = screenState,
+            maxWidthItem = maxWidthItem,
+            viewModel = viewModel
+        )
+    }
+
 }
 
 @Composable

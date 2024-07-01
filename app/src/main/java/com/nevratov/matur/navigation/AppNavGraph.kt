@@ -1,6 +1,15 @@
 package com.nevratov.matur.navigation
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,27 +41,42 @@ fun AppNavGraph(
                 requestEmailScreenContent = requestEmailScreenContent,
                 registrationSuccessScreenContent = registrationSuccessScreenContent
             )
-            composable(
+            composableWithTransition(
                 route = Screen.Login.route,
                 content = { loginScreenContent() }
             )
-
-            composable(
+            composableWithTransition(
                 route = Screen.Explore.route,
                 content = { exploreScreenContent() }
             )
-            composable(
+            composableWithTransition(
                 route = Screen.Matches.route,
                 content = { matchesScreenContent() }
             )
-            chatScreenNavGraph(
-                chatListScreenContent = chatListScreenContent,
-                chatScreenContent = chatScreenContent
+            composableWithTransition(
+                route = Screen.ChatList.route,
+                content = { chatListScreenContent() }
             )
-            composable(
+            composableWithTransition(
+                route = Screen.Chat.route,
+                content = { chatScreenContent() }
+            )
+            composableWithTransition(
                 route = Screen.Profile.route,
                 content = { profileScreenContent() }
             )
         }
+    )
+}
+
+private fun NavGraphBuilder.composableWithTransition(
+    route: String,
+    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+) {
+    composable(
+        route = route,
+        content = content,
+        enterTransition = { fadeIn(animationSpec = tween(700)) },
+        exitTransition = { fadeOut(animationSpec = tween(700)) },
     )
 }

@@ -1,5 +1,6 @@
 [versions]
 accompanistCoilVersion = "<latest-version>"
+accompanistNavigationAnimationVersion = "0.30.1"
 agp = "8.3.1"
 coilComposeVersion = "2.1.0"
 converterGsonVersion = "2.9.0"
@@ -23,6 +24,7 @@ stompAndroid = "0.9.0"
 emoji2BundledVersion = "1.4.0"
 
 [libraries]
+accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanistNavigationAnimationVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-emoji2-emojipicker = { module = "androidx.emoji2:emoji2-emojipicker", version.ref = "emoji2EmojipickerVersion" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeVersion" }

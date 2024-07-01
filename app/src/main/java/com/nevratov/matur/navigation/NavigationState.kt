@@ -1,10 +1,12 @@
 package com.nevratov.matur.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 class NavigationState(
     val navHostController: NavHostController
@@ -33,7 +35,8 @@ class NavigationState(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun rememberNavigationState(
-    navHostController: NavHostController = rememberNavController()
+    navHostController: NavHostController = rememberAnimatedNavController()
 ): NavigationState = remember { NavigationState(navHostController) }

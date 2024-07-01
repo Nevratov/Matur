@@ -47,11 +47,15 @@ fun ChatListScreen(
 
     val screenState = viewModel.state.collectAsState(initial = ChatListScreenState.Initial)
 
-    ChatListContent(
-        state = screenState,
-        onMessageItemClicked = onMessageItemClicked,
-        userId = viewModel.getUser().id
-    )
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        ChatListContent(
+            state = screenState,
+            onMessageItemClicked = onMessageItemClicked,
+            userId = viewModel.getUser().id
+        )
+    }
 }
 
 @Composable
