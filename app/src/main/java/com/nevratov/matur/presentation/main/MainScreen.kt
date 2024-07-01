@@ -43,6 +43,7 @@ import com.nevratov.matur.presentation.main.registration.RequestDateScreen
 import com.nevratov.matur.presentation.main.registration.RequestEmailScreen
 import com.nevratov.matur.presentation.main.registration.RequestNameScreen
 import com.nevratov.matur.presentation.matches.MatchesScreen
+import com.nevratov.matur.presentation.profile.ProfileScreen
 
 lateinit var chatViewModel: ChatViewModel
 
@@ -116,14 +117,7 @@ fun MainScreen(
                         })
                 },
                 chatScreenContent = { ChatScreen(chatViewModel) },
-                profileScreenContent = {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center)
-                    {
-                        CircularProgressIndicator()
-                    }
-                },
+                profileScreenContent = { ProfileScreen() },
                 requestNameScreenContent = {
                     RequestNameScreen(
                         viewModel = registrationViewModel,
@@ -158,7 +152,8 @@ fun MainScreen(
 private fun BottomNavigationBar(
     navigationState: NavigationState
 ) {
-    var selectedItem by remember { mutableIntStateOf(0) }
+    val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
+
     val items = listOf(
         NavigationItem.Explore,
         NavigationItem.Matches,
@@ -168,10 +163,10 @@ private fun BottomNavigationBar(
 
     NavigationBar {
         items.forEachIndexed { index, item ->
+            val selectedItem = navBackStackEntry?.destination?.route == item.screen.route
             NavigationBarItem(
-                selected = selectedItem == index,
+                selected = selectedItem,
                 onClick = {
-                    selectedItem = index
                     navigationState.navigateTo(item.screen.route)
                 },
                 label = { Text(stringResource(item.titleResId)) },
