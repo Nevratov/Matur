@@ -329,17 +329,14 @@ class MaturRepositoryImpl @Inject constructor(
 
             emit(chatList.sortedByDescending { it.message.timestamp })
         }
-    }
-        .retry {
-            Log.d("okhttp", "ERROR - ${it.message} - toRetry - 1 SEC")
-            delay(RETRY_TIMEOUT_MILLIS)
-            true
-        }
-        .stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.Lazily,
-        initialValue = listOf()
-    )
+    }.retry {
+        delay(RETRY_TIMEOUT_MILLIS)
+        true
+    }.stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.Lazily,
+            initialValue = listOf()
+        )
 
     override fun connectToWS() {
         webSocketClient.connect(

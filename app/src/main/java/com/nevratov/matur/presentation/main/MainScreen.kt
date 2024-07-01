@@ -96,7 +96,14 @@ fun MainScreen(
                     )
                 },
                 exploreScreenContent = { ExploreScreen(viewModel = exploreViewModel) },
-                matchesScreenContent = { MatchesScreen() },
+                matchesScreenContent = { MatchesScreen(
+                    // Передать актуальный список совпавших пользователей
+                    users = emptyList(),
+                    //Раскоментировать после передачи актуального списка
+                    onMatchUserClicked = {
+//                    chatViewModel = component.chatListComponentFactory().create(it.id).getViewModel()
+//                    navigationState.navigateToChat(Screen.Chat.route)
+                }) },
                 chatListScreenContent = {
                     ChatListScreen(
                         viewModel = chatListViewModel,

@@ -64,7 +64,7 @@ fun ChatScreen(
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val maxWidthItem = screenWidth * 0.80f
+    val maxWidthItem = screenWidth * 0.70f
 
     ChatScreenContent(
         screenState = screenState,

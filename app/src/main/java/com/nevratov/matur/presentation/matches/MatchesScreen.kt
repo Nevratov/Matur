@@ -1,6 +1,7 @@
 package com.nevratov.matur.presentation.matches
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,25 +26,50 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
+import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.chat_list.UserProfile
 
 @Composable
-fun MatchesScreen() {
+fun MatchesScreen(
+    users: List<User>,
+    onMatchUserClicked: (User) -> Unit
+) {
 
     //Test - to delete potom
-    val testListMessageItems = mutableListOf<UserProfile>().apply {
+    val testListMessageItems = mutableListOf<User>().apply {
         repeat(20) {
-            add(UserProfile(
-                id = it,
-                firstName = "Kate",
-                lastName = "Jhonson $it",
-                logoUri = "https://bipbap.ru/wp-content/uploads/2016/04/1566135836_devushka-v-shortah-na-pirone.jpg",
-                lastMessage = "I love you baby, go to sex on next night? I really like to vizit you!"
-
-            ))
+            add(
+                User(
+                    id = it,
+                    name = "Kate $it",
+                    logoUrl = "https://bipbap.ru/wp-content/uploads/2016/04/1566135836_devushka-v-shortah-na-pirone.jpg",
+                    aboutMe = "",
+                    gender = "",
+                    birthday = "",
+                    cityId = 12,
+                    height = 120,
+                    weight = 120,
+                    bodyType = "",
+                    education = "",
+                    job = "",
+                    maritalStatus = "",
+                    children = "",
+                    house = "",
+                    nationality = "",
+                    languageSkills = "",
+                    religion = "",
+                    religiosityLevel = "",
+                    expectations = "",
+                    drinking = "",
+                    smoking = ""
+                )
+            )
         }
     }
-    Column()  {
+
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
         Text(
             text = stringResource(R.string.Matches_label),
             fontSize = 24.sp,
@@ -58,7 +84,10 @@ fun MatchesScreen() {
 
         ) {
             items(items = testListMessageItems, key = { it.id }) {
-                MatchesItem(userProfile = it)
+                MatchesItem(
+                    user = it,
+                    onItemClicked = onMatchUserClicked
+                )
             }
         }
     }
@@ -66,13 +95,15 @@ fun MatchesScreen() {
 
 @Composable
 private fun MatchesItem(
-    userProfile: UserProfile
+    user: User,
+    onItemClicked: (User) -> Unit
 ) {
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .background(Color.White)
             .size(width = 200.dp, height = 320.dp)
+            .clickable { onItemClicked(user) }
             .padding(bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -80,13 +111,13 @@ private fun MatchesItem(
             modifier = Modifier
                 .size(width = 200.dp, height = 250.dp)
                 .clip(RoundedCornerShape(20.dp)),
-            model = userProfile.logoUri,
+            model = user.logoUrl,
             contentScale = ContentScale.Crop,
             contentDescription = "person's photo"
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "${userProfile.firstName} ${userProfile.lastName}",
+            text = user.name,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp
         )
