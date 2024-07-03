@@ -1,23 +1,37 @@
 package com.nevratov.matur.data.repository
 
 import android.app.Application
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context.MODE_PRIVATE
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Icon
+import android.media.RingtoneManager
 import android.util.Log
+import android.widget.RemoteViews
+import androidx.compose.runtime.Composable
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
+import coil.imageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
+import com.nevratov.matur.R
 import com.nevratov.matur.data.Mapper
 import com.nevratov.matur.data.network.ApiFactory
 import com.nevratov.matur.data.network.webSocket.WebSocketClient
 import com.nevratov.matur.data.network.webSocket.WebSocketListener
 import com.nevratov.matur.di.ApplicationScope
 import com.nevratov.matur.domain.entity.AuthState
+import com.nevratov.matur.domain.entity.City
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
-import com.nevratov.matur.presentation.main.login.LoginData
-import com.nevratov.matur.domain.entity.City
 import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.presentation.chat_list.ChatListItem
+import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +48,7 @@ import kotlin.random.Random
 
 @ApplicationScope
 class MaturRepositoryImpl @Inject constructor(
-    application: Application
+    private val application: Application
 ) : MaturRepository {
     private val apiService = ApiFactory.apiService
     private val mapper = Mapper()
@@ -156,12 +170,9 @@ class MaturRepositoryImpl @Inject constructor(
 
     private val refreshMessagesEvents = MutableSharedFlow<Unit>(replay = 1)
 
+    private var dialogUserId: Int? = null
     private var dialogPage = DEFAULT_PAGE
 
-    private fun resetSettings() {
-        _chatMessages.clear()
-        dialogPage = DEFAULT_PAGE
-    }
 
     // Firebase Cloud Messaging
 
@@ -183,9 +194,44 @@ class MaturRepositoryImpl @Inject constructor(
 
     private fun receiveMessage(message: Message) {
         coroutineScope.launch {
-            _chatMessages.add(index = 0, element = message)
-            refreshMessagesEvents.emit(Unit)
+            if (dialogUserId == message.senderId) {
+                _chatMessages.add(index = 0, element = message)
+                refreshMessagesEvents.emit(Unit)
+            }
             chatListRefreshEvents.emit(message)
+        }
+    }
+
+    // Notifications
+
+    private fun sendNotificationNewMessage(message: Message) {
+        coroutineScope.launch {
+            val sender = getUserById(message.senderId)
+
+            val imageRequest = ImageRequest.Builder(application.applicationContext)
+                .data(sender.logoUrl)
+                .build()
+
+            val imageResult = (application.applicationContext.imageLoader.execute(imageRequest) as SuccessResult).drawable
+            val bitmap = (imageResult as BitmapDrawable).bitmap
+
+            val notificationBuilder = Notification.Builder(application.applicationContext, CHANEL_ID)
+                .setSmallIcon(R.drawable.matur_ico)
+                .setContentTitle("${sender.name} · Matur")
+                .setContentText(message.content)
+                .setLargeIcon(bitmap)
+
+            val notificationManager = getSystemService(application.applicationContext, NotificationManager::class.java)
+
+            val channel = NotificationChannel(
+                CHANEL_ID,
+                CHANEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+
+            notificationManager?.createNotificationChannel(channel)
+
+            notificationManager?.notify(NOTIFICATION_ID, notificationBuilder.build())
         }
     }
 
@@ -260,7 +306,8 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     override fun getMessagesByUserId(id: Int) = flow {
-        resetSettings()
+        resetDialogOptions()
+        dialogUserId = id
 
         loadNextMessages(messagesWithId = id)
         refreshMessagesEvents.collect {
@@ -345,8 +392,9 @@ class MaturRepositoryImpl @Inject constructor(
     override fun connectToWS() {
         webSocketClient.connect(
             listener = WebSocketListener(
-                onMessageReceived = {
-                    receiveMessage(message = it)
+                onMessageReceived = { message ->
+                    receiveMessage(message = message)
+                    if (dialogUserId != message.senderId) sendNotificationNewMessage(message)
                 },
                 onStatusReceived = {
 
@@ -369,10 +417,23 @@ class MaturRepositoryImpl @Inject constructor(
 
     override fun getUser(): User = getUserOrNull() ?: throw RuntimeException("User == null")
 
+    override suspend fun getUserById(id: Int): User {
+        return mapper.userDtoToUser(apiService.getUserById(id = id, token = getToken()))
+    }
+
+    override fun resetDialogOptions() {
+        _chatMessages.clear()
+        dialogPage = DEFAULT_PAGE
+        dialogUserId = null
+    }
+
     companion object {
         private const val USER_KEY = "user_data"
         private const val TOKEN_KEY = "token"
         private const val DEFAULT_PAGE = 1
         private const val RETRY_TIMEOUT_MILLIS = 1000L
+        private const val CHANEL_ID = "30"
+        private const val CHANEL_NAME = "receive_message"
+        private const val NOTIFICATION_ID = 40
     }
 }

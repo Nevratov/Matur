@@ -10,6 +10,7 @@ import com.nevratov.matur.data.model.LoginResponseDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RegUserInfoDto
 import com.nevratov.matur.data.model.SendMessageResponse
+import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.data.model.UsersToExploreResponseDto
 import com.nevratov.matur.domain.entity.City
 import retrofit2.Response
@@ -18,6 +19,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -66,4 +68,10 @@ interface ApiService {
     suspend fun getChatList(
         @Header("Authorization") token: String
     ) : ChatListResponseDto
+
+    @GET("user/view/{id}")
+    suspend fun getUserById(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): UserDto
 }

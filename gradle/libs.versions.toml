@@ -7,6 +7,7 @@ converterGsonVersion = "2.9.0"
 daggerCompilerVersion = "2.x"
 daggerVersion = "2.28.3"
 emoji2EmojipickerVersion = "1.4.0"
+glideVersion = "4.12.0"
 kotlin = "1.9.0"
 coreKtx = "1.12.0"
 junit = "4.13.2"
@@ -31,6 +32,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeV
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGsonVersion" }
 dagger = { module = "com.google.dagger:dagger", version.ref = "daggerVersion" }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "daggerCompilerVersion" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersion" }
 google-accompanist-coil = { module = "com.google.accompanist:accompanist-coil", version.ref = "accompanistCoilVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.nevratov.matur.domain.usecases.GetMessagesByUserIdUseCase
 import com.nevratov.matur.domain.usecases.GetUserUseCase
 import com.nevratov.matur.domain.usecases.LoadNextMessagesUseCase
+import com.nevratov.matur.domain.usecases.ResetDialogOptionsUseCase
 import com.nevratov.matur.domain.usecases.SendMessageUseCase
 import com.nevratov.matur.extentions.mergeWith
 import kotlinx.coroutines.Job
@@ -24,6 +25,7 @@ class ChatViewModel @Inject constructor(
     private val getMessagesByUserIdUseCase: GetMessagesByUserIdUseCase,
     private val loadNextMessagesUseCase: LoadNextMessagesUseCase,
     private val getUserUseCase: GetUserUseCase,
+    private val resetDialogOptionsUseCase: ResetDialogOptionsUseCase,
     private val receiverId: Int,
     private val application: Application
 ) : ViewModel() {
@@ -71,4 +73,10 @@ class ChatViewModel @Inject constructor(
         Toast.makeText(application, "Вы достигли конца диалога", Toast.LENGTH_LONG).show()
     }
 
+
+    override fun onCleared() {
+        Log.d("onCleared", "onCleared")
+        super.onCleared()
+        resetDialogOptionsUseCase()
+    }
 }
