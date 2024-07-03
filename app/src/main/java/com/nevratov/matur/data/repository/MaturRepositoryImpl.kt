@@ -301,13 +301,15 @@ class MaturRepositoryImpl @Inject constructor(
         // TODO Catch server error response
         val messageToSend = mapper.messageDtoToSendMessageWSDto(response.message)
 
-
         val messageJson = Gson().toJson(messageToSend)
         Log.d("sendMessage", messageJson)
         webSocketClient.send(messageJson)
 
-        _chatMessages.add(index = 0, element = message.copy(id = _chatMessages.size + 100))
+        val messageWithId = mapper.messageDtoToMessage(response.message)
+
+        _chatMessages.add(index = 0, element = messageWithId)
         refreshMessagesEvents.emit(Unit)
+        chatListRefreshEvents.emit(messageWithId)
     }
 
     override fun getChatList(): StateFlow<List<ChatListItem>> = flow {
@@ -319,7 +321,9 @@ class MaturRepositoryImpl @Inject constructor(
 
         chatListRefreshEvents.collect { newMessage ->
             _chatList.apply {
-                val chatListItem = find { it.user.id == newMessage.senderId }
+                val chatListItem = find {
+                    it.user.id == newMessage.senderId || it.user.id == newMessage.receiverId
+                }
                 val newChatListItem = chatListItem?.copy(
                     message = newMessage,
                 )

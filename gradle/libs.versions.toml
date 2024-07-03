@@ -1,7 +1,7 @@
 [versions]
 accompanistCoilVersion = "<latest-version>"
 accompanistNavigationAnimationVersion = "0.30.1"
-agp = "8.3.1"
+agp = "8.5.0"
 coilComposeVersion = "2.1.0"
 converterGsonVersion = "2.9.0"
 daggerCompilerVersion = "2.x"
