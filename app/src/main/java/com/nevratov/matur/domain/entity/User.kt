@@ -1,8 +1,10 @@
 package com.nevratov.matur.domain.entity
 
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 
+@Immutable
 @Parcelize
 data class User(
     val id: Int,
