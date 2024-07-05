@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nevratov.matur.di.ChatScope
 import com.nevratov.matur.domain.usecases.GetMessagesByUserIdUseCase
 import com.nevratov.matur.domain.usecases.GetUserUseCase
 import com.nevratov.matur.domain.usecases.LoadNextMessagesUseCase
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//@ChatScope
 class ChatViewModel @Inject constructor(
     private val sendMessageUseCase: SendMessageUseCase,
     private val getMessagesByUserIdUseCase: GetMessagesByUserIdUseCase,
@@ -74,7 +76,7 @@ class ChatViewModel @Inject constructor(
     }
 
 
-    override fun onCleared() {
+    public override fun onCleared() {
         Log.d("onCleared", "onCleared")
         super.onCleared()
         resetDialogOptionsUseCase()

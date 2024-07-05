@@ -22,7 +22,7 @@ fun AppNavGraph(
     exploreScreenContent: @Composable () -> Unit,
     matchesScreenContent: @Composable () -> Unit,
     chatListScreenContent: @Composable () -> Unit,
-    chatScreenContent: @Composable () -> Unit,
+    chatScreenContent: @Composable (Int) -> Unit,
     profileScreenContent: @Composable () -> Unit,
     requestNameScreenContent: @Composable () -> Unit,
     requestDateScreenContent: @Composable () -> Unit,
@@ -59,7 +59,11 @@ fun AppNavGraph(
             )
             composableWithTransition(
                 route = Screen.Chat.route,
-                content = { chatScreenContent() }
+                content = {
+                    val dialogUserId = it.arguments?.getString(Screen.KEY_DIALOG_USER_ID)?.toInt()
+                        ?: throw RuntimeException("argument  for ChatScreen when navigation not found")
+                    chatScreenContent(dialogUserId)
+                }
             )
             composableWithTransition(
                 route = Screen.Profile.route,

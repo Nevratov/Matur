@@ -24,6 +24,7 @@ class NavigationState(
 
     fun navigateToChat(route: String) {
         navHostController.navigate(route) {
+            popUpTo(Screen.ChatList.route)
             launchSingleTop = true
         }
     }

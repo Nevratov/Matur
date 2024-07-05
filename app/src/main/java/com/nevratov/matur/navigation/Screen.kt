@@ -22,11 +22,16 @@ sealed class Screen(val route: String) {
 
     data object ChatList: Screen(CHAT_LIST_ROUTE)
 
-    data object Chat: Screen(CHAT_ROUTE)
+    data object Chat: Screen(CHAT_ROUTE) {
+        private const val ROUTE_FOR_ARGS = "chat"
+        fun getRouteWithArgs(dialogUserId: Int) = "$ROUTE_FOR_ARGS/${dialogUserId}"
+    }
 
     data object Profile: Screen(PROFILE_ROUTE)
 
-    private companion object {
+    companion object {
+        const val KEY_DIALOG_USER_ID = "dialog_user_id"
+
         private const val LOGIN_ROUTE = "login"
         private const val REGISTRATION_ROUTE = "registration"
         private const val REQUEST_NAME_ROUTE = "request_name"
@@ -37,7 +42,7 @@ sealed class Screen(val route: String) {
         private const val EXPLORE_ROUTE = "explore"
         private const val MATCHES_ROUTE = "matches"
         private const val CHAT_LIST_ROUTE = "chat_list"
-        private const val CHAT_ROUTE = "chat"
+        private const val CHAT_ROUTE = "chat/{$KEY_DIALOG_USER_ID}"
         private const val PROFILE_ROUTE = "profile"
     }
 }

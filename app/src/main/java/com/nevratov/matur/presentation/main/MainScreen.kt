@@ -45,8 +45,6 @@ import com.nevratov.matur.presentation.main.registration.RequestNameScreen
 import com.nevratov.matur.presentation.matches.MatchesScreen
 import com.nevratov.matur.presentation.profile.ProfileScreen
 
-lateinit var chatViewModel: ChatViewModel
-
 @Composable
 fun MainScreen(
     authState: State<AuthState>,
@@ -71,8 +69,6 @@ fun MainScreen(
             return
         }
     }
-
-    val component = (LocalContext.current.applicationContext as MaturApplication).component
 
     Scaffold(
         bottomBar = {
@@ -111,12 +107,10 @@ fun MainScreen(
                     ChatListScreen(
                         viewModel = chatListViewModel,
                         onMessageItemClicked = {
-                            chatViewModel = component.chatListComponentFactory().create(it.user.id)
-                                .getViewModel()
-                            navigationState.navigateToChat(Screen.Chat.route)
+                            navigationState.navigateToChat(Screen.Chat.getRouteWithArgs(it.user.id))
                         })
                 },
-                chatScreenContent = { ChatScreen(chatViewModel) },
+                chatScreenContent = { ChatScreen(it) },
                 profileScreenContent = { ProfileScreen() },
                 requestNameScreenContent = {
                     RequestNameScreen(

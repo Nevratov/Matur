@@ -1,6 +1,7 @@
 package com.nevratov.matur.di
 
 import androidx.lifecycle.ViewModel
+import com.nevratov.matur.presentation.chat.ChatViewModel
 import com.nevratov.matur.presentation.main.MainViewModel
 import com.nevratov.matur.presentation.main.login.LoginViewModel
 import com.nevratov.matur.presentation.main.registration.RegistrationViewModel

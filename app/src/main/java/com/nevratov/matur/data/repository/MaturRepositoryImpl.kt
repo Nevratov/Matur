@@ -422,6 +422,7 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     override fun resetDialogOptions() {
+        Log.d("onCleared", "impl repo - reset")
         _chatMessages.clear()
         dialogPage = DEFAULT_PAGE
         dialogUserId = null

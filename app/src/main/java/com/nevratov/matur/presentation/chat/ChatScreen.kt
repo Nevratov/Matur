@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
@@ -45,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -54,12 +56,21 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
+import com.nevratov.matur.di.ChatScope
+import com.nevratov.matur.presentation.MaturApplication
 import com.nevratov.matur.ui.theme.Beige
 
 @Composable
 fun ChatScreen(
-    viewModel: ChatViewModel
+    dialogUserId: Int
 ) {
+    val component = (LocalContext.current.applicationContext as MaturApplication).component
+    val viewModel = component.chatListComponentFactory().create(dialogUserId).getViewModel()
+
+    DisposableEffect(Unit) {
+        onDispose { viewModel.onCleared() }
+    }
+
     val screenState = viewModel.chatScreenState.collectAsState(initial = ChatScreenState.Initial)
 
     val configuration = LocalConfiguration.current
