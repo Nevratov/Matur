@@ -13,6 +13,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.gson.Gson
+import com.nevratov.matur.domain.entity.User
 
 @Composable
 fun AppNavGraph(
@@ -22,7 +24,7 @@ fun AppNavGraph(
     exploreScreenContent: @Composable () -> Unit,
     matchesScreenContent: @Composable () -> Unit,
     chatListScreenContent: @Composable () -> Unit,
-    chatScreenContent: @Composable (Int) -> Unit,
+    chatScreenContent: @Composable (User) -> Unit,
     profileScreenContent: @Composable () -> Unit,
     requestNameScreenContent: @Composable () -> Unit,
     requestDateScreenContent: @Composable () -> Unit,
@@ -60,9 +62,10 @@ fun AppNavGraph(
             composableWithTransition(
                 route = Screen.Chat.route,
                 content = {
-                    val dialogUserId = it.arguments?.getString(Screen.KEY_DIALOG_USER_ID)?.toInt()
+                    val dialogUserJson = it.arguments?.getString(Screen.KEY_DIALOG_USER)
                         ?: throw RuntimeException("argument  for ChatScreen when navigation not found")
-                    chatScreenContent(dialogUserId)
+                    val dialogUser = Gson().fromJson(dialogUserJson, User::class.java)
+                    chatScreenContent(dialogUser)
                 }
             )
             composableWithTransition(

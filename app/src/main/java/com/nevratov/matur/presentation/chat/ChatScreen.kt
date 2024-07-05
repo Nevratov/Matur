@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
@@ -57,15 +58,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
 import com.nevratov.matur.di.ChatScope
+import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.MaturApplication
 import com.nevratov.matur.ui.theme.Beige
 
 @Composable
 fun ChatScreen(
-    dialogUserId: Int
+    dialogUser: User
 ) {
+    Log.d("ChatScreen", "REC")
+
     val component = (LocalContext.current.applicationContext as MaturApplication).component
-    val viewModel = component.chatListComponentFactory().create(dialogUserId).getViewModel()
+    val viewModel = component.chatListComponentFactory().create(dialogUser).getViewModel()
 
     DisposableEffect(Unit) {
         onDispose { viewModel.onCleared() }
@@ -133,10 +137,26 @@ private fun Chat(
 
     val lazyListState = rememberLazyListState()
 
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
+
+        
+//        Row {
+//            IconButton(onClick = { /*TODO*/ }) {
+//                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+//            }
+//            // Photo
+//            Column {
+//                Text(text = )
+//            }
+//        }
+
+
+
         LazyColumn(
             reverseLayout = true,
             modifier = Modifier

@@ -1,5 +1,9 @@
 package com.nevratov.matur.navigation
 
+import android.net.Uri
+import com.google.gson.Gson
+import com.nevratov.matur.domain.entity.User
+
 sealed class Screen(val route: String) {
 
     data object Login: Screen(LOGIN_ROUTE)
@@ -24,13 +28,16 @@ sealed class Screen(val route: String) {
 
     data object Chat: Screen(CHAT_ROUTE) {
         private const val ROUTE_FOR_ARGS = "chat"
-        fun getRouteWithArgs(dialogUserId: Int) = "$ROUTE_FOR_ARGS/${dialogUserId}"
+        fun getRouteWithArgs(dialogUser: User): String {
+            val userJson = Gson().toJson(dialogUser)
+            return "$ROUTE_FOR_ARGS/${userJson.encode()}"
+        }
     }
 
     data object Profile: Screen(PROFILE_ROUTE)
 
     companion object {
-        const val KEY_DIALOG_USER_ID = "dialog_user_id"
+        const val KEY_DIALOG_USER = "dialog_user"
 
         private const val LOGIN_ROUTE = "login"
         private const val REGISTRATION_ROUTE = "registration"
@@ -42,8 +49,10 @@ sealed class Screen(val route: String) {
         private const val EXPLORE_ROUTE = "explore"
         private const val MATCHES_ROUTE = "matches"
         private const val CHAT_LIST_ROUTE = "chat_list"
-        private const val CHAT_ROUTE = "chat/{$KEY_DIALOG_USER_ID}"
+        private const val CHAT_ROUTE = "chat/{$KEY_DIALOG_USER}"
         private const val PROFILE_ROUTE = "profile"
     }
 }
+
+fun String.encode(): String = Uri.encode(this)
 

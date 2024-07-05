@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nevratov.matur.di.ChatScope
+import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.usecases.GetMessagesByUserIdUseCase
 import com.nevratov.matur.domain.usecases.GetUserUseCase
 import com.nevratov.matur.domain.usecases.LoadNextMessagesUseCase
@@ -28,14 +29,14 @@ class ChatViewModel @Inject constructor(
     private val loadNextMessagesUseCase: LoadNextMessagesUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val resetDialogOptionsUseCase: ResetDialogOptionsUseCase,
-    private val receiverId: Int,
+    private val dialogUser: User,
     private val application: Application
 ) : ViewModel() {
 
     private val loadNextMessagesFlow = MutableSharedFlow<ChatScreenState>()
 
-    val chatScreenState = getMessagesByUserIdUseCase(id = receiverId)
-        .map { ChatScreenState.Content(messages = it, userId = userId, receiverId = receiverId) }
+    val chatScreenState = getMessagesByUserIdUseCase(id = dialogUser.id)
+        .map { ChatScreenState.Content(messages = it, userId = userId, receiverId = dialogUser.id) }
         .mergeWith(loadNextMessagesFlow)
         .stateIn(
             scope = viewModelScope,
@@ -60,7 +61,7 @@ class ChatViewModel @Inject constructor(
 
         viewModelScope.launch {
             loadNextMessagesFlow.emit(currentState.copy(loadNextMessages = true))
-            val isNextMessages = loadNextMessagesUseCase(messagesWithId = receiverId)
+            val isNextMessages = loadNextMessagesUseCase(messagesWithId = dialogUser.id)
             when (isNextMessages) {
                 true -> {}
                 false -> {
@@ -77,7 +78,7 @@ class ChatViewModel @Inject constructor(
 
 
     public override fun onCleared() {
-        Log.d("onCleared", "onCleared")
+        Log.d("ChatScreen", "onCleared")
         super.onCleared()
         resetDialogOptionsUseCase()
     }
