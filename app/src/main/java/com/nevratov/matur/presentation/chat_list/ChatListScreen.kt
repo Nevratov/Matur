@@ -134,10 +134,6 @@ fun MessageItem(
         .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
-        Log.d("MessageItem", "id = ${chatListItem.user.id}, url = ${chatListItem.user.logoUrl}")
-
-
         AsyncImage(
             modifier = Modifier
                 .size(55.dp)

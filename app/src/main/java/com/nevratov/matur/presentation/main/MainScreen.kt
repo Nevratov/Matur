@@ -110,7 +110,11 @@ fun MainScreen(
                             navigationState.navigateToChat(Screen.Chat.getRouteWithArgs(it.user))
                         })
                 },
-                chatScreenContent = { ChatScreen(it) },
+                chatScreenContent = {
+                    ChatScreen(
+                        dialogUser = it,
+                        onBackPressed = { navigationState.navHostController.popBackStack() }
+                    ) },
                 profileScreenContent = { ProfileScreen() },
                 requestNameScreenContent = {
                     RequestNameScreen(

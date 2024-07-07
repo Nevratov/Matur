@@ -10,6 +10,7 @@ sealed class ChatScreenState {
         val messages: List<Message>,
         val userId: Int,
         val receiverId: Int,
+        val onlineStatus: Boolean = false,
         val loadNextMessages: Boolean = false,
         val isNextMessages: Boolean = true
     ): ChatScreenState()

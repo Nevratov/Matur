@@ -11,6 +11,7 @@ import android.media.RingtoneManager
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
@@ -27,6 +28,7 @@ import com.nevratov.matur.data.network.webSocket.WebSocketListener
 import com.nevratov.matur.di.ApplicationScope
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.domain.entity.City
+import com.nevratov.matur.domain.entity.NetworkStatus
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
 import com.nevratov.matur.presentation.chat.Message
@@ -37,9 +39,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -162,7 +168,7 @@ class MaturRepositoryImpl @Inject constructor(
 
     private val chatListRefreshEvents = MutableSharedFlow<Message>()
 
-    // Get Messages for Chat Screen
+    // Chat Screen
 
     private val _chatMessages = mutableListOf<Message>()
     private val chatMessages: List<Message>
@@ -172,6 +178,24 @@ class MaturRepositoryImpl @Inject constructor(
 
     private var dialogUserId: Int? = null
     private var dialogPage = DEFAULT_PAGE
+
+    // Online status
+
+    private val _onlineUsers = mutableMapOf<Int, Boolean>()
+    private val onlineStatusRefreshFlow = MutableSharedFlow<NetworkStatus>()
+
+    private val onlineStatusDialogUserStateFlow = flow {
+        onlineStatusRefreshFlow.collect {
+            _onlineUsers[it.userId] = it.isOnline
+            if (it.userId == dialogUserId) { emit(it.isOnline) }
+        }
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = false
+    )
+
+    private fun checkOnlineStatusByUserId(id: Int): Boolean = _onlineUsers[id] ?: false
 
 
     // Firebase Cloud Messaging
@@ -191,6 +215,26 @@ class MaturRepositoryImpl @Inject constructor(
     // WebSocket
 
     private val webSocketClient = WebSocketClient
+
+    private suspend fun connectToWS() {
+        webSocketClient.connect(
+            listener = WebSocketListener(
+                onMessageReceived = { message ->
+                    receiveMessage(message = message)
+                    if (dialogUserId != message.senderId) sendNotificationNewMessage(message)
+                },
+                onStatusReceived = { status ->
+                    coroutineScope.launch {
+                        onlineStatusRefreshFlow.emit(status)
+                    }
+                },
+                onUserIdReadAllMessages = {
+
+                },
+                senderId = getUserOrNull()?.id ?: throw RuntimeException("User == null")
+            )
+        )
+    }
 
     private fun receiveMessage(message: Message) {
         coroutineScope.launch {
@@ -308,6 +352,8 @@ class MaturRepositoryImpl @Inject constructor(
     override fun getMessagesByUserId(id: Int) = flow {
         resetDialogOptions()
         dialogUserId = id
+        onlineStatusRefreshFlow.emit(NetworkStatus(userId = id, isOnline = checkOnlineStatusByUserId(id)))
+
 
         loadNextMessages(messagesWithId = id)
         refreshMessagesEvents.collect {
@@ -389,23 +435,7 @@ class MaturRepositoryImpl @Inject constructor(
             initialValue = listOf()
         )
 
-    override fun connectToWS() {
-        webSocketClient.connect(
-            listener = WebSocketListener(
-                onMessageReceived = { message ->
-                    receiveMessage(message = message)
-                    if (dialogUserId != message.senderId) sendNotificationNewMessage(message)
-                },
-                onStatusReceived = {
-
-                },
-                onUserIdReadAllMessages = {
-
-                },
-                senderId = getUserOrNull()?.id ?: throw RuntimeException("User == null")
-            )
-        )
-    }
+    override fun onlineStatus(): StateFlow<Boolean> = onlineStatusDialogUserStateFlow
 
     override suspend fun registration(regUserInfo: RegUserInfo) {
         apiService.registerUser(mapper.regUserInfoToRegUserInfoDto(regUserInfo))
