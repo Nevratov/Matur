@@ -74,4 +74,8 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("id") id: Int
     ): UserDto
+
+    @Headers("Content-Type: application/json")
+    @GET("user/online")
+    suspend fun getOnlineUsersId(@Header("Authorization") token: String): List<Int>
 }

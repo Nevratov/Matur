@@ -27,7 +27,7 @@ object WebSocketClient {
     }
 
 
-    private const val URL_SERVER = "wss://test.matur.app/chat"
+    private const val URL_SERVER = "wss://test.matur.app/websocket/connect"
 
 }
 

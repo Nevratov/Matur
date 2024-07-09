@@ -73,6 +73,7 @@ class MaturRepositoryImpl @Inject constructor(
             val isLoggedIn = user != null
             if (isLoggedIn) {
                 connectToWS()
+                getOnlineUsersId()
                 emit(AuthState.Authorized)
                 //Test FCM
                 firebaseGetInstance()
@@ -191,11 +192,20 @@ class MaturRepositoryImpl @Inject constructor(
         }
     }.stateIn(
         scope = coroutineScope,
-        started = SharingStarted.Lazily,
+        started = SharingStarted.Eagerly,
         initialValue = false
     )
 
-    private fun checkOnlineStatusByUserId(id: Int): Boolean = _onlineUsers[id] ?: false
+    private suspend fun getOnlineUsersId() {
+        val users = apiService.getOnlineUsersId(token = getToken())
+        users.forEach { _onlineUsers[it] = true }
+    }
+
+    private fun checkOnlineStatusByUserId(id: Int): Boolean  {
+        val x = _onlineUsers[id] ?: false
+        Log.d("getOnlineUsersId", "userID $id = $x")
+        return x
+    }
 
 
     // Firebase Cloud Messaging
@@ -352,8 +362,9 @@ class MaturRepositoryImpl @Inject constructor(
     override fun getMessagesByUserId(id: Int) = flow {
         resetDialogOptions()
         dialogUserId = id
-        onlineStatusRefreshFlow.emit(NetworkStatus(userId = id, isOnline = checkOnlineStatusByUserId(id)))
 
+        val onlineStatusDialogUser = NetworkStatus(userId = id, isOnline = checkOnlineStatusByUserId(id))
+        onlineStatusRefreshFlow.emit(onlineStatusDialogUser)
 
         loadNextMessages(messagesWithId = id)
         refreshMessagesEvents.collect {
@@ -395,7 +406,6 @@ class MaturRepositoryImpl @Inject constructor(
         val messageToSend = mapper.messageDtoToSendMessageWSDto(response.message)
 
         val messageJson = Gson().toJson(messageToSend)
-        Log.d("sendMessage", messageJson)
         webSocketClient.send(messageJson)
 
         val messageWithId = mapper.messageDtoToMessage(response.message)
@@ -409,7 +419,6 @@ class MaturRepositoryImpl @Inject constructor(
         val chatListDto = apiService.getChatList(token = getToken()).chatList
         val downloadedChatList = mapper.chatListDtoToChatList(chatListDto)
         _chatList.addAll(downloadedChatList)
-        Log.d("getChatList", downloadedChatList.toString())
         emit(downloadedChatList)
 
         chatListRefreshEvents.collect { newMessage ->

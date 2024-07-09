@@ -5,7 +5,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nevratov.matur.di.ChatScope
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.usecases.GetMessagesByUserIdUseCase
 import com.nevratov.matur.domain.usecases.GetUserUseCase
@@ -14,18 +13,14 @@ import com.nevratov.matur.domain.usecases.OnlineStatusUseCase
 import com.nevratov.matur.domain.usecases.ResetDialogOptionsUseCase
 import com.nevratov.matur.domain.usecases.SendMessageUseCase
 import com.nevratov.matur.extentions.mergeWith
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//@ChatScope
 class ChatViewModel @Inject constructor(
     private val sendMessageUseCase: SendMessageUseCase,
     private val getMessagesByUserIdUseCase: GetMessagesByUserIdUseCase,
