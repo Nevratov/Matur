@@ -15,6 +15,7 @@ val MaturColorPrimary = Color(0xFFB294F9)
 val MaturColorLight = Color(0xFFBEA6F8)
 val MaturColorDark = Color(0xFF895AF8)
 
-val VeryLightGray = Color(0xFFf7f5f5)
+val MaturAlternativeColor = Color(0xFF8771E7)
+val VeryLightGray = Color(0xFFe6e4f0)
 
 val Beige = Color(0xFFFAEED4)
