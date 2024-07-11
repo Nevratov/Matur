@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,11 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,7 +32,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -61,9 +54,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,11 +62,7 @@ import coil.compose.AsyncImage
 import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.MaturApplication
-import com.nevratov.matur.ui.theme.Beige
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
-import com.nevratov.matur.ui.theme.MaturColorDark
-import com.nevratov.matur.ui.theme.MaturColorLight
-import com.nevratov.matur.ui.theme.MaturColorPrimary
 import com.nevratov.matur.ui.theme.VeryLightGray
 
 @Composable
@@ -83,8 +70,6 @@ fun ChatScreen(
     dialogUser: User,
     onBackPressed: () -> Unit
 ) {
-    Log.d("ChatScreen", "REC")
-
     val component = (LocalContext.current.applicationContext as MaturApplication).component
     val viewModel = component.chatListComponentFactory().create(dialogUser).getViewModel()
 
@@ -109,7 +94,6 @@ fun ChatScreen(
             onBackPressed = onBackPressed
         )
     }
-
 }
 
 @Composable
@@ -131,9 +115,7 @@ private fun ChatScreenContent(
             )
         }
 
-        ChatScreenState.Initial -> {
-
-        }
+        ChatScreenState.Initial -> { }
 
         ChatScreenState.Loading -> {
             Box(
@@ -154,7 +136,6 @@ private fun Chat(
     viewModel: ChatViewModel,
     onBackPressed: () -> Unit
 ) {
-    Log.d("Chat", "REC")
     val message = remember { mutableStateOf(TextFieldValue("")) }
     val showEmojiPicker = remember { mutableStateOf(false) }
 
@@ -181,6 +162,9 @@ private fun Chat(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = lazyListState
         ) {
+            item {
+                SeparateLine()
+            }
             items(screenState.messages, key = { it.id }) { message ->
                 MessageItem(
                     message = message,
@@ -214,7 +198,6 @@ private fun Chat(
                 lazyListState.scrollToItem(FIRST_ELEMENT)
             }
             lastMessage = screenState.messages.first()
-
         }
 
         Typing(
@@ -242,6 +225,18 @@ private fun Chat(
             }
         )
     }
+}
+
+@Composable
+fun SeparateLine() {
+    Spacer(modifier = Modifier.height(4.dp))
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .height(2.dp)
+        .padding(horizontal = 12.dp)
+        .background(VeryLightGray)
+    )
+    Spacer(modifier = Modifier.height(4.dp))
 }
 
 @Composable
@@ -296,7 +291,8 @@ private fun ProfilePanel(
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = textStatus,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    color = Color.LightGray
                 )
             }
         }
@@ -327,43 +323,37 @@ private fun Typing(
 ) {
     val message = messageState.value
 
-//    Box(modifier = Modifier
-//        .height(2.dp)
-//        .fillMaxWidth()
-//        .padding(horizontal = 12.dp, vertical = 0.dp)
-//        .background(VeryLightGray))
-
     Row(
+        modifier = Modifier.padding(start = 12.dp, end = 6.dp, bottom = 8.dp),
         verticalAlignment = Alignment.Bottom
     ) {
-        TextField(
-            modifier = Modifier
-                .weight(1f)
-                .padding(12.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(VeryLightGray),
-            leadingIcon = {
-                    IconButton(
-                        modifier = Modifier.padding(bottom = 12.dp),
-                        onClick = { onEmojiIcoClicked() }
-                    ) {
-                        Icon(imageVector = Icons.Default.Face, contentDescription = null)
-                    }
-            },
-            placeholder = { Text(text = stringResource(R.string.message_placeholer_chat)) },
-            maxLines = 6,
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = VeryLightGray,
-                focusedContainerColor = VeryLightGray,
-                focusedIndicatorColor = Color.White,
-                unfocusedIndicatorColor = Color.White
+        Row(modifier = Modifier
+            .clip(RoundedCornerShape(24.dp))
+            .weight(1f)
+            .background(VeryLightGray),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            IconButton(
+                modifier = Modifier.padding(bottom = 4.dp),
+                onClick = { onEmojiIcoClicked() }
+            ) {
+                Icon(painter = painterResource(id = R.drawable.frame_13__1_), contentDescription = null)
+            }
 
-            ),
-            value = message,
-            onValueChange = { onValueChanged(it) },
-        )
-
-
+            TextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .background(VeryLightGray),
+                placeholder = { Text(stringResource(R.string.message_placeholer_chat)) },
+                maxLines = 6,
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = VeryLightGray,
+                    unfocusedIndicatorColor = VeryLightGray,
+                ),
+                value = message,
+                onValueChange = { onValueChanged(it) },
+            )
+        }
 
         IconButton(
             modifier = Modifier.padding(bottom = 4.dp),
@@ -486,58 +476,3 @@ private fun MessageTimeAndIsRead(
 }
 
 private const val FIRST_ELEMENT = 0
-
-
-@Preview
-@Composable
-private fun TypingPrev() {
-    Row(modifier = Modifier.height(100.dp)) {
-        TextField(
-            modifier = Modifier
-                .weight(1f)
-                .clip(RoundedCornerShape(50)),
-            prefix = {
-                Column(
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    IconButton(
-                        onClick = {  }
-                    ) {
-                        Icon(
-                            modifier = Modifier.padding(bottom = 12.dp),
-                            imageVector = Icons.Filled.Face, contentDescription = null
-                        )
-                    }
-                }
-
-            },
-            placeholder = { Text(text = stringResource(R.string.message_placeholer_chat)) },
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = VeryLightGray,
-                focusedContainerColor = Color.White,
-                focusedIndicatorColor = Color.White,
-                unfocusedIndicatorColor = Color.White
-
-            ),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
-            keyboardActions = KeyboardActions(
-                onSend = {
-
-                }
-            ),
-            value = "messageXXXmessageXXXmessageXXXmessageXXXmessageXXXmessageXXXmessageXXXmessageXXXmessageXXXmessageXXXmessageXXXmessage",
-            onValueChange = {  },
-        )
-
-
-
-        IconButton(
-            colors = IconButtonDefaults.iconButtonColors(),
-            onClick = {
-
-            }
-        ) {
-            Icon(imageVector = Icons.Filled.Send, contentDescription = "send message")
-        }
-    }
-}
