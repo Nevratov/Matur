@@ -40,7 +40,7 @@ class WebSocketListener (
                 onStatusReceived(mapper.responseWSDtoToNetworkStatus(responseDto))
             }
             WebSocketConst.READ_ALL_TYPE -> {
-                onUserIdReadAllMessages(responseDto.id)
+                onUserIdReadAllMessages(responseDto.senderId)
             }
         }
         logWebSocket("Received: $text")

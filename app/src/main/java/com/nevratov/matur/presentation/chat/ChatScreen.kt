@@ -205,10 +205,7 @@ private fun Chat(
             messageState = message,
             viewModel = viewModel,
             onValueChanged = { newValue ->
-                message.value = newValue.copy(
-                    text = newValue.text,
-                    selection = TextRange(newValue.text.length)
-                )
+                message.value = newValue.copy(text = newValue.text)
             },
             onEmojiIcoClicked = { showEmojiPicker.value = !showEmojiPicker.value },
             messageReset = { message.value = TextFieldValue("") }

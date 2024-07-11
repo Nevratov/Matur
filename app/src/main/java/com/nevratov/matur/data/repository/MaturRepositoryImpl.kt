@@ -6,13 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Icon
-import android.media.RingtoneManager
 import android.util.Log
-import android.widget.RemoteViews
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -39,13 +33,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -152,7 +142,6 @@ class MaturRepositoryImpl @Inject constructor(
 //            delay(10)
 
             emit(testListExploreUsers.firstOrNull())
-            Log.d("ExploreScreen", "Emitted: $testListExploreUsers")
         }
     }
         .stateIn(
@@ -188,7 +177,9 @@ class MaturRepositoryImpl @Inject constructor(
     private val onlineStatusDialogUserStateFlow = flow {
         onlineStatusRefreshFlow.collect {
             _onlineUsers[it.userId] = it.isOnline
-            if (it.userId == dialogUserId) { emit(it.isOnline) }
+            if (it.userId == dialogUserId) {
+                emit(it.isOnline)
+            }
         }
     }.stateIn(
         scope = coroutineScope,
@@ -201,9 +192,8 @@ class MaturRepositoryImpl @Inject constructor(
         users.forEach { _onlineUsers[it] = true }
     }
 
-    private fun checkOnlineStatusByUserId(id: Int): Boolean  {
+    private fun checkOnlineStatusByUserId(id: Int): Boolean {
         val x = _onlineUsers[id] ?: false
-        Log.d("getOnlineUsersId", "userID $id = $x")
         return x
     }
 
@@ -238,8 +228,18 @@ class MaturRepositoryImpl @Inject constructor(
                         onlineStatusRefreshFlow.emit(status)
                     }
                 },
-                onUserIdReadAllMessages = {
-
+                onUserIdReadAllMessages = { id ->
+                    if (id == dialogUserId) {
+                        val readMessages = mutableListOf<Message>()
+                        _chatMessages.forEach { oldMessage ->
+                            readMessages.add(oldMessage.copy(isRead = true))
+                        }
+                        _chatMessages.clear()
+                        _chatMessages.addAll(readMessages)
+                        coroutineScope.launch {
+                            refreshMessagesEvents.emit(Unit)
+                        }
+                    }
                 },
                 senderId = getUserOrNull()?.id ?: throw RuntimeException("User == null")
             )
@@ -256,7 +256,7 @@ class MaturRepositoryImpl @Inject constructor(
         }
     }
 
-    // Notifications
+// Notifications
 
     private fun sendNotificationNewMessage(message: Message) {
         coroutineScope.launch {
@@ -266,16 +266,19 @@ class MaturRepositoryImpl @Inject constructor(
                 .data(sender.logoUrl)
                 .build()
 
-            val imageResult = (application.applicationContext.imageLoader.execute(imageRequest) as SuccessResult).drawable
+            val imageResult =
+                (application.applicationContext.imageLoader.execute(imageRequest) as SuccessResult).drawable
             val bitmap = (imageResult as BitmapDrawable).bitmap
 
-            val notificationBuilder = Notification.Builder(application.applicationContext, CHANEL_ID)
-                .setSmallIcon(R.drawable.matur_ico)
-                .setContentTitle("${sender.name} · Matur")
-                .setContentText(message.content)
-                .setLargeIcon(bitmap)
+            val notificationBuilder =
+                Notification.Builder(application.applicationContext, CHANEL_ID)
+                    .setSmallIcon(R.drawable.matur_ico)
+                    .setContentTitle("${sender.name} · Matur")
+                    .setContentText(message.content)
+                    .setLargeIcon(bitmap)
 
-            val notificationManager = getSystemService(application.applicationContext, NotificationManager::class.java)
+            val notificationManager =
+                getSystemService(application.applicationContext, NotificationManager::class.java)
 
             val channel = NotificationChannel(
                 CHANEL_ID,
@@ -289,7 +292,7 @@ class MaturRepositoryImpl @Inject constructor(
         }
     }
 
-    // Save User in cache with SharedPreferences
+// Save User in cache with SharedPreferences
 
     private fun saveUserAndToken(user: User, token: String) {
         Log.d("User", user.toString())
@@ -313,7 +316,7 @@ class MaturRepositoryImpl @Inject constructor(
             ?: throw RuntimeException("authKey == null")
     }
 
-    // Implementations
+// Implementations
 
     override fun getAuthStateFlow() = authStateFlow
 
@@ -363,7 +366,8 @@ class MaturRepositoryImpl @Inject constructor(
         resetDialogOptions()
         dialogUserId = id
 
-        val onlineStatusDialogUser = NetworkStatus(userId = id, isOnline = checkOnlineStatusByUserId(id))
+        val onlineStatusDialogUser =
+            NetworkStatus(userId = id, isOnline = checkOnlineStatusByUserId(id))
         onlineStatusRefreshFlow.emit(onlineStatusDialogUser)
 
         loadNextMessages(messagesWithId = id)
@@ -439,10 +443,10 @@ class MaturRepositoryImpl @Inject constructor(
         delay(RETRY_TIMEOUT_MILLIS)
         true
     }.stateIn(
-            scope = coroutineScope,
-            started = SharingStarted.Lazily,
-            initialValue = listOf()
-        )
+        scope = coroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = listOf()
+    )
 
     override fun onlineStatus(): StateFlow<Boolean> = onlineStatusDialogUserStateFlow
 
