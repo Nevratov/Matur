@@ -188,9 +188,15 @@ class Mapper {
 
         val pattern = "Был(а) в сети"
         return when(difference) {
-            in 0..MILLIS_IN_HOUR -> { "$pattern $minute мин. назад" }
-            in MILLIS_IN_HOUR ..MILLIS_IN_6_HOUR -> { "$pattern $hour ч. назад" }
-            in MILLIS_IN_6_HOUR .. MILLIS_IN_DAY -> { "$pattern в $hour:$minute" }
+            in 0..MILLIS_IN_HOUR -> {
+                "$pattern ${TimeUnit.MILLISECONDS.toMinutes(difference)} мин. назад"
+            }
+            in MILLIS_IN_HOUR ..MILLIS_IN_6_HOUR -> {
+                "$pattern ${TimeUnit.MILLISECONDS.toHours(difference)} ч. назад"
+            }
+            in MILLIS_IN_6_HOUR .. MILLIS_IN_DAY -> {
+                "$pattern в $hour:$minute"
+            }
             in MILLIS_IN_DAY .. MILLIS_IN_WEEK-> {
                 String.format(Locale.getDefault(),"$pattern %02d.%02d в $hour:$minute", day, month)
             }
