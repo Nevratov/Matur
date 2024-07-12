@@ -38,12 +38,14 @@ class ChatViewModel @Inject constructor(
 
     val chatScreenState = getMessagesByUserIdUseCase(id = dialogUser.id)
         .onStart { observeOnlineStatus() }
-        .map { ChatScreenState.Content(
-            messages = it,
-            userId = userId,
-            receiverId = dialogUser.id,
-            onlineStatus = onlineStatus().value
-        ) }
+        .map {
+            ChatScreenState.Content(
+                messages = it,
+                userId = userId,
+                dialogUser = dialogUser,
+                onlineStatus = onlineStatus().value
+            )
+        }
         .mergeWith(loadNextMessagesFlow)
         .mergeWith(onlineStatusRefreshFlow)
         .stateIn(
@@ -74,7 +76,12 @@ class ChatViewModel @Inject constructor(
                 true -> {}
                 false -> {
                     val newState = chatScreenState.value as ChatScreenState.Content
-                    loadNextMessagesFlow.emit(newState.copy(loadNextMessages = false, isNextMessages = false))
+                    loadNextMessagesFlow.emit(
+                        newState.copy(
+                            loadNextMessages = false,
+                            isNextMessages = false
+                        )
+                    )
                 }
             }
         }
@@ -86,10 +93,18 @@ class ChatViewModel @Inject constructor(
 
     private fun observeOnlineStatus() {
         viewModelScope.launch {
-            onlineStatus().collect {
+            onlineStatus().collect { status ->
                 val currentState = chatScreenState.value
                 if (currentState !is ChatScreenState.Content) return@collect
-                    onlineStatusRefreshFlow.emit(currentState.copy(onlineStatus = it))
+
+                if (status) onlineStatusRefreshFlow.emit(currentState.copy(onlineStatus = true))
+                else {
+                    val currentTimestamp = System.currentTimeMillis()
+                    onlineStatusRefreshFlow.emit(currentState.copy(
+                        onlineStatus = false,
+                        dialogUser = dialogUser.copy(wasOnlineTimestamp = currentTimestamp)
+                    ))
+                }
             }
         }
     }

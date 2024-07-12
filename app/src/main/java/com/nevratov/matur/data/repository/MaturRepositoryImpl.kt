@@ -98,7 +98,7 @@ class MaturRepositoryImpl @Inject constructor(
                     name = "Надя $it",
                     gender = "",
                     birthday = "",
-                    wasOnline = "",
+                    wasOnlineTimestamp = 0,
                     cityId = 1,
                     aboutMe = "Очень красивая девушка твоей мечты. Шлю $it воздушных поцелуев",
                     height = 160,
@@ -179,10 +179,15 @@ class MaturRepositoryImpl @Inject constructor(
     private val onlineStatusRefreshFlow = MutableSharedFlow<NetworkStatus>()
 
     private val onlineStatusDialogUserStateFlow = flow {
-        onlineStatusRefreshFlow.collect {
-            _onlineUsers[it.userId] = it.isOnline
-            if (it.userId == dialogUserId) {
-                emit(it.isOnline)
+        onlineStatusRefreshFlow.collect { newStatus ->
+            _onlineUsers[newStatus.userId] = newStatus.isOnline
+            if (newStatus.userId == dialogUserId) {
+                emit(newStatus.isOnline)
+            }
+            chatList.find { item -> item.user.id == newStatus.userId }?.let { item ->
+                val currentTimestamp = System.currentTimeMillis()
+                val itemIndex = chatList.indexOf(item)
+                _chatList[itemIndex] = item.copy(user = item.user.copy(wasOnlineTimestamp = currentTimestamp))
             }
         }
     }.stateIn(

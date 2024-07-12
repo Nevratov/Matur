@@ -39,7 +39,7 @@ class Mapper {
             logoUrl = userDto.images.firstOrNull()?.sizes?.urlSquare1024,
             gender = getGenderByNumber(userDto.gender),
             birthday = userDto.birthday,
-            wasOnline = timestampToTime(userDto.wasOnlineTimestampSec),
+            wasOnlineTimestamp = userDto.wasOnlineTimestampSec * MILLIS_IN_SEC,
             cityId = userDto.cityId,
             aboutMe = userDto.aboutMe,
             height = userDto.height,
@@ -169,45 +169,6 @@ class Mapper {
         page = "1"
     )
 
-    private fun timestampToTime(timestampSec: Long): String {
-        val currentTime = System.currentTimeMillis()
-        val difference = currentTime - (timestampSec * MILLIS_IN_SEC)
-        Log.d("timestampToTime", "current millis = $currentTime")
-        Log.d("timestampToTime", "userWas millis = ${timestampSec * MILLIS_IN_SEC}")
-        Log.d("timestampToTime", "$difference")
-
-        val calendar = Calendar.getInstance().apply {
-            time = Date(timestampSec * MILLIS_IN_SEC)
-        }
-
-        val minute = calendar.get(Calendar.MINUTE)
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        val month = calendar.get(Calendar.MONTH)
-        val year = calendar.get(Calendar.YEAR)
-
-        val pattern = "Был(а) в сети"
-        return when(difference) {
-            in 0..MILLIS_IN_HOUR -> {
-                "$pattern ${TimeUnit.MILLISECONDS.toMinutes(difference)} мин. назад"
-            }
-            in MILLIS_IN_HOUR ..MILLIS_IN_6_HOUR -> {
-                "$pattern ${TimeUnit.MILLISECONDS.toHours(difference)} ч. назад"
-            }
-            in MILLIS_IN_6_HOUR .. MILLIS_IN_DAY -> {
-                "$pattern в $hour:$minute"
-            }
-            in MILLIS_IN_DAY .. MILLIS_IN_WEEK-> {
-                String.format(Locale.getDefault(),"$pattern %02d.%02d в $hour:$minute", day, month)
-            }
-            in MILLIS_IN_WEEK .. MILLIS_IN_MONTH -> {
-                "$pattern ${TimeUnit.MILLISECONDS.toDays(difference)} дн. назад"
-            }
-            else -> {
-                String.format(Locale.getDefault(),"$pattern %02d.%02d.$year", day, month)
-            }
-        }
-    }
 
     private fun getBirthday(day: String, month: String, year: String) = "$year-$month-$day"
 
@@ -227,10 +188,5 @@ class Mapper {
 
     private companion object {
         private const val MILLIS_IN_SEC = 1000
-        private const val MILLIS_IN_HOUR = 3_600_000
-        private const val MILLIS_IN_6_HOUR = 21_600_000
-        private const val MILLIS_IN_DAY = 86_400_000
-        private const val MILLIS_IN_WEEK = 604_800_000
-        private const val MILLIS_IN_MONTH = 2_592_000_000
     }
 }

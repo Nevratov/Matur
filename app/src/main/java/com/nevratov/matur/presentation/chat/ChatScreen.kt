@@ -109,7 +109,6 @@ private fun ChatScreenContent(
             Chat(
                 screenState = currentState,
                 maxWidthItem = maxWidthItem,
-                dialogUser = dialogUser,
                 viewModel = viewModel,
                 onBackPressed = onBackPressed
             )
@@ -132,7 +131,6 @@ private fun ChatScreenContent(
 private fun Chat(
     screenState: ChatScreenState.Content,
     maxWidthItem: Dp,
-    dialogUser: User,
     viewModel: ChatViewModel,
     onBackPressed: () -> Unit
 ) {
@@ -149,7 +147,6 @@ private fun Chat(
     ) {
         ProfilePanel(
             screenState = screenState,
-            dialogUser = dialogUser,
             onBackPressed = onBackPressed
         )
 
@@ -239,7 +236,6 @@ fun SeparateLine() {
 @Composable
 private fun ProfilePanel(
     screenState: ChatScreenState.Content,
-    dialogUser: User,
     onBackPressed: () -> Unit,
 ) {
     Row(
@@ -263,21 +259,21 @@ private fun ProfilePanel(
             modifier = Modifier
                 .size(55.dp)
                 .clip(CircleShape),
-            model = dialogUser.logoUrl,
+            model = screenState.dialogUser.logoUrl,
             contentScale = ContentScale.Crop,
             contentDescription = "person's photo"
         )
         Spacer(modifier = Modifier.width(12.dp))
         Column {
             Text(
-                text = dialogUser.name,
+                text = screenState.dialogUser.name,
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.background
             )
 
             val color = if (screenState.onlineStatus) Color.Green else Color.Red
-            val textStatus = if (screenState.onlineStatus) "online" else dialogUser.wasOnline
+            val textStatus = if (screenState.onlineStatus) "online" else screenState.dialogUser.wasOnlineText
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
@@ -381,7 +377,7 @@ fun getMessage(
     val result = Message(
         id = 0,
         senderId = screenState.userId,
-        receiverId = screenState.receiverId,
+        receiverId = screenState.dialogUser.id,
         content = message.text,
         timestamp = System.currentTimeMillis(),
         isRead = false
