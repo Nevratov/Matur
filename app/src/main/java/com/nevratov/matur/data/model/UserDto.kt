@@ -7,6 +7,7 @@ data class UserDto(
     @SerializedName("name") val name: String,
     @SerializedName("gender") val gender: Int,
     @SerializedName("birthday") val birthday: String,
+    @SerializedName("updated_at") val wasOnlineTimestampSec: Long,
     @SerializedName("city_id") val cityId: Int,
     @SerializedName("about_me") val aboutMe: String,
     @SerializedName("height") val height: Int,

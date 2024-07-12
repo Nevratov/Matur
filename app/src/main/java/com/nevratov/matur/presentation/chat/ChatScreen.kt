@@ -277,7 +277,7 @@ private fun ProfilePanel(
             )
 
             val color = if (screenState.onlineStatus) Color.Green else Color.Red
-            val textStatus = if (screenState.onlineStatus) "online" else "offline"
+            val textStatus = if (screenState.onlineStatus) "online" else dialogUser.wasOnline
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier

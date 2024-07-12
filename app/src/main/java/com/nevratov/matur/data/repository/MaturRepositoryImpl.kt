@@ -71,6 +71,9 @@ class MaturRepositoryImpl @Inject constructor(
                 emit(AuthState.NotAuthorized)
             }
         }
+    }.retry {
+        delay(RETRY_TIMEOUT_MILLIS)
+        true
     }.stateIn(
         scope = coroutineScope,
         started = SharingStarted.Lazily,
@@ -95,6 +98,7 @@ class MaturRepositoryImpl @Inject constructor(
                     name = "Надя $it",
                     gender = "",
                     birthday = "",
+                    wasOnline = "",
                     cityId = 1,
                     aboutMe = "Очень красивая девушка твоей мечты. Шлю $it воздушных поцелуев",
                     height = 160,

@@ -18,7 +18,7 @@ fun ProfileScreen() {
         verticalArrangement = Arrangement.Center
     ) {
 
-        Text(text = "Тут пока ничего нет")
+        Text(text = "Тут пока нихуя нет")
         CircularProgressIndicator()
     }
 }

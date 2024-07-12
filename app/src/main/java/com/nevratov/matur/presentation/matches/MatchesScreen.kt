@@ -48,6 +48,7 @@ fun MatchesScreen(
                     aboutMe = "",
                     gender = "",
                     birthday = "",
+                    wasOnline = "",
                     cityId = 12,
                     height = 120,
                     weight = 120,

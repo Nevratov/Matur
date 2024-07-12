@@ -12,6 +12,7 @@ data class User(
     val logoUrl: String?,
     val gender: String,
     val birthday: String,
+    val wasOnline: String,
     val cityId: Int,
     val aboutMe: String?,
     val height: Int,
