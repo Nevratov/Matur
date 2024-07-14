@@ -1,6 +1,7 @@
 package com.nevratov.matur.presentation.chat_list
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,12 +33,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
 import com.nevratov.matur.presentation.chat.Message
+import com.nevratov.matur.ui.theme.MaturAlternativeColor
 
 @Composable
 fun ChatListScreen(
@@ -96,27 +99,40 @@ private fun ChatList(
     userId: Int
 ) {
 
-    LazyColumn(
-        modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item {
-            Text(
-                text = stringResource(R.string.messages_label),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-        items(items = chatList, key = { it.user.id }) { chatListItem ->
-            MessageItem(
-                chatListItem = chatListItem,
-                onMessageItemClicked = onMessageItemClicked,
-                userId = userId
-            )
+    Column {
+
+         TopPanel()
+//        Spacer(modifier = Modifier.height(8.dp))
+
+        LazyColumn(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(items = chatList, key = { it.user.id }) { chatListItem ->
+                MessageItem(
+                    chatListItem = chatListItem,
+                    onMessageItemClicked = onMessageItemClicked,
+                    userId = userId
+                )
+            }
         }
     }
 
+}
+
+@Composable
+private fun TopPanel() {
+    Text(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaturAlternativeColor)
+            .padding(24.dp),
+        text = stringResource(R.string.messages_label),
+        color = Color.White,
+        textAlign = TextAlign.Start,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Medium
+    )
 }
 
 @Composable
@@ -176,7 +192,9 @@ private fun MessageTimeAndIsRead(
     val icoId = if (message.isRead) R.drawable.check_mark_double else R.drawable.check_mark
     if (userId == message.senderId) {
         Icon(
-            modifier = Modifier.size(22.dp).padding(end = 4.dp),
+            modifier = Modifier
+                .size(22.dp)
+                .padding(end = 4.dp),
             painter = painterResource(id = icoId),
             contentDescription = null
         )

@@ -160,7 +160,21 @@ class MaturRepositoryImpl @Inject constructor(
     private val chatList: List<ChatListItem>
         get() = _chatList.toList()
 
-    private val chatListRefreshEvents = MutableSharedFlow<Message>()
+    private val chatListRefreshEvents = MutableSharedFlow<Unit>()
+
+    private suspend fun refreshChatList(newMessage: Message) {
+        _chatList.apply {
+            val chatListItem = find {
+                it.user.id == newMessage.senderId || it.user.id == newMessage.receiverId
+            }
+            val newChatListItem = chatListItem?.copy(
+                message = newMessage,
+            )
+            remove(chatListItem)
+            newChatListItem?.let { add(it) }
+        }
+        chatListRefreshEvents.emit(Unit)
+    }
 
     // Chat Screen
 
@@ -187,7 +201,9 @@ class MaturRepositoryImpl @Inject constructor(
             chatList.find { item -> item.user.id == newStatus.userId }?.let { item ->
                 val currentTimestamp = System.currentTimeMillis()
                 val itemIndex = chatList.indexOf(item)
-                _chatList[itemIndex] = item.copy(user = item.user.copy(wasOnlineTimestamp = currentTimestamp))
+                val newItem =  item.copy(user = item.user.copy(wasOnlineTimestamp = currentTimestamp))
+                _chatList[itemIndex] = newItem
+                chatListRefreshEvents.emit(Unit)
             }
         }
     }.stateIn(
@@ -261,7 +277,7 @@ class MaturRepositoryImpl @Inject constructor(
                 _chatMessages.add(index = 0, element = message)
                 refreshMessagesEvents.emit(Unit)
             }
-            chatListRefreshEvents.emit(message)
+            refreshChatList(message)
         }
     }
 
@@ -304,14 +320,12 @@ class MaturRepositoryImpl @Inject constructor(
 // Save User in cache with SharedPreferences
 
     private fun saveUserAndToken(user: User, token: String) {
-        Log.d("User", user.toString())
         sharedPreferences.edit().apply {
             val userJson = Gson().toJson(user)
             putString(USER_KEY, userJson)
             putString(TOKEN_KEY, token)
             apply()
         }
-        Log.d("User", "auth = ${getToken()}")
         checkAuthState()
     }
 
@@ -375,10 +389,6 @@ class MaturRepositoryImpl @Inject constructor(
         resetDialogOptions()
         dialogUserId = id
 
-        val onlineStatusDialogUser =
-            NetworkStatus(userId = id, isOnline = checkOnlineStatusByUserId(id))
-        onlineStatusRefreshFlow.emit(onlineStatusDialogUser)
-
         loadNextMessages(messagesWithId = id)
         refreshMessagesEvents.collect {
             emit(chatMessages)
@@ -425,7 +435,7 @@ class MaturRepositoryImpl @Inject constructor(
 
         _chatMessages.add(index = 0, element = messageWithId)
         refreshMessagesEvents.emit(Unit)
-        chatListRefreshEvents.emit(messageWithId)
+        refreshChatList(messageWithId)
     }
 
     override fun getChatList(): StateFlow<List<ChatListItem>> = flow {
@@ -434,18 +444,7 @@ class MaturRepositoryImpl @Inject constructor(
         _chatList.addAll(downloadedChatList)
         emit(downloadedChatList)
 
-        chatListRefreshEvents.collect { newMessage ->
-            _chatList.apply {
-                val chatListItem = find {
-                    it.user.id == newMessage.senderId || it.user.id == newMessage.receiverId
-                }
-                val newChatListItem = chatListItem?.copy(
-                    message = newMessage,
-                )
-                remove(chatListItem)
-                newChatListItem?.let { add(it) }
-            }
-
+        chatListRefreshEvents.collect {
             emit(chatList.sortedByDescending { it.message.timestamp })
         }
     }.retry {
@@ -474,7 +473,6 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     override fun resetDialogOptions() {
-        Log.d("onCleared", "impl repo - reset")
         _chatMessages.clear()
         dialogPage = DEFAULT_PAGE
         dialogUserId = null

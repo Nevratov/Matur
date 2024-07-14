@@ -183,7 +183,6 @@ private fun Chat(
                     viewModel.showToast()
                 } else {
                     SideEffect {
-                        Log.d("messageId", "SideEffect")
                         viewModel.loadNextMessages()
                     }
                 }
@@ -273,7 +272,11 @@ private fun ProfilePanel(
             )
 
             val color = if (screenState.onlineStatus) Color.Green else Color.Red
-            val textStatus = if (screenState.onlineStatus) "online" else screenState.dialogUser.wasOnlineText
+
+            val duwo = screenState.dialogUser.wasOnlineText
+            Log.d("onlineStatusDialogUserStateFlow", "StringChat - $duwo")
+
+            val textStatus = if (screenState.onlineStatus) "online" else duwo
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
