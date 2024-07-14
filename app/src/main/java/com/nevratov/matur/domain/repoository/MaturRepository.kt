@@ -43,4 +43,6 @@ interface MaturRepository {
     suspend fun loadNextMessages(messagesWithId: Int): Boolean
 
     fun resetDialogOptions()
+
+    fun createNewFCMToken(newToken: String)
 }

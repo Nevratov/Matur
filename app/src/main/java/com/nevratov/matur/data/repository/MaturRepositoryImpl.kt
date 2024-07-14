@@ -478,6 +478,15 @@ class MaturRepositoryImpl @Inject constructor(
         dialogUserId = null
     }
 
+    override fun createNewFCMToken(newToken: String) {
+        coroutineScope.launch {
+            apiService.createNewFCMToken(
+                token = getToken(),
+                newToken = mapper.stringToCreateFCMTokenDto(newToken)
+            )
+        }
+    }
+
     companion object {
         private const val USER_KEY = "user_data"
         private const val TOKEN_KEY = "token"

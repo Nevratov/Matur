@@ -1,16 +1,16 @@
 package com.nevratov.matur.data
 
-import android.icu.util.Calendar
 import android.util.Log
 import com.nevratov.matur.data.model.ChatListItemDto
 import com.nevratov.matur.data.model.CreateMessageDto
+import com.nevratov.matur.data.model.CreateNewFCMTokenDto
 import com.nevratov.matur.data.model.DislikedUserDto
-import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
-import com.nevratov.matur.data.model.ResponseWSDto
+import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RegUserInfoDto
+import com.nevratov.matur.data.model.ResponseWSDto
 import com.nevratov.matur.data.model.SendMessageWSDto
 import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.data.network.webSocket.WebSocketConst
@@ -21,13 +21,6 @@ import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.Genders
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 class Mapper {
 
@@ -168,6 +161,8 @@ class Mapper {
         pageSize = (100 * page).toString(),
         page = "1"
     )
+
+    fun stringToCreateFCMTokenDto(newToken: String) = CreateNewFCMTokenDto(token = newToken)
 
 
     private fun getBirthday(day: String, month: String, year: String) = "$year-$month-$day"

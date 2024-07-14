@@ -3,6 +3,7 @@ package com.nevratov.matur.data.network
 import com.nevratov.matur.data.model.ChatListResponseDto
 import com.nevratov.matur.data.model.ChatMessagesResponse
 import com.nevratov.matur.data.model.CreateMessageDto
+import com.nevratov.matur.data.model.CreateNewFCMTokenDto
 import com.nevratov.matur.data.model.DislikedUserDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
@@ -33,7 +34,6 @@ interface ApiService {
     @GET("city/get-by-name")
     suspend fun getCitiesByName(@Query("q") name: String): List<City>
 
-    @Headers("Content-Type: application/json")
     @GET("like/user-list")
     suspend fun getUsersToExplore(@Header("Authorization") token: String): UsersToExploreResponseDto
 
@@ -49,21 +49,18 @@ interface ApiService {
         @Body likedUser: LikedUserDto
     )
 
-    @Headers("Content-Type: application/json")
     @POST("im/create")
     suspend fun sendMessage(
         @Header("Authorization") token: String,
         @Body message: CreateMessageDto
     ) : SendMessageResponse
 
-    @Headers("Content-Type: application/json")
     @POST("im/messages")
     suspend fun getChatMessages(
         @Header("Authorization") token: String,
         @Body messagesOptions: MessagesOptionsDto
     ): ChatMessagesResponse
 
-    @Headers("Content-Type: application/json")
     @GET("im")
     suspend fun getChatList(
         @Header("Authorization") token: String
@@ -75,7 +72,12 @@ interface ApiService {
         @Path("id") id: Int
     ): UserDto
 
-    @Headers("Content-Type: application/json")
     @GET("user/online")
     suspend fun getOnlineUsersId(@Header("Authorization") token: String): List<Int>
+    
+    @GET("firebase-token/create")
+    suspend fun createNewFCMToken(
+        @Header("Authorization") token: String,
+        @Body newToken: CreateNewFCMTokenDto
+    )
 }

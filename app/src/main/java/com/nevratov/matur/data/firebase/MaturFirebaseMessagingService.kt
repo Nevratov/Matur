@@ -12,9 +12,14 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.nevratov.matur.R
+import com.nevratov.matur.data.model.CreateNewFCMTokenDto
+import com.nevratov.matur.domain.usecases.CreateNewFCMTokenUseCase
 import com.nevratov.matur.presentation.main.MainActivity
+import javax.inject.Inject
 
-class MaturFirebaseMessagingService : FirebaseMessagingService() {
+class MaturFirebaseMessagingService @Inject constructor(
+    private val createNewFCMTokenUseCase: CreateNewFCMTokenUseCase
+) : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
@@ -36,6 +41,7 @@ class MaturFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+        createNewFCMTokenUseCase(newToken = token)
         log("Refreshed token: $token")
     }
 
