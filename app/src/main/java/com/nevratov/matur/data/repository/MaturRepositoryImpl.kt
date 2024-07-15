@@ -198,12 +198,15 @@ class MaturRepositoryImpl @Inject constructor(
             if (newStatus.userId == dialogUserId) {
                 emit(newStatus.isOnline)
             }
-            chatList.find { item -> item.user.id == newStatus.userId }?.let { item ->
-                val currentTimestamp = System.currentTimeMillis()
-                val itemIndex = chatList.indexOf(item)
-                val newItem =  item.copy(user = item.user.copy(wasOnlineTimestamp = currentTimestamp))
-                _chatList[itemIndex] = newItem
-                chatListRefreshEvents.emit(Unit)
+            if (!newStatus.isOpenedChatScreen) {
+                chatList.find { item -> item.user.id == newStatus.userId }?.let { item ->
+                    val currentTimestamp = System.currentTimeMillis()
+                    val itemIndex = chatList.indexOf(item)
+                    val newItem =
+                        item.copy(user = item.user.copy(wasOnlineTimestamp = currentTimestamp))
+                    _chatList[itemIndex] = newItem
+                    chatListRefreshEvents.emit(Unit)
+                }
             }
         }
     }.stateIn(
@@ -231,8 +234,15 @@ class MaturRepositoryImpl @Inject constructor(
                 Log.w("FCM", "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
-            val token = task.result
-            Log.d("FCM", "token = $token")
+            coroutineScope.launch {
+                val token = task.result
+
+//                apiService.createNewFCMToken(
+//                    token = getToken(),
+//                    newToken = mapper.stringToCreateFCMTokenDto(newToken = token)
+//                )
+                Log.d("FCM", "token = $token")
+            }
         })
     }
 
@@ -388,6 +398,13 @@ class MaturRepositoryImpl @Inject constructor(
     override fun getMessagesByUserId(id: Int) = flow {
         resetDialogOptions()
         dialogUserId = id
+
+        val networkStatus = NetworkStatus(
+            userId = id,
+            isOnline = checkOnlineStatusByUserId(id),
+            isOpenedChatScreen = true
+        )
+        onlineStatusRefreshFlow.emit(networkStatus)
 
         loadNextMessages(messagesWithId = id)
         refreshMessagesEvents.collect {

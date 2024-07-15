@@ -11,15 +11,20 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.google.gson.Gson
 import com.nevratov.matur.R
-import com.nevratov.matur.data.model.CreateNewFCMTokenDto
-import com.nevratov.matur.domain.usecases.CreateNewFCMTokenUseCase
+import com.nevratov.matur.data.Mapper
+import com.nevratov.matur.data.network.ApiFactory
+import com.nevratov.matur.data.repository.MaturRepositoryImpl
+import com.nevratov.matur.data.repository.MaturRepositoryImpl.Companion
 import com.nevratov.matur.presentation.main.MainActivity
-import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class MaturFirebaseMessagingService @Inject constructor(
-    private val createNewFCMTokenUseCase: CreateNewFCMTokenUseCase
-) : FirebaseMessagingService() {
+class MaturFirebaseMessagingService () : FirebaseMessagingService() {
+
+
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
@@ -40,9 +45,26 @@ class MaturFirebaseMessagingService @Inject constructor(
     }
 
     override fun onNewToken(token: String) {
-        super.onNewToken(token)
-        createNewFCMTokenUseCase(newToken = token)
-        log("Refreshed token: $token")
+        log("Refreshed token: pre refresh")
+        CoroutineScope(Dispatchers.Default).launch {
+
+            val apiService = ApiFactory.apiService
+            val mapper = Mapper()
+
+            val USER_KEY = "user_data"
+            val TOKEN_KEY = "token"
+            val FCM_TOKEN_KEY = "token"
+
+
+            val sharedPreferences = application.getSharedPreferences(USER_KEY, MODE_PRIVATE)
+            sharedPreferences.edit().apply {
+                putString(FCM_TOKEN_KEY, token)
+                log("NEW token saved = $token")
+                apply()
+            }
+
+            log("Refreshed token: $token")
+        }
     }
 
 

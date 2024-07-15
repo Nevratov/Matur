@@ -74,8 +74,8 @@ interface ApiService {
 
     @GET("user/online")
     suspend fun getOnlineUsersId(@Header("Authorization") token: String): List<Int>
-    
-    @GET("firebase-token/create")
+
+    @POST("firebase-token/create")
     suspend fun createNewFCMToken(
         @Header("Authorization") token: String,
         @Body newToken: CreateNewFCMTokenDto

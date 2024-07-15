@@ -4,13 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
-import com.nevratov.matur.R
 import com.nevratov.matur.presentation.chat_list.ChatListViewModel
 import com.nevratov.matur.presentation.explore.ExploreViewModel
 import com.nevratov.matur.presentation.getApplicationComponent
 import com.nevratov.matur.presentation.main.login.LoginViewModel
 import com.nevratov.matur.presentation.main.registration.RegistrationViewModel
-import com.nevratov.matur.ui.theme.MaturAlternativeColor
 import com.nevratov.matur.ui.theme.MaturTheme
 import javax.inject.Inject
 

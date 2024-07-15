@@ -16,6 +16,7 @@ class LoginViewModel @Inject constructor(
 
     init {
         _state.value = LoginScreenState.Content("59aksai59@mail.ru", "123123")
+//        _state.value = LoginScreenState.Content("aeinmylife@gmail.com", "2fo7R5")
     }
 
     fun login() {
