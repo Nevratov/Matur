@@ -11,12 +11,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.google.gson.Gson
 import com.nevratov.matur.R
-import com.nevratov.matur.data.Mapper
-import com.nevratov.matur.data.network.ApiFactory
-import com.nevratov.matur.data.repository.MaturRepositoryImpl
-import com.nevratov.matur.data.repository.MaturRepositoryImpl.Companion
 import com.nevratov.matur.presentation.main.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -45,26 +40,8 @@ class MaturFirebaseMessagingService () : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        log("Refreshed token: pre refresh")
-        CoroutineScope(Dispatchers.Default).launch {
-
-            val apiService = ApiFactory.apiService
-            val mapper = Mapper()
-
-            val USER_KEY = "user_data"
-            val TOKEN_KEY = "token"
-            val FCM_TOKEN_KEY = "token"
-
-
-            val sharedPreferences = application.getSharedPreferences(USER_KEY, MODE_PRIVATE)
-            sharedPreferences.edit().apply {
-                putString(FCM_TOKEN_KEY, token)
-                log("NEW token saved = $token")
-                apply()
-            }
-
-            log("Refreshed token: $token")
-        }
+        super.onNewToken(token)
+        Log.d("FCM", "onNewToken = $token")
     }
 
 
@@ -104,7 +81,6 @@ class MaturFirebaseMessagingService () : FirebaseMessagingService() {
     }
 
     companion object {
-
         private const val CHANEL_ID = "20"
         private const val CONTENT_TITLE = "Сообщение"
         private const val CHANEL_NAME = "received_messages"

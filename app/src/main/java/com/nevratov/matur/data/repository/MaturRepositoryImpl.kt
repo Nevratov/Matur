@@ -49,7 +49,8 @@ class MaturRepositoryImpl @Inject constructor(
     private val apiService = ApiFactory.apiService
     private val mapper = Mapper()
 
-    private val sharedPreferences = application.getSharedPreferences(USER_KEY, MODE_PRIVATE)
+    private val userSharedPreferences = application.getSharedPreferences(USER_KEY, MODE_PRIVATE)
+    private val firebaseSharedPreferences = application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -236,14 +237,23 @@ class MaturRepositoryImpl @Inject constructor(
             }
             coroutineScope.launch {
                 val token = task.result
-
-//                apiService.createNewFCMToken(
-//                    token = getToken(),
-//                    newToken = mapper.stringToCreateFCMTokenDto(newToken = token)
-//                )
-                Log.d("FCM", "token = $token")
+                Log.d("FCM", "task.isSuccessful | token = $token")
+                checkOnNewFCMToken(token)
             }
         })
+    }
+
+    private suspend fun checkOnNewFCMToken(newToken: String) {
+        val oldToken = firebaseSharedPreferences.getString(FCM_TOKEN_KEY, null)
+        Log.d("FCM", "check token, old token = $oldToken")
+        if (oldToken == newToken) return
+
+        apiService.createNewFCMToken(token = getToken(), newToken = mapper.stringToCreateFCMTokenDto(newToken))
+        firebaseSharedPreferences.edit().apply {
+            putString(FCM_TOKEN_KEY, newToken)
+            apply()
+        }
+        Log.d("FCM", "new Token is REGISTER")
     }
 
 
@@ -330,7 +340,7 @@ class MaturRepositoryImpl @Inject constructor(
 // Save User in cache with SharedPreferences
 
     private fun saveUserAndToken(user: User, token: String) {
-        sharedPreferences.edit().apply {
+        userSharedPreferences.edit().apply {
             val userJson = Gson().toJson(user)
             putString(USER_KEY, userJson)
             putString(TOKEN_KEY, token)
@@ -340,12 +350,12 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     private fun getUserOrNull(): User? {
-        val userJson = sharedPreferences.getString(USER_KEY, null)
+        val userJson = userSharedPreferences.getString(USER_KEY, null)
         return Gson().fromJson(userJson, User::class.java)
     }
 
     private fun getToken(): String {
-        return sharedPreferences.getString(TOKEN_KEY, null)
+        return userSharedPreferences.getString(TOKEN_KEY, null)
             ?: throw RuntimeException("authKey == null")
     }
 
@@ -395,7 +405,7 @@ class MaturRepositoryImpl @Inject constructor(
         refreshExploreUsersEvents.emit(Unit)
     }
 
-    override fun getMessagesByUserId(id: Int) = flow {
+    override fun getChatByUserId(id: Int) = flow {
         resetDialogOptions()
         dialogUserId = id
 
@@ -507,6 +517,8 @@ class MaturRepositoryImpl @Inject constructor(
     companion object {
         private const val USER_KEY = "user_data"
         private const val TOKEN_KEY = "token"
+        const val FIREBASE_NAME = "firebase"
+        const val FCM_TOKEN_KEY = "fcm_token"
         private const val DEFAULT_PAGE = 1
         private const val RETRY_TIMEOUT_MILLIS = 1000L
         private const val CHANEL_ID = "30"

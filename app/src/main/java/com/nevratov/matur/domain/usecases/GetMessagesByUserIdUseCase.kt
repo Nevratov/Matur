@@ -5,5 +5,5 @@ import javax.inject.Inject
 
 class GetMessagesByUserIdUseCase @Inject constructor(private val repository: MaturRepository) {
 
-    operator fun invoke(id: Int) = repository.getMessagesByUserId(id)
+    operator fun invoke(id: Int) = repository.getChatByUserId(id)
 }

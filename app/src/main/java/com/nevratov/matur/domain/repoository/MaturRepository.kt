@@ -28,7 +28,7 @@ interface MaturRepository {
 
     fun getUsersToExplore(): StateFlow<User?>
 
-    fun getMessagesByUserId(id: Int): Flow<List<Message>>
+    fun getChatByUserId(id: Int): Flow<List<Message>>
 
     suspend fun sendMessage(message: Message)
 
