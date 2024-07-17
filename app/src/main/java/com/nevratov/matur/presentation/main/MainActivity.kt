@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
+import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.presentation.chat_list.ChatListViewModel
 import com.nevratov.matur.presentation.explore.ExploreViewModel
 import com.nevratov.matur.presentation.getApplicationComponent
@@ -38,13 +39,22 @@ class MainActivity : ComponentActivity() {
 
             val authState = mainViewModel.authState.collectAsState()
             MaturTheme {
-                MainScreen(
-                    authState = authState,
-                    exploreViewModel = exploreViewModel,
-                    loginViewModel = loginViewModel,
-                    registrationViewModel = registrationViewModel,
-                    chatListViewModel = chatListViewModel
-                )
+                when (authState.value) {
+                    AuthState.Authorized -> {
+                        MainScreen(
+                            authState = authState,
+                            exploreViewModel = exploreViewModel,
+                            chatListViewModel = chatListViewModel
+                        )
+                    }
+                    AuthState.NotAuthorized -> {
+                        LoginMainScreen(
+                            loginViewModel = loginViewModel,
+                            registrationViewModel = registrationViewModel
+                        )
+                    }
+                    AuthState.Initial -> {}
+                }
             }
         }
     }

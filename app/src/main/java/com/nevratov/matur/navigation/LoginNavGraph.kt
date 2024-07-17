@@ -17,42 +17,42 @@ import com.google.gson.Gson
 import com.nevratov.matur.domain.entity.User
 
 @Composable
-fun AppNavGraph(
+fun LoginNavGraph(
     navHostController: NavHostController,
-    exploreScreenContent: @Composable () -> Unit,
-    matchesScreenContent: @Composable () -> Unit,
-    chatListScreenContent: @Composable () -> Unit,
-    chatScreenContent: @Composable (User) -> Unit,
-    profileScreenContent: @Composable () -> Unit
+    loginScreenContent: @Composable () -> Unit,
+    requestNameScreenContent: @Composable () -> Unit,
+    requestDateScreenContent: @Composable () -> Unit,
+    requestCityScreenContent: @Composable () -> Unit,
+    requestEmailScreenContent: @Composable () -> Unit,
+    registrationSuccessScreenContent: @Composable () -> Unit
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = Screen.Explore.route,
+        startDestination = Screen.Login.route,
         builder = {
             composableWithTransition(
-                route = Screen.Explore.route,
-                content = { exploreScreenContent() }
+                route = Screen.Login.route,
+                content = { loginScreenContent() }
             )
             composableWithTransition(
-                route = Screen.Matches.route,
-                content = { matchesScreenContent() }
+                route = Screen.RequestName.route,
+                content = { requestNameScreenContent() }
             )
             composableWithTransition(
-                route = Screen.ChatList.route,
-                content = { chatListScreenContent() }
+                route = Screen.RequestDate.route,
+                content = { requestDateScreenContent() }
             )
             composableWithTransition(
-                route = Screen.Chat.route,
-                content = {
-                    val dialogUserJson = it.arguments?.getString(Screen.KEY_DIALOG_USER)
-                        ?: throw RuntimeException("argument  for ChatScreen when navigation not found")
-                    val dialogUser = Gson().fromJson(dialogUserJson, User::class.java)
-                    chatScreenContent(dialogUser)
-                }
+                route = Screen.RequestCity.route,
+                content = { requestCityScreenContent() }
             )
             composableWithTransition(
-                route = Screen.Profile.route,
-                content = { profileScreenContent() }
+                route = Screen.RequestEmail.route,
+                content = { requestEmailScreenContent() }
+            )
+            composableWithTransition(
+                route = Screen.RegistrationSuccess.route,
+                content = { registrationSuccessScreenContent() }
             )
         }
     )
