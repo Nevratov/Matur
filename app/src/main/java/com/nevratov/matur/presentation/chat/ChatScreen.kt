@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -61,6 +62,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.User
+import com.nevratov.matur.navigation.NavigationState
+import com.nevratov.matur.presentation.BottomNavigationBar
 import com.nevratov.matur.presentation.MaturApplication
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
 import com.nevratov.matur.ui.theme.VeryLightGray
@@ -68,8 +71,10 @@ import com.nevratov.matur.ui.theme.VeryLightGray
 @Composable
 fun ChatScreen(
     dialogUser: User,
+    navigationState: NavigationState,
     onBackPressed: () -> Unit
 ) {
+    Log.d("Rebugger", "ChatScreen")
     val component = (LocalContext.current.applicationContext as MaturApplication).component
     val viewModel = component.chatListComponentFactory().create(dialogUser).getViewModel()
 
@@ -83,16 +88,18 @@ fun ChatScreen(
     val screenWidth = configuration.screenWidthDp.dp
     val maxWidthItem = screenWidth * 0.70f
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        ChatScreenContent(
-            screenState = screenState,
-            maxWidthItem = maxWidthItem,
-            dialogUser = dialogUser,
-            viewModel = viewModel,
-            onBackPressed = onBackPressed
-        )
+
+    Scaffold { paddingValues ->
+        Box(
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            ChatScreenContent(
+                screenState = screenState,
+                maxWidthItem = maxWidthItem,
+                viewModel = viewModel,
+                onBackPressed = onBackPressed
+            )
+        }
     }
 }
 
@@ -100,7 +107,6 @@ fun ChatScreen(
 private fun ChatScreenContent(
     screenState: State<ChatScreenState>,
     maxWidthItem: Dp,
-    dialogUser: User,
     viewModel: ChatViewModel,
     onBackPressed: () -> Unit
 ) {

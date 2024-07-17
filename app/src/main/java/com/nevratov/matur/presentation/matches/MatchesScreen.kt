@@ -1,10 +1,9 @@
 package com.nevratov.matur.presentation.matches
 
-import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,11 +29,13 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.User
-import com.nevratov.matur.presentation.chat_list.UserProfile
+import com.nevratov.matur.navigation.NavigationState
+import com.nevratov.matur.presentation.BottomNavigationBar
 
 @Composable
 fun MatchesScreen(
     users: List<User>,
+    navigationState: NavigationState,
     onMatchUserClicked: (User) -> Unit
 ) {
 
@@ -70,6 +72,25 @@ fun MatchesScreen(
         }
     }
 
+    Scaffold(
+        bottomBar = { BottomNavigationBar(navigationState = navigationState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            MatchesContent(
+                items = testListMessageItems,
+                onMatchUserClicked = onMatchUserClicked
+            )
+        }
+    }
+}
+
+@Composable
+private fun MatchesContent(
+    items: List<User>,
+    onMatchUserClicked: (User) -> Unit
+) {
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
@@ -86,7 +107,7 @@ fun MatchesScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
 
         ) {
-            items(items = testListMessageItems, key = { it.id }) {
+            items(items = items, key = { it.id }) {
                 MatchesItem(
                     user = it,
                     onItemClicked = onMatchUserClicked

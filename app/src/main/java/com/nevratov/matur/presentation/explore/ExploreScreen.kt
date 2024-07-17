@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
@@ -45,22 +45,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.domain.entity.User
+import com.nevratov.matur.navigation.NavigationState
+import com.nevratov.matur.presentation.BottomNavigationBar
 import com.nevratov.matur.ui.theme.MaturColorDark
 
 @Composable
 fun ExploreScreen(
-    viewModel: ExploreViewModel
+    viewModel: ExploreViewModel,
+    navigationState: NavigationState
 ) {
     val screenState = viewModel.state.collectAsState(initial = ExploreScreenState.Initial)
 
-    ExploreScreenContent(
-        screenState = screenState,
-        viewModel = viewModel
-    )
+    Scaffold(
+        bottomBar = { BottomNavigationBar(navigationState = navigationState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            ExploreScreenContent(
+                screenState = screenState,
+                viewModel = viewModel
+            )
+        }
+    }
 }
 
 @Composable
-fun ExploreScreenContent(
+private fun ExploreScreenContent(
     screenState: State<ExploreScreenState>,
     viewModel: ExploreViewModel
 ) {

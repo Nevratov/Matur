@@ -42,7 +42,6 @@ class MainActivity : ComponentActivity() {
                 when (authState.value) {
                     AuthState.Authorized -> {
                         MainScreen(
-                            authState = authState,
                             exploreViewModel = exploreViewModel,
                             chatListViewModel = chatListViewModel
                         )

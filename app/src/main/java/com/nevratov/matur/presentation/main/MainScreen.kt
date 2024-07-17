@@ -14,6 +14,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.navigation.AppNavGraph
@@ -31,7 +32,6 @@ import com.nevratov.matur.presentation.profile.ProfileScreen
 
 @Composable
 fun MainScreen(
-    authState: State<AuthState>,
     exploreViewModel: ExploreViewModel,
     chatListViewModel: ChatListViewModel
 ) {
@@ -39,81 +39,43 @@ fun MainScreen(
 
     val navigationState = rememberNavigationState()
 
-    Scaffold(
-        bottomBar = {
-            val navBacStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
-            val currentRoute = navBacStackEntry?.destination?.route
-            if (authState.value == AuthState.Authorized && currentRoute != Screen.Chat.route) {
-                BottomNavigationBar(navigationState)
-            }
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            AppNavGraph(
-                navHostController = navigationState.navHostController,
-                exploreScreenContent = { ExploreScreen(viewModel = exploreViewModel) },
-                matchesScreenContent = {
-                    MatchesScreen(
-                        // Передать актуальный список совпавших пользователей
-                        users = emptyList(),
-                        //Раскоментировать после передачи актуального списка
-                        onMatchUserClicked = {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        AppNavGraph(
+            navHostController = navigationState.navHostController,
+            exploreScreenContent = { ExploreScreen(
+                viewModel = exploreViewModel,
+                navigationState = navigationState
+            ) },
+            matchesScreenContent = {
+                MatchesScreen(
+                    // Передать актуальный список совпавших пользователей
+                    users = emptyList(),
+                    navigationState = navigationState,
+                    //Раскоментировать после передачи актуального списка
+                    onMatchUserClicked = {
 //                    chatViewModel = component.chatListComponentFactory().create(it.id).getViewModel()
 //                    navigationState.navigateToChat(Screen.Chat.route)
-                        })
-                },
-                chatListScreenContent = {
-                    ChatListScreen(
-                        viewModel = chatListViewModel,
-                        onMessageItemClicked = {
-                            navigationState.navigateToChat(Screen.Chat.getRouteWithArgs(it.user))
-                        })
-                },
-                chatScreenContent = {
-                    ChatScreen(
-                        dialogUser = it,
-                        onBackPressed = { navigationState.navHostController.popBackStack() }
-                    )
-                },
-                profileScreenContent = { ProfileScreen() },
-            )
-        }
+                    })
+            },
+            chatListScreenContent = {
+                ChatListScreen(
+                    viewModel = chatListViewModel,
+                    navigationState = navigationState,
+                    onMessageItemClicked = {
+                        navigationState.navigateToChat(Screen.Chat.getRouteWithArgs(it.user))
+                    })
+            },
+            chatScreenContent = {
+                ChatScreen(
+                    dialogUser = it,
+                    navigationState = navigationState,
+                    onBackPressed = { navigationState.navHostController.popBackStack() }
+                )
+            },
+            profileScreenContent = { ProfileScreen(navigationState = navigationState) },
+        )
     }
 }
 
-@Composable
-private fun BottomNavigationBar(
-    navigationState: NavigationState
-) {
-    val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
-
-    val items = listOf(
-        NavigationItem.Explore,
-        NavigationItem.Matches,
-        NavigationItem.Chat,
-        NavigationItem.Profile
-    )
-
-    NavigationBar {
-        items.forEachIndexed { index, item ->
-            val selectedItem = navBackStackEntry?.destination?.route == item.screen.route
-            NavigationBarItem(
-                selected = selectedItem,
-                onClick = {
-                    navigationState.navigateTo(item.screen.route)
-                },
-                label = { Text(stringResource(item.titleResId)) },
-                icon = {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = stringResource(item.descriptionResId)
-                    )
-                }
-            )
-        }
-    }
-}

@@ -21,10 +21,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,27 +39,37 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
+import com.nevratov.matur.navigation.NavigationState
+import com.nevratov.matur.presentation.BottomNavigationBar
 import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
 
 @Composable
 fun ChatListScreen(
     viewModel: ChatListViewModel,
+    navigationState: NavigationState,
     onMessageItemClicked: (ChatListItem) -> Unit
 ) {
 
+    Log.d("Rebugger", "ChatListScreen")
+
     val screenState = viewModel.state.collectAsState(initial = ChatListScreenState.Initial)
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        ChatListContent(
-            state = screenState,
-            onMessageItemClicked = onMessageItemClicked,
-            userId = viewModel.getUser().id
-        )
+    Scaffold(
+        bottomBar = { BottomNavigationBar(navigationState = navigationState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            ChatListContent(
+                state = screenState,
+                onMessageItemClicked = onMessageItemClicked,
+                userId = viewModel.getUser().id
+            )
+        }
     }
 }
 
@@ -83,7 +95,8 @@ private fun ChatListContent(
 
         ChatListScreenState.Loading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -100,12 +113,9 @@ private fun ChatList(
 ) {
 
     Column {
-
-         TopPanel()
-//        Spacer(modifier = Modifier.height(8.dp))
-
+        TopPanel()
         LazyColumn(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items = chatList, key = { it.user.id }) { chatListItem ->
