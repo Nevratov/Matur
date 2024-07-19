@@ -70,7 +70,6 @@ fun MainScreen(
             chatScreenContent = {
                 ChatScreen(
                     dialogUser = it,
-                    navigationState = navigationState,
                     onBackPressed = { navigationState.navHostController.popBackStack() }
                 )
             },

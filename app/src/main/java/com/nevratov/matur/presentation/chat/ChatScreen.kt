@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -33,6 +34,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -68,10 +71,10 @@ import com.nevratov.matur.presentation.MaturApplication
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
 import com.nevratov.matur.ui.theme.VeryLightGray
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     dialogUser: User,
-    navigationState: NavigationState,
     onBackPressed: () -> Unit
 ) {
     Log.d("Rebugger", "ChatScreen")
@@ -89,7 +92,28 @@ fun ChatScreen(
     val maxWidthItem = screenWidth * 0.70f
 
 
-    Scaffold { paddingValues ->
+    Scaffold(
+//        topBar = {
+//            TopAppBar(
+//                title = { Text(
+//                    text = "Панель",
+//                ) },
+//                navigationIcon = {
+//                    IconButton(onClick = { onBackPressed() }) {
+//                        Icon(
+//                            modifier = Modifier.size(30.dp),
+//                            imageVector = Icons.Filled.KeyboardArrowLeft,
+//                            contentDescription = "Back",
+//                            tint = MaterialTheme.colorScheme.onBackground
+//                        )
+//                    }
+//                },
+//                colors = TopAppBarDefaults.topAppBarColors(
+//                    containerColor = MaturAlternativeColor
+//                )
+//            )
+//        }
+    ) { paddingValues ->
         Box(
             modifier = Modifier.padding(paddingValues)
         ) {
@@ -227,7 +251,7 @@ private fun Chat(
 }
 
 @Composable
-fun SeparateLine() {
+private fun SeparateLine() {
     Spacer(modifier = Modifier.height(4.dp))
     Box(modifier = Modifier
         .fillMaxWidth()
