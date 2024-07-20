@@ -14,7 +14,7 @@ import com.nevratov.matur.data.model.ResponseWSDto
 import com.nevratov.matur.data.model.SendMessageWSDto
 import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.data.network.webSocket.WebSocketConst
-import com.nevratov.matur.domain.entity.NetworkStatus
+import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.presentation.chat_list.ChatListItem
@@ -121,10 +121,24 @@ class Mapper {
         isRead = false
     )
 
-    fun responseWSDtoToNetworkStatus(responseWSDto: ResponseWSDto): NetworkStatus = NetworkStatus (
-        userId = responseWSDto.senderId,
-        isOnline = responseWSDto.content == WebSocketConst.IS_ONLINE
-    )
+    fun responseWSDtoToOnlineStatus(responseWSDto: ResponseWSDto): OnlineStatus {
+        return when (responseWSDto.type) {
+            WebSocketConst.STATUS_TYPE -> {
+                OnlineStatus (
+                    userId = responseWSDto.senderId,
+                    isOnline = responseWSDto.content == WebSocketConst.IS_ONLINE
+                )
+            }
+            WebSocketConst.TYPING_TYPE -> {
+                OnlineStatus (
+                    userId = responseWSDto.senderId,
+                    isOnline = true,
+                    isTyping = responseWSDto.content == WebSocketConst.IS_TYPING
+                )
+            }
+            else -> { throw RuntimeException("response type ${responseWSDto.type} is unknown") }
+        }
+    }
 
     // Now, we get MessageDTO in ResponseSendMessage, this method no actual
 //    fun messageToSendMessageDto(message: Message): SendMessageWSDto {

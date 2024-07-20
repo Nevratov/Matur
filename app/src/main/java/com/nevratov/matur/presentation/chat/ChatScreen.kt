@@ -34,8 +34,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -59,14 +57,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants.IterateForever
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.User
-import com.nevratov.matur.navigation.NavigationState
-import com.nevratov.matur.presentation.BottomNavigationBar
 import com.nevratov.matur.presentation.MaturApplication
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
 import com.nevratov.matur.ui.theme.VeryLightGray
@@ -92,28 +94,7 @@ fun ChatScreen(
     val maxWidthItem = screenWidth * 0.70f
 
 
-    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text(
-//                    text = "Панель",
-//                ) },
-//                navigationIcon = {
-//                    IconButton(onClick = { onBackPressed() }) {
-//                        Icon(
-//                            modifier = Modifier.size(30.dp),
-//                            imageVector = Icons.Filled.KeyboardArrowLeft,
-//                            contentDescription = "Back",
-//                            tint = MaterialTheme.colorScheme.onBackground
-//                        )
-//                    }
-//                },
-//                colors = TopAppBarDefaults.topAppBarColors(
-//                    containerColor = MaturAlternativeColor
-//                )
-//            )
-//        }
-    ) { paddingValues ->
+    Scaffold() { paddingValues ->
         Box(
             modifier = Modifier.padding(paddingValues)
         ) {
@@ -301,20 +282,30 @@ private fun ProfilePanel(
                 color = MaterialTheme.colorScheme.background
             )
 
-            val color = if (screenState.onlineStatus) Color.Green else Color.Red
-            val textStatus = if (screenState.onlineStatus) "online" else screenState.dialogUser.wasOnlineText
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                )
+            val (color, textStatus) = if (screenState.onlineStatus.isTyping) {
+                Pair(Color.Gray, "печатает")
+            } else if (screenState.onlineStatus.isOnline) {
+                Pair(Color.Green, "online")
+            } else {
+                Pair(Color.Red, screenState.dialogUser.wasOnlineText)
+            }
+
+            Row(verticalAlignment = Alignment.Bottom) {
+                if (screenState.onlineStatus.isTyping) {
+                    TypingAnimation()
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                    )
+                }
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = textStatus,
                     fontSize = 12.sp,
-                    color = Color.LightGray
+                    color = Color.LightGray,
                 )
             }
         }
@@ -495,6 +486,19 @@ private fun MessageTimeAndIsRead(
             contentDescription = null
         )
     }
+}
+
+@Composable
+private fun TypingAnimation() {
+    val composition by rememberLottieComposition(
+        spec = LottieCompositionSpec.Asset("typing_animation.json")
+    )
+    LottieAnimation(
+            modifier = Modifier.size(14.dp),
+            composition = composition,
+            speed = 2f,
+            iterations = IterateForever
+    )
 }
 
 private const val FIRST_ELEMENT = 0

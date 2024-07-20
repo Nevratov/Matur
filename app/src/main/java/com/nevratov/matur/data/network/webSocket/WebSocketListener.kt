@@ -4,7 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.nevratov.matur.data.Mapper
 import com.nevratov.matur.data.model.ResponseWSDto
-import com.nevratov.matur.domain.entity.NetworkStatus
+import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.presentation.chat.UserId
 import okhttp3.Response
@@ -14,7 +14,7 @@ import okhttp3.WebSocketListener
 
 class WebSocketListener (
     private val onMessageReceived: (Message) -> Unit,
-    private val onStatusReceived: (NetworkStatus) -> Unit,
+    private val onStatusReceived: (OnlineStatus) -> Unit,
     private val onUserIdReadAllMessages: (Int) -> Unit,
     private val senderId: Int
 ): WebSocketListener() {
@@ -36,8 +36,9 @@ class WebSocketListener (
             WebSocketConst.MESSAGE_TYPE -> {
                 onMessageReceived(mapper.responseWSDtoToMessage(responseDto))
             }
-            WebSocketConst.STATUS_TYPE -> {
-                onStatusReceived(mapper.responseWSDtoToNetworkStatus(responseDto))
+            WebSocketConst.STATUS_TYPE, WebSocketConst.TYPING_TYPE -> {
+                Log.d("chatScreenState", "type = $responseDto")
+                onStatusReceived(mapper.responseWSDtoToOnlineStatus(responseDto))
             }
             WebSocketConst.READ_ALL_TYPE -> {
                 onUserIdReadAllMessages(responseDto.senderId)

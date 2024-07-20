@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.log
 
 class ChatViewModel @Inject constructor(
     private val sendMessageUseCase: SendMessageUseCase,
@@ -39,11 +40,13 @@ class ChatViewModel @Inject constructor(
     val chatScreenState = getMessagesByUserIdUseCase(id = dialogUser.id)
         .onStart { observeOnlineStatus() }
         .map {
+            val status = onlineStatus.invoke().value
+            Log.d("chatScreenState", it.toString())
             ChatScreenState.Content(
                 messages = it,
                 userId = userId,
                 dialogUser = dialogUser,
-                onlineStatus = onlineStatus().value
+                onlineStatus = status
             )
         }
         .mergeWith(loadNextMessagesFlow)
@@ -97,11 +100,11 @@ class ChatViewModel @Inject constructor(
                 val currentState = chatScreenState.value
                 if (currentState !is ChatScreenState.Content) return@collect
 
-                if (status) onlineStatusRefreshFlow.emit(currentState.copy(onlineStatus = true))
+                if (status.isOnline) onlineStatusRefreshFlow.emit(currentState.copy(onlineStatus = status))
                 else {
                     val currentTimestamp = System.currentTimeMillis()
                     onlineStatusRefreshFlow.emit(currentState.copy(
-                        onlineStatus = false,
+                        onlineStatus = status,
                         dialogUser = dialogUser.copy(wasOnlineTimestamp = currentTimestamp)
                     ))
                 }

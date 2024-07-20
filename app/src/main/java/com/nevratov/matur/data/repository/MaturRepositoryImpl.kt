@@ -22,7 +22,7 @@ import com.nevratov.matur.data.network.webSocket.WebSocketListener
 import com.nevratov.matur.di.ApplicationScope
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.domain.entity.City
-import com.nevratov.matur.domain.entity.NetworkStatus
+import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
 import com.nevratov.matur.presentation.chat.Message
@@ -188,16 +188,17 @@ class MaturRepositoryImpl @Inject constructor(
     private var dialogUserId: Int? = null
     private var dialogPage = DEFAULT_PAGE
 
-    // Online status
+    // User status (online / offline / typing)
 
     private val _onlineUsers = mutableMapOf<Int, Boolean>()
-    private val onlineStatusRefreshFlow = MutableSharedFlow<NetworkStatus>()
+    private val onlineStatusRefreshFlow = MutableSharedFlow<OnlineStatus>()
 
     private val onlineStatusDialogUserStateFlow = flow {
         onlineStatusRefreshFlow.collect { newStatus ->
+            Log.d("chatScreenState", "collect")
             _onlineUsers[newStatus.userId] = newStatus.isOnline
             if (newStatus.userId == dialogUserId) {
-                emit(newStatus.isOnline)
+                emit(newStatus)
             }
             if (!newStatus.isOpenedChatScreen) {
                 chatList.find { item -> item.user.id == newStatus.userId }?.let { item ->
@@ -213,7 +214,7 @@ class MaturRepositoryImpl @Inject constructor(
     }.stateIn(
         scope = coroutineScope,
         started = SharingStarted.Eagerly,
-        initialValue = false
+        initialValue = EMPTY_ONLINE_STATUS
     )
 
     private suspend fun getOnlineUsersId() {
@@ -269,6 +270,7 @@ class MaturRepositoryImpl @Inject constructor(
                     if (dialogUserId != message.senderId) sendNotificationNewMessage(message)
                 },
                 onStatusReceived = { status ->
+                    Log.d("chatScreenState", "recived: $status")
                     coroutineScope.launch {
                         onlineStatusRefreshFlow.emit(status)
                     }
@@ -409,12 +411,12 @@ class MaturRepositoryImpl @Inject constructor(
         resetDialogOptions()
         dialogUserId = id
 
-        val networkStatus = NetworkStatus(
+        val onlineStatus = OnlineStatus(
             userId = id,
             isOnline = checkOnlineStatusByUserId(id),
             isOpenedChatScreen = true
         )
-        onlineStatusRefreshFlow.emit(networkStatus)
+        onlineStatusRefreshFlow.emit(onlineStatus)
 
         loadNextMessages(messagesWithId = id)
         refreshMessagesEvents.collect {
@@ -483,7 +485,7 @@ class MaturRepositoryImpl @Inject constructor(
         initialValue = listOf()
     )
 
-    override fun onlineStatus(): StateFlow<Boolean> = onlineStatusDialogUserStateFlow
+    override fun onlineStatus(): StateFlow<OnlineStatus> = onlineStatusDialogUserStateFlow
 
     override suspend fun registration(regUserInfo: RegUserInfo) {
         apiService.registerUser(mapper.regUserInfoToRegUserInfoDto(regUserInfo))
@@ -515,6 +517,13 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     companion object {
+        private val EMPTY_ONLINE_STATUS =  OnlineStatus(
+            userId = 0,
+            isOnline = false,
+            isTyping = false,
+            isOpenedChatScreen = false
+        )
+
         private const val USER_KEY = "user_data"
         private const val TOKEN_KEY = "token"
         const val FIREBASE_NAME = "firebase"

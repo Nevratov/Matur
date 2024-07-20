@@ -1,7 +1,8 @@
 package com.nevratov.matur.domain.entity
 
-data class NetworkStatus(
+data class OnlineStatus(
     val userId: Int,
-    val isOnline: Boolean,
+    val isOnline: Boolean = false,
+    val isTyping: Boolean = false,
     val isOpenedChatScreen: Boolean = false
 )

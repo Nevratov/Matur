@@ -2,6 +2,7 @@ package com.nevratov.matur.domain.repoository
 
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.domain.entity.City
+import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.presentation.chat_list.ChatListItem
@@ -38,7 +39,7 @@ interface MaturRepository {
 
     fun getChatList(): StateFlow<List<ChatListItem>>
 
-    fun onlineStatus(): StateFlow<Boolean>
+    fun onlineStatus(): StateFlow<OnlineStatus>
 
     suspend fun loadNextMessages(messagesWithId: Int): Boolean
 
