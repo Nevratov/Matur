@@ -24,7 +24,7 @@ fun AppNavGraph(
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = Screen.ChatList.route,
+        startDestination = Screen.Explore.route,
         builder = {
             composableWithTransition(
                 route = Screen.Explore.route,
