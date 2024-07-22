@@ -82,8 +82,6 @@ dependencies {
 
     implementation (libs.accompanist.navigation.animation)
 
-    implementation("androidx.compose.runtime:runtime-tracing:1.0.0-beta01")
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

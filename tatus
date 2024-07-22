@@ -1,0 +1,209 @@
+[33mcommit 4434324a068f29eb4b9917e766a43ecf7ed4de3d[m[33m ([m[1;36mHEAD -> [m[1;32mv_0.1[m[33m)[m
+Author: admin <nevratov22@gmail.com>
+Date:   Mon Jun 17 02:55:22 2024 +0300
+
+    messages download complete.
+    send messages complete
+
+[33mcommit 90fffa5e43333b65084b30a8e24b6dedfaacca15[m
+Author: admin <nevratov22@gmail.com>
+Date:   Sun Jun 16 15:57:23 2024 +0300
+
+    navigation changes
+
+[33mcommit eb0ba6960a111fc8640e133d80e2edf63f2c6f20[m
+Author: admin <nevratov22@gmail.com>
+Date:   Sun Jun 16 00:53:40 2024 +0300
+
+    Chat screen created
+
+[33mcommit d79781700ef9499200ef1bc25066d6ceeac937ee[m
+Author: admin <nevratov22@gmail.com>
+Date:   Sat Jun 15 04:20:50 2024 +0300
+
+    Download chat messages from server.
+    MessageItem added
+
+[33mcommit f8457ef2826a0e34f7c68bb573f26ceb84ff1abc[m
+Author: admin <nevratov22@gmail.com>
+Date:   Wed Jun 12 22:18:17 2024 +0300
+
+    Swipe in Column, but double padding 16 dp
+
+[33mcommit ff37e1d38bcf2985d124ce1306370a19a4ae187f[m
+Author: admin <nevratov22@gmail.com>
+Date:   Wed Jun 12 21:30:14 2024 +0300
+
+    Loading and end content on ExploreScreen.kt
+
+[33mcommit 49e5f56a1ce96dea274a9b75a39a131ffd512b5d[m
+Author: admin <nevratov22@gmail.com>
+Date:   Wed Jun 12 20:55:40 2024 +0300
+
+    Swipe cards on ExploreScreen.kt
+
+[33mcommit 96ab435d8e365e2daa8cbea7566c47106d5a6ff0[m
+Author: admin <nevratov22@gmail.com>
+Date:   Sun Jun 9 17:57:51 2024 +0300
+
+    Change request on server
+
+[33mcommit 7f26d8354ce027f82ed4951a7f9181b8d56412a8[m
+Author: admin <nevratov22@gmail.com>
+Date:   Sun Jun 9 01:24:25 2024 +0300
+
+    Add logic like and dislike user.
+    Add dismiss on ExploreScreen.kt.
+    Changed request on server.
+    More different changes.
+
+[33mcommit dea045919f0b585b62f1ff44675876b11a253e59[m
+Author: admin <nevratov22@gmail.com>
+Date:   Thu Jun 6 03:33:32 2024 +0300
+
+    Navigation logic changed.
+    All viewModels constructors changed.
+    Add more dagger.
+
+[33mcommit 21a01de78a341eee45cb6bed54b25f4c8a522023[m
+Author: admin <nevratov22@gmail.com>
+Date:   Thu Jun 6 00:50:47 2024 +0300
+
+    DI Dagger2 added for some objects
+
+[33mcommit 18231659f7b323a05e0426f2f6458816fef35d56[m
+Author: admin <nevratov22@gmail.com>
+Date:   Wed Jun 5 04:17:44 2024 +0300
+
+    Navigation changes - first changes: divide LoginScreen and RegistrationScreen with other screens.
+    Add AuthState
+    Add Repo in domain
+
+[33mcommit f45597f3fbc836c3e7b3ac7cbe60b21a596e8edb[m
+Author: admin <nevratov22@gmail.com>
+Date:   Tue Jun 4 09:26:20 2024 +0300
+
+    Navigation changes prepare.
+
+[33mcommit 304876b6fd83a8cdc2d46e1122709ed07bf13084[m
+Author: admin <nevratov22@gmail.com>
+Date:   Mon Jun 3 17:31:17 2024 +0300
+
+    LoginScreen.kt added.
+    Add LoginScreenViewModel.kt
+    Add logic login in repo.
+    Change packages names.
+
+[33mcommit 0efb1a724f4e28f551f61b1947dcd120bf3db918[m
+Author: admin <nevratov22@gmail.com>
+Date:   Sun Jun 2 14:45:05 2024 +0300
+
+    MatchesScreen.kt added.
+
+[33mcommit f66a28e940d19b39748f7aea9e75d87c8c7d780d[m
+Author: admin <nevratov22@gmail.com>
+Date:   Sun Jun 2 00:40:47 2024 +0300
+
+    MessagesScreen.kt added.
+
+[33mcommit d97a8f08f52a4f8ce8197cf39d1898ca52f63565[m
+Author: admin <nevratov22@gmail.com>
+Date:   Sat Jun 1 19:14:28 2024 +0300
+
+    Paint explore screen.
+
+[33mcommit 177e8e4e68125fd7e2fefd5c5cfb2a9623e50a4d[m
+Author: admin <nevratov22@gmail.com>
+Date:   Tue May 28 23:03:25 2024 +0300
+
+    RequestCityScreen added.
+    Update request server
+
+[33mcommit df8cf4032659958b8f59e1f19238e7b69e0f07a3[m
+Author: admin <nevratov22@gmail.com>
+Date:   Tue May 28 16:45:14 2024 +0300
+
+    WebSocket added
+
+[33mcommit 92e987c9a2312bb4bd977050dde78c5c067d111c[m
+Author: admin <nevratov22@gmail.com>
+Date:   Mon May 27 19:50:37 2024 +0300
+
+    New logo ico.
+
+[33mcommit 0376fedcfd39500c6994103595413124e4f88248[m
+Author: admin <nevratov22@gmail.com>
+Date:   Thu May 23 19:22:02 2024 +0300
+
+    Fix text color on alert dialog in dark theme.
+    New logo ico.
+    The data is sent to the server
+
+[33mcommit bab79a4225dee7fd3a2c426cb9b98900c98e5597[m[33m ([m[1;31morigin/v_0.1[m[33m)[m
+Author: admin <nevratov22@gmail.com>
+Date:   Thu May 2 22:02:42 2024 +0300
+
+    Handling incorrect date and email input
+
+[33mcommit 9152e4d3f052ae01399984eb6eb01bd831769e9f[m
+Author: admin <nevratov22@gmail.com>
+Date:   Tue Apr 30 18:21:11 2024 +0300
+
+    Handling incorrect name input
+
+[33mcommit 1af8aa222ded9710ecaa91ca85eeea0392452b64[m
+Author: admin <nevratov22@gmail.com>
+Date:   Sat Apr 27 12:34:02 2024 +0300
+
+    Navigation Graph created.
+    Navigation between registration screens.
+    Rename registration functions
+
+[33mcommit 939828f09446c4b05a80ba0a3322bbc366f12960[m
+Author: admin <nevratov22@gmail.com>
+Date:   Thu Apr 25 22:22:56 2024 +0300
+
+    Register screen - step 3 (email) - created
+
+[33mcommit 490fe631faf5a31ba7e12d65dc7c047a0cbc7436[m
+Author: admin <nevratov22@gmail.com>
+Date:   Thu Apr 25 21:48:04 2024 +0300
+
+    Register screen - step 2 (birthdate) - fix radio button's bug, when  selected 1st option
+
+[33mcommit e37e29330a9114cddecc053dc15ed9c43e332d11[m
+Author: admin <nevratov22@gmail.com>
+Date:   Thu Apr 25 21:14:39 2024 +0300
+
+    Register screen - step 2 (birthdate) - code optimized
+
+[33mcommit 11eceeb99b57871da387d2d0ec66d3c90804d5f8[m
+Author: admin <nevratov22@gmail.com>
+Date:   Thu Apr 25 18:46:39 2024 +0300
+
+    Register screen - step 2 (birthdate) created
+    Fix - add text field gender
+
+[33mcommit 640a32254dd5fe0d42014d0610da26ee3fe1006c[m
+Author: admin <nevratov22@gmail.com>
+Date:   Thu Apr 25 18:12:35 2024 +0300
+
+    Register screen - step 2 (birthdate) created
+
+[33mcommit e91c0dc54ed72fff3ff5c198ba2015bfd2be006a[m
+Author: admin <nevratov22@gmail.com>
+Date:   Tue Apr 23 10:04:55 2024 +0300
+
+    Register screen - step 1 (name, last name) created
+
+[33mcommit 331445b5fc2011e7d12c44009d90f19f0854fede[m
+Author: admin <nevratov22@gmail.com>
+Date:   Tue Apr 23 10:03:29 2024 +0300
+
+    api created
+
+[33mcommit d778df748edcb446a060500864a1502e9ba47ca9[m[33m ([m[1;32mmaster[m[33m)[m
+Author: admin <nevratov22@gmail.com>
+Date:   Tue Apr 23 10:01:06 2024 +0300
+
+    init Commit
