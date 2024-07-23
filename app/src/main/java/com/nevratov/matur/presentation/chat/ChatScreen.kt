@@ -2,6 +2,7 @@ package com.nevratov.matur.presentation.chat
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,20 +49,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -73,7 +81,6 @@ import com.nevratov.matur.presentation.MaturApplication
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
 import com.nevratov.matur.ui.theme.VeryLightGray
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     dialogUser: User,
@@ -153,13 +160,9 @@ private fun Chat(
     val lazyListState = rememberLazyListState()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
-        ProfilePanel(
-            screenState = screenState,
-            onBackPressed = onBackPressed
-        )
+        ProfilePanel(screenState = screenState, onBackPressed = onBackPressed)
 
         LazyColumn(
             reverseLayout = true,
@@ -170,14 +173,14 @@ private fun Chat(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = lazyListState
         ) {
-            item {
-                SeparateLine()
-            }
+            item { SeparateLine() }
             items(screenState.messages, key = { it.id }) { message ->
                 MessageItem(
                     message = message,
                     maxWidthItem = maxWidthItem,
-                    userId = screenState.userId
+                    userId = screenState.userId,
+                    onEditClicked = {  },
+                    onRemoveClicked = {  }
                 )
             }
             // Load next messages
@@ -408,10 +411,17 @@ fun getMessage(
 
 @Composable
 private fun MessageItem(
+    modifier: Modifier = Modifier,
     message: Message,
     maxWidthItem: Dp,
-    userId: Int
+    userId: Int,
+    onEditClicked: () -> Unit,
+    onRemoveClicked: () -> Unit
 ) {
+    var isMenuVisible by remember { mutableStateOf(false) }
+    var pressOffset by remember { mutableStateOf(DpOffset.Zero) }
+    var itemHeight by remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
 
     val contentAlignment = if (message.senderId == userId) Alignment.CenterEnd
     else Alignment.CenterStart
@@ -430,7 +440,19 @@ private fun MessageItem(
         }
 
     Box(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .onSizeChanged { itemHeight = with(density) { it.height.toDp() } }
+            .pointerInput(true) {
+                detectTapGestures(
+                    onLongPress = {
+                        pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
+                        isMenuVisible = true
+                        Log.d("onGloballyPositioned", it.toString())
+                    }
+                )
+            }
+        ,
         contentAlignment = contentAlignment
     ) {
         Row(
@@ -444,7 +466,9 @@ private fun MessageItem(
                     )
                 )
                 .background(messageBackground)
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp)
+
+            ,
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -461,6 +485,26 @@ private fun MessageItem(
                 )
             }
             MessageTimeAndIsRead(message = message, userId = userId)
+        }
+        DropdownMenu(
+            expanded = isMenuVisible,
+            onDismissRequest = { isMenuVisible = false },
+            offset = pressOffset.copy(y = pressOffset.y - itemHeight)
+        ) {
+            DropdownMenuItem(
+                text = { Text(text = "Редактировать") },
+                onClick = {
+                    isMenuVisible = false
+                    onEditClicked()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(text = "Удалить") },
+                onClick = {
+                    isMenuVisible = false
+                    onRemoveClicked()
+                }
+            )
         }
     }
 }
@@ -499,6 +543,20 @@ private fun TypingAnimation() {
             speed = 2f,
             iterations = IterateForever
     )
+}
+
+private fun Offset.toIntOffset() = IntOffset(x.toInt(), y.toInt())
+
+
+@Composable
+private fun IntOffset.toDp(): DpOffset {
+    val density = LocalDensity.current
+    with(density) {
+        val x = DpOffset(x.toDp(), y.toDp())
+        Log.d("onGloballyPositioned", "this =  ${this@toDp}")
+        Log.d("onGloballyPositioned", "clicked $x")
+        return x
+    }
 }
 
 private const val FIRST_ELEMENT = 0

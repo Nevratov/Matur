@@ -123,7 +123,7 @@ private fun ChatList(
                     onMessageItemClicked = onMessageItemClicked,
                     userId = userId
                 )
-//                SeparateLine()
+                SeparateLine()
             }
         }
     }
