@@ -419,6 +419,8 @@ class MaturRepositoryImpl @Inject constructor(
         onlineStatusRefreshFlow.emit(onlineStatus)
 
         loadNextMessages(messagesWithId = id)
+        refreshChatList(chatMessages.first())
+
         refreshMessagesEvents.collect {
             emit(chatMessages)
         }
@@ -449,10 +451,13 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sendMessage(message: Message) {
+        Log.d("sendMessage", "in sendMessage")
         val response = apiService.sendMessage(
             token = getToken(),
             message = mapper.messageToCreateMessageDto(message)
         )
+
+        Log.d("sendMessage", "response = $response")
 
         // TODO Catch server error response
         val messageToSend = mapper.messageDtoToSendMessageWSDto(response.message)
@@ -465,6 +470,7 @@ class MaturRepositoryImpl @Inject constructor(
         _chatMessages.add(index = 0, element = messageWithId)
         refreshMessagesEvents.emit(Unit)
         refreshChatList(messageWithId)
+        Log.d("sendMessage", "Message sending")
     }
 
     override fun getChatList(): StateFlow<List<ChatListItem>> = flow {
