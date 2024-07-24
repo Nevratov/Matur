@@ -298,8 +298,9 @@ class MaturRepositoryImpl @Inject constructor(
             if (dialogUserId == message.senderId) {
                 _chatMessages.add(index = 0, element = message)
                 refreshMessagesEvents.emit(Unit)
+            } else {
+                refreshChatList(message)
             }
-            refreshChatList(message)
         }
     }
 

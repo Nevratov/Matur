@@ -28,7 +28,6 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -49,7 +48,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -132,7 +130,7 @@ private fun ChatScreenContent(
             )
         }
 
-        ChatScreenState.Initial -> { }
+        ChatScreenState.Initial -> {}
 
         ChatScreenState.Loading -> {
             Box(
@@ -179,8 +177,8 @@ private fun Chat(
                     message = message,
                     maxWidthItem = maxWidthItem,
                     userId = screenState.userId,
-                    onEditClicked = {  },
-                    onRemoveClicked = {  }
+                    onEditClicked = { },
+                    onRemoveClicked = { }
                 )
             }
             // Load next messages
@@ -237,11 +235,12 @@ private fun Chat(
 @Composable
 private fun SeparateLine() {
     Spacer(modifier = Modifier.height(4.dp))
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .height(2.dp)
-        .padding(horizontal = 12.dp)
-        .background(VeryLightGray)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(2.dp)
+            .padding(horizontal = 12.dp)
+            .background(VeryLightGray)
     )
     Spacer(modifier = Modifier.height(4.dp))
 }
@@ -343,17 +342,21 @@ private fun Typing(
         modifier = Modifier.padding(start = 12.dp, end = 6.dp, bottom = 8.dp),
         verticalAlignment = Alignment.Bottom
     ) {
-        Row(modifier = Modifier
-            .clip(RoundedCornerShape(24.dp))
-            .weight(1f)
-            .background(VeryLightGray),
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(24.dp))
+                .weight(1f)
+                .background(VeryLightGray),
             verticalAlignment = Alignment.Bottom
         ) {
             IconButton(
                 modifier = Modifier.padding(bottom = 4.dp),
                 onClick = { onEmojiIcoClicked() }
             ) {
-                Icon(painter = painterResource(id = R.drawable.frame_13__1_), contentDescription = null)
+                Icon(
+                    painter = painterResource(id = R.drawable.frame_13__1_),
+                    contentDescription = null
+                )
             }
 
             TextField(
@@ -418,57 +421,59 @@ private fun MessageItem(
     onEditClicked: () -> Unit,
     onRemoveClicked: () -> Unit
 ) {
-    var isMenuVisible by remember { mutableStateOf(false) }
-    var pressOffset by remember { mutableStateOf(DpOffset.Zero) }
-    var itemHeight by remember { mutableStateOf(0.dp) }
+    val isMenuVisibleState = remember { mutableStateOf(false) }
+    val pressOffsetState = remember { mutableStateOf(DpOffset.Zero) }
+    val itemHeightState = remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
-    val contentAlignment = if (message.senderId == userId) Alignment.CenterEnd
-    else Alignment.CenterStart
+    val contentAlignment =
+        if (message.senderId == userId) Alignment.CenterEnd
+        else Alignment.CenterStart
 
-    val (messageColor, messageBackground) = if (message.senderId == userId) {
-        listOf(MaterialTheme.colorScheme.background, MaturAlternativeColor)
-    } else {
-        listOf(MaterialTheme.colorScheme.onBackground, VeryLightGray)
-    }
-
-    val (topRightCorner, topLeftCorner, bottomRightCorner, bottomLeftCorner) =
+    val (messageColor, messageBackground) =
         if (message.senderId == userId) {
-            listOf(28.dp, 20.dp, 0.dp, 20.dp)
+            listOf(MaterialTheme.colorScheme.background, MaturAlternativeColor)
         } else {
-            listOf(20.dp, 0.dp, 20.dp, 28.dp)
+            listOf(MaterialTheme.colorScheme.onBackground, VeryLightGray)
+        }
+
+    val messageShape =
+        if (message.senderId == userId) {
+            RoundedCornerShape(
+                topStart = 20.dp,
+                topEnd = 20.dp,
+                bottomStart = 20.dp,
+                bottomEnd = 0.dp
+            )
+        } else {
+            RoundedCornerShape(
+                topStart = 0.dp,
+                topEnd = 20.dp,
+                bottomStart = 20.dp,
+                bottomEnd = 20.dp
+            )
         }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .onSizeChanged { itemHeight = with(density) { it.height.toDp() } }
+            .onSizeChanged { itemHeightState.value = with(density) { it.height.toDp() } }
             .pointerInput(true) {
                 detectTapGestures(
                     onLongPress = {
-                        pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
-                        isMenuVisible = true
+                        pressOffsetState.value = DpOffset(it.x.toDp(), it.y.toDp())
+                        isMenuVisibleState.value = true
                         Log.d("onGloballyPositioned", it.toString())
                     }
                 )
-            }
-        ,
+            },
         contentAlignment = contentAlignment
     ) {
         Row(
             modifier = Modifier
-                .clip(
-                    RoundedCornerShape(
-                        topStart = topLeftCorner,
-                        topEnd = topRightCorner,
-                        bottomStart = bottomLeftCorner,
-                        bottomEnd = bottomRightCorner
-                    )
-                )
+                .clip(messageShape)
                 .background(messageBackground)
-                .padding(horizontal = 14.dp, vertical = 10.dp)
-
-            ,
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -486,26 +491,49 @@ private fun MessageItem(
             }
             MessageTimeAndIsRead(message = message, userId = userId)
         }
-        DropdownMenu(
-            expanded = isMenuVisible,
-            onDismissRequest = { isMenuVisible = false },
-            offset = pressOffset.copy(y = pressOffset.y - itemHeight)
-        ) {
-            DropdownMenuItem(
-                text = { Text(text = "Редактировать") },
-                onClick = {
-                    isMenuVisible = false
-                    onEditClicked()
-                }
-            )
-            DropdownMenuItem(
-                text = { Text(text = "Удалить") },
-                onClick = {
-                    isMenuVisible = false
-                    onRemoveClicked()
-                }
-            )
-        }
+        OnMessageClickedMenu(
+            isMenuVisibleState = isMenuVisibleState,
+            offsetState = pressOffsetState,
+            onDismissed = { isMenuVisibleState.value = false },
+            itemHeightState = itemHeightState,
+            onEditClicked = onEditClicked,
+            onRemoveClicked = onRemoveClicked,
+        )
+    }
+}
+
+@Composable
+private fun OnMessageClickedMenu(
+    isMenuVisibleState: MutableState<Boolean>,
+    offsetState: MutableState<DpOffset>,
+    itemHeightState: MutableState<Dp>,
+    onDismissed: () -> Unit,
+    onEditClicked: () -> Unit,
+    onRemoveClicked: () -> Unit,
+) {
+    val offset = offsetState.value
+    val visible = isMenuVisibleState.value
+    val itemHeight = itemHeightState.value
+
+    DropdownMenu(
+        expanded = visible,
+        onDismissRequest = { onDismissed() },
+        offset = offset.copy(y = offset.y - itemHeight)
+    ) {
+        DropdownMenuItem(
+            text = { Text(text = "Редактировать") },
+            onClick = {
+                onDismissed()
+                onEditClicked()
+            }
+        )
+        DropdownMenuItem(
+            text = { Text(text = "Удалить") },
+            onClick = {
+                onDismissed()
+                onRemoveClicked()
+            }
+        )
     }
 }
 
@@ -538,10 +566,10 @@ private fun TypingAnimation() {
         spec = LottieCompositionSpec.Asset("typing_animation.json")
     )
     LottieAnimation(
-            modifier = Modifier.size(14.dp),
-            composition = composition,
-            speed = 2f,
-            iterations = IterateForever
+        modifier = Modifier.size(14.dp),
+        composition = composition,
+        speed = 2f,
+        iterations = IterateForever
     )
 }
 

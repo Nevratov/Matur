@@ -194,7 +194,7 @@ fun MessageItem(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 MessageTimeAndIsRead(message = chatListItem.message, userId = userId)
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 NewMessageIco(message = chatListItem.message, userId = userId)
             }
         }
@@ -249,7 +249,7 @@ private fun NewMessageIco(
     if (!message.isRead && message.senderId != userId)
     Box(
         modifier = Modifier
-            .size(22.dp)
+            .size(18.dp)
             .clip(CircleShape)
             .background(MaturAlternativeColor)
             .padding(end = 4.dp)
