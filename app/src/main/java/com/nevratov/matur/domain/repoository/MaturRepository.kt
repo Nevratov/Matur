@@ -46,4 +46,8 @@ interface MaturRepository {
     fun resetDialogOptions()
 
     fun createNewFCMToken(newToken: String)
+
+    suspend fun removeMessage(message: Message)
+
+    suspend fun editMessage(message: Message)
 }

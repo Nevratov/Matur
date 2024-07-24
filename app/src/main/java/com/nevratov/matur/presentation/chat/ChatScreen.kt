@@ -1,6 +1,7 @@
 package com.nevratov.matur.presentation.chat
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -23,19 +24,26 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -50,7 +58,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -63,9 +70,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -143,6 +150,7 @@ private fun ChatScreenContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun Chat(
     screenState: ChatScreenState.Content,
@@ -150,7 +158,8 @@ private fun Chat(
     viewModel: ChatViewModel,
     onBackPressed: () -> Unit
 ) {
-    val message = remember { mutableStateOf(TextFieldValue("")) }
+    val inputMessage = remember { mutableStateOf(TextFieldValue("")) }
+    var messageEditing by remember { mutableStateOf<Message?>(null) }
     val showEmojiPicker = remember { mutableStateOf(false) }
 
     var lastMessage by remember { mutableStateOf(screenState.messages.first()) }
@@ -167,18 +176,35 @@ private fun Chat(
             modifier = Modifier
                 .weight(1f)
                 .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp),
+                .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom =  6.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = lazyListState
         ) {
-            item { SeparateLine() }
+//            item { SeparateLine() }
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
             items(screenState.messages, key = { it.id }) { message ->
-                MessageItem(
-                    message = message,
-                    maxWidthItem = maxWidthItem,
-                    userId = screenState.userId,
-                    onEditClicked = { },
-                    onRemoveClicked = { }
+                val dismissState = rememberDismissState()
+                val directions =
+                    if (message.senderId == screenState.userId) setOf(DismissDirection.EndToStart) else setOf()
+                SwipeToDismiss(
+                    modifier = Modifier.animateItemPlacement(),
+                    state = dismissState,
+                    directions = directions,
+                    background = { },
+                    dismissContent = {
+                        MessageItem(
+                            message = message,
+                            maxWidthItem = maxWidthItem,
+                            userId = screenState.userId,
+                            onEditClicked = {
+                                inputMessage.value = inputMessage.value.copy(text = message.content)
+                                messageEditing = message
+                            },
+                            onRemoveClicked = { viewModel.removeMessage(message) }
+                        )
+                    }
                 )
             }
             // Load next messages
@@ -208,22 +234,41 @@ private fun Chat(
             lastMessage = screenState.messages.first()
         }
 
+        messageEditing?.let { message ->
+            EditingMessageItem(
+                message = message,
+                onCloseEditing = {
+                    inputMessage.value = TextFieldValue("")
+                    messageEditing = null
+                }
+            )
+        }
+
         Typing(
-            screenState = screenState,
-            messageState = message,
-            viewModel = viewModel,
+            messageState = inputMessage,
             onValueChanged = { newValue ->
-                message.value = newValue.copy(text = newValue.text)
+                inputMessage.value = newValue.copy(text = newValue.text)
             },
             onEmojiIcoClicked = { showEmojiPicker.value = !showEmojiPicker.value },
-            messageReset = { message.value = TextFieldValue("") }
+            messageEditing = messageEditing,
+            onConfirmClicked = {
+                if (inputMessage.value.text.isBlank()) return@Typing
+                val currentMessageEditing = messageEditing
+                if (currentMessageEditing != null) {
+                    viewModel.editMessage(currentMessageEditing.copy(content = inputMessage.value.text))
+                    messageEditing = null
+                } else {
+                    viewModel.sendMessage(inputMessage.value.text)
+                }
+                inputMessage.value = TextFieldValue("")
+            }
         )
 
         ShowEmojiPicker(
             showEmojiPickerState = showEmojiPicker,
             onEmojiClicked = { emoji ->
-                val newMessage = StringBuilder().append(message.value.text).append(emoji)
-                message.value = message.value.copy(
+                val newMessage = StringBuilder().append(inputMessage.value.text).append(emoji)
+                inputMessage.value = inputMessage.value.copy(
                     text = newMessage.toString(),
                     selection = TextRange(newMessage.length)
                 )
@@ -329,12 +374,11 @@ private fun ShowEmojiPicker(
 
 @Composable
 private fun Typing(
-    screenState: ChatScreenState.Content,
     messageState: MutableState<TextFieldValue>,
-    viewModel: ChatViewModel,
+    onConfirmClicked: () -> Unit,
     onValueChanged: (TextFieldValue) -> Unit,
     onEmojiIcoClicked: () -> Unit,
-    messageReset: () -> Unit
+    messageEditing: Message? = null,
 ) {
     val message = messageState.value
 
@@ -374,42 +418,17 @@ private fun Typing(
             )
         }
 
+        val icoConfirm = if (messageEditing == null) Icons.Filled.Send else Icons.Filled.Done
         IconButton(
             modifier = Modifier.padding(bottom = 4.dp),
             colors = IconButtonDefaults.iconButtonColors(),
             onClick = {
-                viewModel.sendMessage(
-                    message =
-                    getMessage(
-                        screenState = screenState,
-                        messageState = messageState,
-                        messageReset = messageReset
-                    )
-                )
+                onConfirmClicked()
             }
         ) {
-            Icon(imageVector = Icons.Filled.Send, contentDescription = "send message")
+            Icon(imageVector = icoConfirm, contentDescription = "send message")
         }
     }
-}
-
-fun getMessage(
-    screenState: ChatScreenState.Content,
-    messageState: MutableState<TextFieldValue>,
-    messageReset: () -> Unit
-): Message {
-    val message = messageState.value
-
-    val result = Message(
-        id = 0,
-        senderId = screenState.userId,
-        receiverId = screenState.dialogUser.id,
-        content = message.text,
-        timestamp = System.currentTimeMillis(),
-        isRead = false
-    )
-    messageReset()
-    return result
 }
 
 @Composable
@@ -418,8 +437,8 @@ private fun MessageItem(
     message: Message,
     maxWidthItem: Dp,
     userId: Int,
-    onEditClicked: () -> Unit,
-    onRemoveClicked: () -> Unit
+    onEditClicked: (Message) -> Unit,
+    onRemoveClicked: (Message) -> Unit
 ) {
     val isMenuVisibleState = remember { mutableStateOf(false) }
     val pressOffsetState = remember { mutableStateOf(DpOffset.Zero) }
@@ -491,14 +510,78 @@ private fun MessageItem(
             }
             MessageTimeAndIsRead(message = message, userId = userId)
         }
+
+        val messageMenuItems = listOf(
+            MessageActionItem.Edit(onEditClicked = { onEditClicked(message) }),
+            MessageActionItem.Remove(onRemoveClicked = { onRemoveClicked(message) })
+        )
         OnMessageClickedMenu(
             isMenuVisibleState = isMenuVisibleState,
             offsetState = pressOffsetState,
             onDismissed = { isMenuVisibleState.value = false },
             itemHeightState = itemHeightState,
-            onEditClicked = onEditClicked,
-            onRemoveClicked = onRemoveClicked,
+            menuItems = messageMenuItems
         )
+    }
+}
+
+@Composable
+private fun EditingMessageItem(
+    message: Message,
+    onCloseEditing: () -> Unit
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+
+    ) {
+        Icon(
+            modifier = Modifier
+                .size(22.dp)
+                .weight(0.1f)
+            ,
+            imageVector = Icons.Default.Edit,
+            tint = MaturAlternativeColor,
+            contentDescription = stringResource(id = R.string.edit_message_action)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Column(
+            modifier = Modifier.weight(0.8f)
+        ) {
+            Text(
+                text = "Редактирование",
+                fontSize = 16.sp,
+                color = MaturAlternativeColor,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = message.content,
+                fontSize = 10.sp,
+                color = Color.Gray,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.1f)
+            ,
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(
+                onClick = { onCloseEditing() }
+            ) {
+                Icon(
+                    modifier = Modifier.size(22.dp),
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Отменить"
+                )
+            }
+        }
+
     }
 }
 
@@ -508,8 +591,7 @@ private fun OnMessageClickedMenu(
     offsetState: MutableState<DpOffset>,
     itemHeightState: MutableState<Dp>,
     onDismissed: () -> Unit,
-    onEditClicked: () -> Unit,
-    onRemoveClicked: () -> Unit,
+    menuItems: List<MessageActionItem>
 ) {
     val offset = offsetState.value
     val visible = isMenuVisibleState.value
@@ -520,20 +602,21 @@ private fun OnMessageClickedMenu(
         onDismissRequest = { onDismissed() },
         offset = offset.copy(y = offset.y - itemHeight)
     ) {
-        DropdownMenuItem(
-            text = { Text(text = "Редактировать") },
-            onClick = {
-                onDismissed()
-                onEditClicked()
-            }
-        )
-        DropdownMenuItem(
-            text = { Text(text = "Удалить") },
-            onClick = {
-                onDismissed()
-                onRemoveClicked()
-            }
-        )
+        menuItems.forEach { item ->
+            DropdownMenuItem(
+                text = { Text(text = stringResource(id = item.titleResId)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = item.icon,
+                        contentDescription = stringResource(id = item.descriptionResId)
+                    )
+                },
+                onClick = {
+                    onDismissed()
+                    item.action()
+                }
+            )
+        }
     }
 }
 
@@ -571,20 +654,6 @@ private fun TypingAnimation() {
         speed = 2f,
         iterations = IterateForever
     )
-}
-
-private fun Offset.toIntOffset() = IntOffset(x.toInt(), y.toInt())
-
-
-@Composable
-private fun IntOffset.toDp(): DpOffset {
-    val density = LocalDensity.current
-    with(density) {
-        val x = DpOffset(x.toDp(), y.toDp())
-        Log.d("onGloballyPositioned", "this =  ${this@toDp}")
-        Log.d("onGloballyPositioned", "clicked $x")
-        return x
-    }
 }
 
 private const val FIRST_ELEMENT = 0

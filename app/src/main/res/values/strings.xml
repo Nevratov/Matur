@@ -23,6 +23,10 @@
     <string name="chat_description_ico">Иконка чата</string>
     <string name="profile_description_ico">Иконка профиля</string>
     <string name="message_placeholer_chat">Сообщение</string>
+    <string name="edit_message_action">Изменить</string>
+    <string name="edit_message_description">Изменить сообщение</string>
+    <string name="remove_message_action">Удалить</string>
+    <string name="remove_message_description">Удалить сообщение</string>
 
     <array name="monthsOfYear">
         <item>Январь</item>

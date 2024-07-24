@@ -474,6 +474,20 @@ class MaturRepositoryImpl @Inject constructor(
         Log.d("sendMessage", "Message sending")
     }
 
+    override suspend fun removeMessage(message: Message) {
+        _chatMessages.remove(message)
+        refreshMessagesEvents.emit(Unit)
+    }
+
+    override suspend fun editMessage(message: Message) {
+        val index = chatMessages.indexOfFirst { it.id == message.id }
+        if (index != -1) {
+            _chatMessages[index] = message
+            refreshMessagesEvents.emit(Unit)
+        }
+
+    }
+
     override fun getChatList(): StateFlow<List<ChatListItem>> = flow {
         val chatListDto = apiService.getChatList(token = getToken()).chatList
         val downloadedChatList = mapper.chatListDtoToChatList(chatListDto)

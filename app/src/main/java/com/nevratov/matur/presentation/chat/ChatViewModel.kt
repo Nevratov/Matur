@@ -6,10 +6,12 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nevratov.matur.domain.entity.User
+import com.nevratov.matur.domain.usecases.EditMessageUseCase
 import com.nevratov.matur.domain.usecases.GetMessagesByUserIdUseCase
 import com.nevratov.matur.domain.usecases.GetUserUseCase
 import com.nevratov.matur.domain.usecases.LoadNextMessagesUseCase
 import com.nevratov.matur.domain.usecases.OnlineStatusUseCase
+import com.nevratov.matur.domain.usecases.RemoveMessageUseCase
 import com.nevratov.matur.domain.usecases.ResetDialogOptionsUseCase
 import com.nevratov.matur.domain.usecases.SendMessageUseCase
 import com.nevratov.matur.extentions.mergeWith
@@ -24,6 +26,8 @@ import kotlin.math.log
 
 class ChatViewModel @Inject constructor(
     private val sendMessageUseCase: SendMessageUseCase,
+    private val removeMessageUseCase: RemoveMessageUseCase,
+    private val editMessageUseCase: EditMessageUseCase,
     private val getMessagesByUserIdUseCase: GetMessagesByUserIdUseCase,
     private val loadNextMessagesUseCase: LoadNextMessagesUseCase,
     private val getUserUseCase: GetUserUseCase,
@@ -59,9 +63,29 @@ class ChatViewModel @Inject constructor(
 
     private val userId = getUserUseCase().id
 
-    fun sendMessage(message: Message) {
+    fun sendMessage(textMessage: String) {
+        val message = Message(
+            id = 0,
+            senderId = userId,
+            receiverId = dialogUser.id,
+            content = textMessage,
+            timestamp = System.currentTimeMillis(),
+            isRead = false
+        )
         viewModelScope.launch {
             sendMessageUseCase(message)
+        }
+    }
+
+    fun removeMessage(message: Message) {
+        viewModelScope.launch {
+            removeMessageUseCase(message)
+        }
+    }
+
+    fun editMessage(message: Message) {
+        viewModelScope.launch {
+            editMessageUseCase(message)
         }
     }
 
