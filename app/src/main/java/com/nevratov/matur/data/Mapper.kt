@@ -4,6 +4,7 @@ import android.util.Log
 import com.nevratov.matur.data.model.ChatListItemDto
 import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.CreateNewFCMTokenDto
+import com.nevratov.matur.data.model.DeleteMessageDto
 import com.nevratov.matur.data.model.DislikedUserDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
@@ -139,6 +140,8 @@ class Mapper {
             else -> { throw RuntimeException("response type ${responseWSDto.type} is unknown") }
         }
     }
+
+    fun messageIdToDeleteMessageDto(id: Int): DeleteMessageDto = DeleteMessageDto(messageId = id)
 
     // Now, we get MessageDTO in ResponseSendMessage, this method no actual
 //    fun messageToSendMessageDto(message: Message): SendMessageWSDto {

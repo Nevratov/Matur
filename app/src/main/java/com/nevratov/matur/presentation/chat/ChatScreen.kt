@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -160,6 +161,7 @@ private fun Chat(
 ) {
     val inputMessage = remember { mutableStateOf(TextFieldValue("")) }
     var messageEditing by remember { mutableStateOf<Message?>(null) }
+    var messageReply by remember { mutableStateOf<Message?>(null) }
     val showEmojiPicker = remember { mutableStateOf(false) }
 
     var lastMessage by remember { mutableStateOf(screenState.messages.first()) }
@@ -176,7 +178,7 @@ private fun Chat(
             modifier = Modifier
                 .weight(1f)
                 .background(MaterialTheme.colorScheme.background)
-                .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom =  6.dp),
+                .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 6.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = lazyListState
         ) {
@@ -185,7 +187,18 @@ private fun Chat(
                 Spacer(modifier = Modifier.height(8.dp))
             }
             items(screenState.messages, key = { it.id }) { message ->
-                val dismissState = rememberDismissState()
+                val dismissState = rememberDismissState(
+                    confirmValueChange = { dismissValue ->
+                        if (dismissValue == DismissValue.DismissedToStart) {
+                            messageReply = message
+                        }
+                        false
+                    },
+                    positionalThreshold = { fullWith ->
+                        fullWith * 0.5f
+                    }
+                )
+
                 val directions =
                     if (message.senderId == screenState.userId) setOf(DismissDirection.EndToStart) else setOf()
                 SwipeToDismiss(
@@ -275,19 +288,6 @@ private fun Chat(
             }
         )
     }
-}
-
-@Composable
-private fun SeparateLine() {
-    Spacer(modifier = Modifier.height(4.dp))
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(2.dp)
-            .padding(horizontal = 12.dp)
-            .background(VeryLightGray)
-    )
-    Spacer(modifier = Modifier.height(4.dp))
 }
 
 @Composable

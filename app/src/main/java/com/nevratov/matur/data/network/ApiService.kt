@@ -4,6 +4,7 @@ import com.nevratov.matur.data.model.ChatListResponseDto
 import com.nevratov.matur.data.model.ChatMessagesResponse
 import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.CreateNewFCMTokenDto
+import com.nevratov.matur.data.model.DeleteMessageDto
 import com.nevratov.matur.data.model.DislikedUserDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
@@ -18,7 +19,6 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -79,5 +79,11 @@ interface ApiService {
     suspend fun createNewFCMToken(
         @Header("Authorization") token: String,
         @Body newToken: CreateNewFCMTokenDto
+    )
+
+    @POST("im/delete")
+    suspend fun removeMessage(
+        @Header("Authorization") token: String,
+        @Body deleteMessage: DeleteMessageDto
     )
 }

@@ -475,6 +475,10 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeMessage(message: Message) {
+        apiService.removeMessage(
+            token = getToken(),
+            deleteMessage = mapper.messageIdToDeleteMessageDto(id = message.id)
+        )
         _chatMessages.remove(message)
         refreshMessagesEvents.emit(Unit)
     }
