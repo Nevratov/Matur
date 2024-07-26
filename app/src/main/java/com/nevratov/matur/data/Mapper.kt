@@ -84,12 +84,13 @@ class Mapper {
 
     fun messageDtoToMessage(message: MessageDto): Message {
         return Message(
-            id = message.id.toInt(),
-            senderId = message.senderId.toInt(),
+            id = message.id,
+            senderId = message.senderId,
             receiverId = message.receiverId,
             content = message.content,
-            timestamp = message.timestampCreateSec * 1000,
-            isRead = message.isRead == 1
+            timestamp = message.timestampCreateSec * MILLIS_IN_SEC,
+            timestampEdited = message.timestampUpdateSec * MILLIS_IN_SEC,
+            isRead = message.isRead == 1,
         )
     }
 
@@ -118,7 +119,8 @@ class Mapper {
         senderId = responseWSDto.senderId,
         receiverId = responseWSDto.receiverId,
         content = responseWSDto.content,
-        timestamp = responseWSDto.timestamp * 1000,
+        timestamp = responseWSDto.timestamp * MILLIS_IN_SEC,
+        timestampEdited = responseWSDto.timestamp * MILLIS_IN_SEC,
         isRead = false
     )
 

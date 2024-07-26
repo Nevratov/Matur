@@ -11,6 +11,7 @@ data class Message(
     val receiverId: Int,
     val content: String,
     val timestamp: Long,
+    val timestampEdited: Long,
     val isRead: Boolean
 ) {
 

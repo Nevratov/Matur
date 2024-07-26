@@ -64,12 +64,14 @@ class ChatViewModel @Inject constructor(
     private val userId = getUserUseCase().id
 
     fun sendMessage(textMessage: String) {
+        val currentTime = System.currentTimeMillis()
         val message = Message(
             id = 0,
             senderId = userId,
             receiverId = dialogUser.id,
             content = textMessage,
-            timestamp = System.currentTimeMillis(),
+            timestamp = currentTime,
+            timestampEdited = currentTime,
             isRead = false
         )
         viewModelScope.launch {

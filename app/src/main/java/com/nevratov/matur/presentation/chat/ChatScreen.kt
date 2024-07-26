@@ -214,7 +214,7 @@ private fun Chat(
                 SwipeToDismiss(
                     modifier = Modifier.animateItemPlacement(),
                     state = dismissState,
-                    directions = setOf(DismissDirection.EndToStart) ,
+                    directions = setOf(DismissDirection.EndToStart),
                     background = {
                         BackgroundDismissIco(dismissState = dismissState)
                     },
@@ -278,7 +278,12 @@ private fun Chat(
                 if (inputMessage.value.text.isBlank()) return@Typing
                 when (val currentMessageMode = messageMode) {
                     is MessageMode.Edit -> {
-                        viewModel.editMessage(currentMessageMode.message.copy(content = inputMessage.value.text))
+                        viewModel.editMessage(
+                            currentMessageMode.message.copy(
+                                content = inputMessage.value.text,
+                                timestampEdited = System.currentTimeMillis()
+                            )
+                        )
                         messageMode = MessageMode.Classic
                     }
 
@@ -309,7 +314,8 @@ private fun Chat(
 
 
 private fun triggerVibrate(context: Context) {
-    @Suppress("DEPRECATION") val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    @Suppress("DEPRECATION")
+    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     val vibrationEffect = VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE)
     vibrator.vibrate(vibrationEffect)
 }
@@ -706,11 +712,20 @@ private fun OnMessageClickedMenu(
 
 @Composable
 private fun MessageTimeAndIsRead(
+    modifier: Modifier = Modifier,
     message: Message,
     userId: Int
 ) {
     val icoId = if (message.isRead) R.drawable.check_mark_double else R.drawable.check_mark
     val timeColor = if (message.senderId == userId) Color.LightGray else Color.Gray
+
+    if (message.timestamp != message.timestampEdited) {
+        Text(
+            text = "изменено",
+            fontSize = 11.sp,
+            color = timeColor
+        )
+    }
     Text(
         text = message.time,
         fontSize = 11.sp,
