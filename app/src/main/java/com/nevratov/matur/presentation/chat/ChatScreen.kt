@@ -1,18 +1,12 @@
 package com.nevratov.matur.presentation.chat
 
 import android.content.Context
-import android.os.Build.VERSION_CODES
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.os.VibratorManager
 import android.util.Log
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -72,8 +66,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawStyle
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -89,6 +81,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -119,7 +112,7 @@ fun ChatScreen(
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val maxWidthItem = screenWidth * 0.70f
+    val maxWidthItem = screenWidth * 0.85f
 
 
     Scaffold() { paddingValues ->
@@ -556,6 +549,7 @@ private fun MessageItem(
     ) {
         Row(
             modifier = Modifier
+                .widthIn(max = maxWidthItem)
                 .clip(messageShape)
                 .background(messageBackground)
                 .padding(horizontal = 14.dp, vertical = 10.dp),
@@ -563,10 +557,8 @@ private fun MessageItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .widthIn(max = maxWidthItem)
-                    .wrapContentHeight()
+                modifier = Modifier.weight(1f, fill = false)
+
             ) {
                 Text(
                     lineHeight = 20.sp,
@@ -574,7 +566,7 @@ private fun MessageItem(
                     color = messageColor
                 )
             }
-            MessageTimeAndIsRead(message = message, userId = userId)
+            TimeIsReadIsEdited(message = message, userId = userId)
         }
 
         val messageMenuItems = listOf(
@@ -711,34 +703,38 @@ private fun OnMessageClickedMenu(
 }
 
 @Composable
-private fun MessageTimeAndIsRead(
-    modifier: Modifier = Modifier,
+private fun TimeIsReadIsEdited(
     message: Message,
     userId: Int
 ) {
     val icoId = if (message.isRead) R.drawable.check_mark_double else R.drawable.check_mark
     val timeColor = if (message.senderId == userId) Color.LightGray else Color.Gray
 
-    if (message.timestamp != message.timestampEdited) {
+    Row(
+        modifier = Modifier.wrapContentWidth(),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        if (message.timestamp != message.timestampEdited) {
+            Text(
+                text = "изменено",
+                fontSize = 11.sp,
+                color = timeColor
+            )
+        }
         Text(
-            text = "изменено",
+            text = message.time,
             fontSize = 11.sp,
             color = timeColor
         )
-    }
-    Text(
-        text = message.time,
-        fontSize = 11.sp,
-        color = timeColor
-    )
-    if (userId == message.senderId) {
-        Icon(
-            modifier = Modifier
-                .size(18.dp)
-                .padding(start = 4.dp),
-            painter = painterResource(id = icoId),
-            contentDescription = null
-        )
+        if (userId == message.senderId) {
+            Icon(
+                modifier = Modifier
+                    .size(width = 22.dp, height = 12.dp)
+                    .padding(start = 4.dp),
+                painter = painterResource(id = icoId),
+                contentDescription = null
+            )
+        }
     }
 }
 
