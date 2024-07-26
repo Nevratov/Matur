@@ -3,13 +3,8 @@ package com.nevratov.matur.presentation.chat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.MailOutline
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.nevratov.matur.R
-import com.nevratov.matur.navigation.Screen
 
 sealed class MessageActionItem(
     val titleResId: Int,
@@ -34,6 +29,15 @@ sealed class MessageActionItem(
         icon = Icons.Default.Delete,
         action = onRemoveClicked
     )
+}
+
+sealed class MessageMode {
+
+    data object Classic : MessageMode()
+
+    data class Edit(val message: Message): MessageMode()
+
+    data class Reply(val message: Message): MessageMode()
 }
 
 

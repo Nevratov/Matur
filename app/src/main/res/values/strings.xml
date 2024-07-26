@@ -27,6 +27,9 @@
     <string name="edit_message_description">Изменить сообщение</string>
     <string name="remove_message_action">Удалить</string>
     <string name="remove_message_description">Удалить сообщение</string>
+    <string name="reply_message_action">Ответить</string>
+    <string name="reply_message_description">Ответить на сообщение</string>
+
 
     <array name="monthsOfYear">
         <item>Январь</item>

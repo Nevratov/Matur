@@ -1,8 +1,18 @@
 package com.nevratov.matur.presentation.chat
 
+import android.content.Context
+import android.os.Build.VERSION_CODES
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +34,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
@@ -31,6 +42,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissState
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -60,6 +72,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -160,8 +175,7 @@ private fun Chat(
     onBackPressed: () -> Unit
 ) {
     val inputMessage = remember { mutableStateOf(TextFieldValue("")) }
-    var messageEditing by remember { mutableStateOf<Message?>(null) }
-    var messageReply by remember { mutableStateOf<Message?>(null) }
+    var messageMode by remember { mutableStateOf<MessageMode>(MessageMode.Classic) }
     val showEmojiPicker = remember { mutableStateOf(false) }
 
     var lastMessage by remember { mutableStateOf(screenState.messages.first()) }
@@ -182,7 +196,6 @@ private fun Chat(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = lazyListState
         ) {
-//            item { SeparateLine() }
             item {
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -190,22 +203,21 @@ private fun Chat(
                 val dismissState = rememberDismissState(
                     confirmValueChange = { dismissValue ->
                         if (dismissValue == DismissValue.DismissedToStart) {
-                            messageReply = message
+                            messageMode = MessageMode.Reply(message)
                         }
                         false
                     },
                     positionalThreshold = { fullWith ->
-                        fullWith * 0.5f
+                        fullWith * 0.1f
                     }
                 )
-
-                val directions =
-                    if (message.senderId == screenState.userId) setOf(DismissDirection.EndToStart) else setOf()
                 SwipeToDismiss(
                     modifier = Modifier.animateItemPlacement(),
                     state = dismissState,
-                    directions = directions,
-                    background = { },
+                    directions = setOf(DismissDirection.EndToStart) ,
+                    background = {
+                        BackgroundDismissIco(dismissState = dismissState)
+                    },
                     dismissContent = {
                         MessageItem(
                             message = message,
@@ -213,7 +225,7 @@ private fun Chat(
                             userId = screenState.userId,
                             onEditClicked = {
                                 inputMessage.value = inputMessage.value.copy(text = message.content)
-                                messageEditing = message
+                                messageMode = MessageMode.Edit(message)
                             },
                             onRemoveClicked = { viewModel.removeMessage(message) }
                         )
@@ -247,15 +259,13 @@ private fun Chat(
             lastMessage = screenState.messages.first()
         }
 
-        messageEditing?.let { message ->
-            EditingMessageItem(
-                message = message,
-                onCloseEditing = {
-                    inputMessage.value = TextFieldValue("")
-                    messageEditing = null
-                }
-            )
-        }
+        ModificationMessageItem(
+            messageMode = messageMode,
+            onCloseModification = {
+                inputMessage.value = TextFieldValue("")
+                messageMode = MessageMode.Classic
+            }
+        )
 
         Typing(
             messageState = inputMessage,
@@ -263,15 +273,22 @@ private fun Chat(
                 inputMessage.value = newValue.copy(text = newValue.text)
             },
             onEmojiIcoClicked = { showEmojiPicker.value = !showEmojiPicker.value },
-            messageEditing = messageEditing,
+            messageMode = messageMode,
             onConfirmClicked = {
                 if (inputMessage.value.text.isBlank()) return@Typing
-                val currentMessageEditing = messageEditing
-                if (currentMessageEditing != null) {
-                    viewModel.editMessage(currentMessageEditing.copy(content = inputMessage.value.text))
-                    messageEditing = null
-                } else {
-                    viewModel.sendMessage(inputMessage.value.text)
+                when (val currentMessageMode = messageMode) {
+                    is MessageMode.Edit -> {
+                        viewModel.editMessage(currentMessageMode.message.copy(content = inputMessage.value.text))
+                        messageMode = MessageMode.Classic
+                    }
+
+                    is MessageMode.Reply -> {
+
+                    }
+
+                    MessageMode.Classic -> {
+                        viewModel.sendMessage(inputMessage.value.text)
+                    }
                 }
                 inputMessage.value = TextFieldValue("")
             }
@@ -287,6 +304,48 @@ private fun Chat(
                 )
             }
         )
+    }
+}
+
+
+private fun triggerVibrate(context: Context) {
+    @Suppress("DEPRECATION") val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    val vibrationEffect = VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE)
+    vibrator.vibrate(vibrationEffect)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BackgroundDismissIco(
+    dismissState: DismissState
+) {
+    val isDismissed = dismissState.targetValue == DismissValue.DismissedToStart
+    val sizeIco by animateDpAsState(targetValue = if (isDismissed) 26.dp else 18.dp)
+
+    val context = LocalContext.current
+    LaunchedEffect(key1 = isDismissed) {
+        if (isDismissed) triggerVibrate(context)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = 4.dp),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Box(
+            modifier = Modifier.size(26.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(sizeIco),
+                painter = painterResource(id = R.drawable.reply_ico),
+                contentDescription = null,
+                tint = MaturAlternativeColor
+            )
+        }
+
     }
 }
 
@@ -378,7 +437,7 @@ private fun Typing(
     onConfirmClicked: () -> Unit,
     onValueChanged: (TextFieldValue) -> Unit,
     onEmojiIcoClicked: () -> Unit,
-    messageEditing: Message? = null,
+    messageMode: MessageMode,
 ) {
     val message = messageState.value
 
@@ -418,7 +477,8 @@ private fun Typing(
             )
         }
 
-        val icoConfirm = if (messageEditing == null) Icons.Filled.Send else Icons.Filled.Done
+        val icoConfirm =
+            if (messageMode is MessageMode.Edit) Icons.Filled.Done else Icons.Filled.Send
         IconButton(
             modifier = Modifier.padding(bottom = 4.dp),
             colors = IconButtonDefaults.iconButtonColors(),
@@ -437,8 +497,8 @@ private fun MessageItem(
     message: Message,
     maxWidthItem: Dp,
     userId: Int,
-    onEditClicked: (Message) -> Unit,
-    onRemoveClicked: (Message) -> Unit
+    onEditClicked: () -> Unit,
+    onRemoveClicked: () -> Unit
 ) {
     val isMenuVisibleState = remember { mutableStateOf(false) }
     val pressOffsetState = remember { mutableStateOf(DpOffset.Zero) }
@@ -476,13 +536,13 @@ private fun MessageItem(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
             .onSizeChanged { itemHeightState.value = with(density) { it.height.toDp() } }
             .pointerInput(true) {
                 detectTapGestures(
                     onLongPress = {
                         pressOffsetState.value = DpOffset(it.x.toDp(), it.y.toDp())
                         isMenuVisibleState.value = true
-                        Log.d("onGloballyPositioned", it.toString())
                     }
                 )
             },
@@ -512,8 +572,8 @@ private fun MessageItem(
         }
 
         val messageMenuItems = listOf(
-            MessageActionItem.Edit(onEditClicked = { onEditClicked(message) }),
-            MessageActionItem.Remove(onRemoveClicked = { onRemoveClicked(message) })
+            MessageActionItem.Edit(onEditClicked = onEditClicked),
+            MessageActionItem.Remove(onRemoveClicked = onRemoveClicked)
         )
         OnMessageClickedMenu(
             isMenuVisibleState = isMenuVisibleState,
@@ -526,10 +586,36 @@ private fun MessageItem(
 }
 
 @Composable
-private fun EditingMessageItem(
-    message: Message,
-    onCloseEditing: () -> Unit
+private fun ModificationMessageItem(
+    messageMode: MessageMode,
+    onCloseModification: () -> Unit
 ) {
+
+    val modeIco: ImageVector
+    val modeName: String
+    val modeIcoDescription: String
+    val textMessage: String
+
+    when (messageMode) {
+        MessageMode.Classic -> {
+            return
+        }
+
+        is MessageMode.Edit -> {
+            modeIco = Icons.Default.Edit
+            modeName = stringResource(id = R.string.edit_message_action)
+            modeIcoDescription = stringResource(id = R.string.edit_message_action)
+            textMessage = messageMode.message.content
+        }
+
+        is MessageMode.Reply -> {
+            modeIco = Icons.Default.ArrowBack
+            modeName = stringResource(id = R.string.reply_message_action)
+            modeIcoDescription = stringResource(id = R.string.reply_message_description)
+            textMessage = messageMode.message.content
+        }
+    }
+
     Row(
         Modifier
             .fillMaxWidth()
@@ -540,24 +626,23 @@ private fun EditingMessageItem(
         Icon(
             modifier = Modifier
                 .size(22.dp)
-                .weight(0.1f)
-            ,
-            imageVector = Icons.Default.Edit,
+                .weight(0.1f),
+            imageVector = modeIco,
             tint = MaturAlternativeColor,
-            contentDescription = stringResource(id = R.string.edit_message_action)
+            contentDescription = modeIcoDescription
         )
         Spacer(modifier = Modifier.width(4.dp))
         Column(
             modifier = Modifier.weight(0.8f)
         ) {
             Text(
-                text = "Редактирование",
+                text = modeName,
                 fontSize = 16.sp,
                 color = MaturAlternativeColor,
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = message.content,
+                text = textMessage,
                 fontSize = 10.sp,
                 color = Color.Gray,
                 maxLines = 1,
@@ -567,12 +652,11 @@ private fun EditingMessageItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.1f)
-            ,
+                .weight(0.1f),
             horizontalArrangement = Arrangement.End
         ) {
             IconButton(
-                onClick = { onCloseEditing() }
+                onClick = { onCloseModification() }
             ) {
                 Icon(
                     modifier = Modifier.size(22.dp),
