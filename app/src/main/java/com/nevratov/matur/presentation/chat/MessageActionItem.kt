@@ -1,6 +1,7 @@
 package com.nevratov.matur.presentation.chat
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -13,21 +14,25 @@ sealed class MessageActionItem(
     val action: () -> Unit
 ) {
 
-    data class Edit(
-        val onEditClicked: () -> Unit
-    ): MessageActionItem(
+    data class Edit(val onEditClicked: () -> Unit): MessageActionItem(
         titleResId = R.string.edit_message_action,
         descriptionResId = R.string.edit_message_description,
         icon = Icons.Default.Edit,
         action = onEditClicked
     )
-    data class Remove(
-        val onRemoveClicked: () -> Unit
-    ): MessageActionItem(
+
+    data class Remove(val onRemoveClicked: () -> Unit): MessageActionItem(
         titleResId = R.string.remove_message_action,
         descriptionResId = R.string.remove_message_description,
         icon = Icons.Default.Delete,
         action = onRemoveClicked
+    )
+
+    data class Reply(val onReplyClicked: () -> Unit): MessageActionItem(
+        titleResId = R.string.reply_message_action,
+        descriptionResId = R.string.reply_message_description,
+        icon = Icons.Default.ArrowBack,
+        action = onReplyClicked
     )
 }
 

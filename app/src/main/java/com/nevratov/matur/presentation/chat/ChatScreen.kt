@@ -220,7 +220,8 @@ private fun Chat(
                                 inputMessage.value = inputMessage.value.copy(text = message.content)
                                 messageMode = MessageMode.Edit(message)
                             },
-                            onRemoveClicked = { viewModel.removeMessage(message) }
+                            onRemoveClicked = { viewModel.removeMessage(message) },
+                            onReplyClicked = { messageMode = MessageMode.Reply(message) }
                         )
                     }
                 )
@@ -277,18 +278,21 @@ private fun Chat(
                                 timestampEdited = System.currentTimeMillis()
                             )
                         )
-                        messageMode = MessageMode.Classic
                     }
 
                     is MessageMode.Reply -> {
-
+                        viewModel.sendMessage(
+                            textMessage = inputMessage.value.text,
+                            replyId = currentMessageMode.message.id
+                        )
                     }
 
                     MessageMode.Classic -> {
-                        viewModel.sendMessage(inputMessage.value.text)
+                        viewModel.sendMessage(textMessage = inputMessage.value.text)
                     }
                 }
                 inputMessage.value = TextFieldValue("")
+                messageMode = MessageMode.Classic
             }
         )
 
@@ -497,7 +501,8 @@ private fun MessageItem(
     maxWidthItem: Dp,
     userId: Int,
     onEditClicked: () -> Unit,
-    onRemoveClicked: () -> Unit
+    onRemoveClicked: () -> Unit,
+    onReplyClicked: () -> Unit
 ) {
     val isMenuVisibleState = remember { mutableStateOf(false) }
     val pressOffsetState = remember { mutableStateOf(DpOffset.Zero) }
@@ -571,7 +576,8 @@ private fun MessageItem(
 
         val messageMenuItems = listOf(
             MessageActionItem.Edit(onEditClicked = onEditClicked),
-            MessageActionItem.Remove(onRemoveClicked = onRemoveClicked)
+            MessageActionItem.Remove(onRemoveClicked = onRemoveClicked),
+            MessageActionItem.Reply(onReplyClicked = onReplyClicked)
         )
         OnMessageClickedMenu(
             isMenuVisibleState = isMenuVisibleState,
@@ -729,8 +735,8 @@ private fun TimeIsReadIsEdited(
         if (userId == message.senderId) {
             Icon(
                 modifier = Modifier
-                    .size(width = 22.dp, height = 12.dp)
-                    .padding(start = 4.dp),
+                    .size(width = 20.dp, height = 10.dp)
+                    .padding(start = 4.dp, bottom = 2.dp),
                 painter = painterResource(id = icoId),
                 contentDescription = null
             )
