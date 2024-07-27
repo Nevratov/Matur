@@ -79,7 +79,7 @@ class Mapper {
             timestampCreateSec = message.timestamp / 1000,
             timestampUpdateSec = message.timestamp / 1000,
             isRead = if (message.isRead) 1 else 0,
-            replyId = message.replyId
+            replyMessage = message.replyMessage?.let { messageToMessageDto(it) }
         )
     }
 
@@ -92,7 +92,7 @@ class Mapper {
             timestamp = message.timestampCreateSec * MILLIS_IN_SEC,
             timestampEdited = message.timestampUpdateSec * MILLIS_IN_SEC,
             isRead = message.isRead == 1,
-            replyId = message.replyId
+            replyMessage = message.replyMessage?.let { messageDtoToMessage(it) }
         )
     }
 
@@ -124,7 +124,7 @@ class Mapper {
         timestamp = responseWSDto.timestamp * MILLIS_IN_SEC,
         timestampEdited = responseWSDto.timestamp * MILLIS_IN_SEC,
         isRead = false,
-        replyId = null //todo
+        replyMessage = null //todo
     )
 
     fun responseWSDtoToOnlineStatus(responseWSDto: ResponseWSDto): OnlineStatus {

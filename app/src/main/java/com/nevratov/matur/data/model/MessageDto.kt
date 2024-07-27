@@ -10,5 +10,5 @@ data class MessageDto(
     @SerializedName("created_at") val timestampCreateSec: Long,
     @SerializedName("updated_at") val timestampUpdateSec: Long,
     @SerializedName("is_read") val isRead: Int,
-    @SerializedName("reply_id") val replyId: Int?
+    @SerializedName("reply") val replyMessage: MessageDto?
 )

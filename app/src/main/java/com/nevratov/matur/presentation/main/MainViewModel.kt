@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
-    val checkAuthUseCase: CheckAuthUseCase,
+    private val checkAuthUseCase: CheckAuthUseCase,
     getAuthStateFlowUseCase: GetAuthStateFlowUseCase
 
 ): ViewModel() {

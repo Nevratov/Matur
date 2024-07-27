@@ -11,7 +11,7 @@ sealed class ChatScreenState {
 
     data class Content(
         val messages: List<Message>,
-        val userId: Int,
+        val user: User,
         val dialogUser: User,
         val onlineStatus: OnlineStatus,
         val loadNextMessages: Boolean = false,

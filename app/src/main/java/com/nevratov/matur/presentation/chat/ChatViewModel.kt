@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.log
 
 class ChatViewModel @Inject constructor(
     private val sendMessageUseCase: SendMessageUseCase,
@@ -48,7 +47,7 @@ class ChatViewModel @Inject constructor(
             Log.d("chatScreenState", it.toString())
             ChatScreenState.Content(
                 messages = it,
-                userId = userId,
+                user = user,
                 dialogUser = dialogUser,
                 onlineStatus = status
             )
@@ -61,19 +60,19 @@ class ChatViewModel @Inject constructor(
             initialValue = ChatScreenState.Initial
         )
 
-    private val userId = getUserUseCase().id
+    private val user = getUserUseCase()
 
-    fun sendMessage(textMessage: String, replyId: Int? = null) {
+    fun sendMessage(textMessage: String, replyMessage: Message? = null) {
         val currentTime = System.currentTimeMillis()
         val message = Message(
             id = 0,
-            senderId = userId,
+            senderId = user.id,
             receiverId = dialogUser.id,
             content = textMessage,
             timestamp = currentTime,
             timestampEdited = currentTime,
             isRead = false,
-            replyId = replyId
+            replyMessage = replyMessage
         )
         viewModelScope.launch {
             sendMessageUseCase(message)

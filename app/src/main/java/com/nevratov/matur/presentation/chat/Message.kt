@@ -13,7 +13,7 @@ data class Message(
     val timestamp: Long,
     val timestampEdited: Long,
     val isRead: Boolean,
-    val replyId: Int?
+    val replyMessage: Message?
 ) {
 
     private val calendar = Calendar.getInstance().apply {

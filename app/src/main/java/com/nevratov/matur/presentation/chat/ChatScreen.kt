@@ -11,8 +11,10 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -81,7 +83,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -92,6 +93,10 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.MaturApplication
+import com.nevratov.matur.ui.theme.Gray
+import com.nevratov.matur.ui.theme.GrayDark
+import com.nevratov.matur.ui.theme.Liloviy
+import com.nevratov.matur.ui.theme.LiloviyDark
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
 import com.nevratov.matur.ui.theme.VeryLightGray
 
@@ -215,7 +220,7 @@ private fun Chat(
                         MessageItem(
                             message = message,
                             maxWidthItem = maxWidthItem,
-                            userId = screenState.userId,
+                            screenState = screenState,
                             onEditClicked = {
                                 inputMessage.value = inputMessage.value.copy(text = message.content)
                                 messageMode = MessageMode.Edit(message)
@@ -283,7 +288,7 @@ private fun Chat(
                     is MessageMode.Reply -> {
                         viewModel.sendMessage(
                             textMessage = inputMessage.value.text,
-                            replyId = currentMessageMode.message.id
+                            replyMessage = currentMessageMode.message
                         )
                     }
 
@@ -497,9 +502,9 @@ private fun Typing(
 @Composable
 private fun MessageItem(
     modifier: Modifier = Modifier,
+    screenState: ChatScreenState.Content,
     message: Message,
     maxWidthItem: Dp,
-    userId: Int,
     onEditClicked: () -> Unit,
     onRemoveClicked: () -> Unit,
     onReplyClicked: () -> Unit
@@ -510,18 +515,18 @@ private fun MessageItem(
     val density = LocalDensity.current
 
     val contentAlignment =
-        if (message.senderId == userId) Alignment.CenterEnd
+        if (message.senderId == screenState.user.id) Alignment.CenterEnd
         else Alignment.CenterStart
 
     val (messageColor, messageBackground) =
-        if (message.senderId == userId) {
+        if (message.senderId == screenState.user.id) {
             listOf(MaterialTheme.colorScheme.background, MaturAlternativeColor)
         } else {
             listOf(MaterialTheme.colorScheme.onBackground, VeryLightGray)
         }
 
     val messageShape =
-        if (message.senderId == userId) {
+        if (message.senderId == screenState.user.id) {
             RoundedCornerShape(
                 topStart = 20.dp,
                 topEnd = 20.dp,
@@ -552,26 +557,36 @@ private fun MessageItem(
             },
         contentAlignment = contentAlignment
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .widthIn(max = maxWidthItem)
                 .clip(messageShape)
                 .background(messageBackground)
                 .padding(horizontal = 14.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Row(
-                modifier = Modifier.weight(1f, fill = false)
-
-            ) {
-                Text(
-                    lineHeight = 20.sp,
-                    text = message.content,
-                    color = messageColor
+            message.replyMessage?.let { replyMessage ->
+                ReplyMessageItem(
+                    message = message,
+                    replyMessage = replyMessage,
+                    screenState = screenState
                 )
             }
-            TimeIsReadIsEdited(message = message, userId = userId)
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f, fill = false)
+
+                ) {
+                    Text(
+                        lineHeight = 20.sp,
+                        text = message.content,
+                        color = messageColor
+                    )
+                }
+                TimeIsReadIsEdited(message = message, userId = screenState.user.id)
+            }
         }
 
         val messageMenuItems = listOf(
@@ -586,6 +601,60 @@ private fun MessageItem(
             itemHeightState = itemHeightState,
             menuItems = messageMenuItems
         )
+    }
+}
+
+@Composable
+private fun ReplyMessageItem(
+    message: Message,
+    replyMessage: Message,
+    screenState: ChatScreenState.Content
+) {
+    val nameUser: String
+    val backgroundColor: Color
+    val markColor: Color
+    val textColor: Color
+
+    if (message.senderId == screenState.user.id) {
+        nameUser = screenState.user.name
+        backgroundColor = Liloviy
+        markColor = LiloviyDark
+        textColor = MaterialTheme.colorScheme.background
+    } else {
+        nameUser = screenState.dialogUser.name
+        backgroundColor = Gray
+        markColor = GrayDark
+        textColor = MaterialTheme.colorScheme.onBackground
+    }
+
+    Row(
+        Modifier
+            .height(IntrinsicSize.Min)
+            .clip(RoundedCornerShape(6.dp))
+            .background(backgroundColor)
+    ) {
+        Box(
+            Modifier
+                .width(4.dp)
+                .fillMaxHeight()
+                .background(markColor)
+        )
+        Spacer(modifier = Modifier.width(2.dp))
+        Column(
+            modifier = Modifier.padding(4.dp)
+        ) {
+            Text(
+                text = nameUser,
+                color = textColor,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = replyMessage.content,
+                color = textColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
