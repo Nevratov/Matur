@@ -14,13 +14,20 @@ import com.nevratov.matur.domain.usecases.OnlineStatusUseCase
 import com.nevratov.matur.domain.usecases.RemoveMessageUseCase
 import com.nevratov.matur.domain.usecases.ResetDialogOptionsUseCase
 import com.nevratov.matur.domain.usecases.SendMessageUseCase
+import com.nevratov.matur.domain.usecases.SendTypingStatusUseCase
 import com.nevratov.matur.extentions.mergeWith
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.time.delay
+import java.time.Duration
 import javax.inject.Inject
 
 class ChatViewModel @Inject constructor(
@@ -32,6 +39,7 @@ class ChatViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val resetDialogOptionsUseCase: ResetDialogOptionsUseCase,
     private val onlineStatus: OnlineStatusUseCase,
+    private val sendTypingStatusUseCase: SendTypingStatusUseCase,
     private val application: Application,
     private val dialogUser: User,
 ) : ViewModel() {
@@ -39,6 +47,28 @@ class ChatViewModel @Inject constructor(
     private val loadNextMessagesFlow = MutableSharedFlow<ChatScreenState>()
     private val onlineStatusRefreshFlow = MutableSharedFlow<ChatScreenState>()
 
+    private var typingJob: Job? = null
+
+
+    fun typing() {
+        Log.d("sendTypingStatus", "typingJob = ${typingJob?.isActive}")
+        val currentTypingJob = typingJob
+        if (currentTypingJob != null && currentTypingJob.isActive) {
+            Log.d("sendTypingStatus", "if - cancel Job")
+            typingJob?.cancel()
+        } else {
+            Log.d("sendTypingStatus", "else")
+            viewModelScope.launch {
+                sendTypingStatusUseCase(isTyping = true, userId = user.id, dialogUserId = dialogUser.id)
+            }
+        }
+        typingJob = viewModelScope.launch {
+            Log.d("sendTypingStatus", "start Job")
+            delay(Duration.ofSeconds(3))
+            sendTypingStatusUseCase(isTyping = false, userId = user.id, dialogUserId = dialogUser.id)
+            Log.d("sendTypingStatus", "finish Job")
+        }
+    }
 
     val chatScreenState = getMessagesByUserIdUseCase(id = dialogUser.id)
         .onStart { observeOnlineStatus() }
@@ -76,7 +106,11 @@ class ChatViewModel @Inject constructor(
         )
         viewModelScope.launch {
             sendMessageUseCase(message)
+
+            typingJob?.cancel()
+            sendTypingStatusUseCase(isTyping = false, userId = user.id, dialogUserId = dialogUser.id)
         }
+
     }
 
     fun removeMessage(message: Message) {
@@ -129,14 +163,17 @@ class ChatViewModel @Inject constructor(
                 if (status.isOnline) onlineStatusRefreshFlow.emit(currentState.copy(onlineStatus = status))
                 else {
                     val currentTimestamp = System.currentTimeMillis()
-                    onlineStatusRefreshFlow.emit(currentState.copy(
-                        onlineStatus = status,
-                        dialogUser = dialogUser.copy(wasOnlineTimestamp = currentTimestamp)
-                    ))
+                    onlineStatusRefreshFlow.emit(
+                        currentState.copy(
+                            onlineStatus = status,
+                            dialogUser = dialogUser.copy(wasOnlineTimestamp = currentTimestamp)
+                        )
+                    )
                 }
             }
         }
     }
+
 
     public override fun onCleared() {
         Log.d("ChatScreen", "onCleared")

@@ -270,6 +270,7 @@ private fun Chat(
             messageState = inputMessage,
             onValueChanged = { newValue ->
                 inputMessage.value = newValue.copy(text = newValue.text)
+                viewModel.typing()
             },
             onEmojiIcoClicked = { showEmojiPicker.value = !showEmojiPicker.value },
             messageMode = messageMode,
@@ -479,6 +480,8 @@ private fun Typing(
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = VeryLightGray,
                     unfocusedIndicatorColor = VeryLightGray,
+                    focusedContainerColor = VeryLightGray,
+                unfocusedContainerColor = VeryLightGray,
                 ),
                 value = message,
                 onValueChange = { onValueChanged(it) },

@@ -9,6 +9,11 @@ object WebSocketConst {
     const val TYPING_TYPE = "typing"
 
     // STATUS
-    const val IS_ONLINE = "online"
-    const val IS_TYPING = "isTyping"
+    const val IS_ONLINE_STATUS = "online"
+    const val IS_TYPING_STATUS = "isTyping"
+
+    // CONTENT
+
+    const val IS_TYPING_CONTENT = "isTyping"
+    const val IS_NOT_TYPING_CONTENT = "notTyping"
 }

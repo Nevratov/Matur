@@ -26,6 +26,7 @@ import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
 import com.nevratov.matur.presentation.chat.Message
+import com.nevratov.matur.presentation.chat.UserId
 import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
@@ -172,7 +173,8 @@ class MaturRepositoryImpl @Inject constructor(
                 message = newMessage,
             )
             remove(chatListItem)
-            newChatListItem?.let { add(it) }
+            newChatListItem?.let { add(index = 0, element = it) }
+            Log.d("refreshChatList", _chatList.toString())
         }
         chatListRefreshEvents.emit(Unit)
     }
@@ -461,7 +463,7 @@ class MaturRepositoryImpl @Inject constructor(
         Log.d("sendMessage", "response = $response")
 
         // TODO Catch server error response
-        val messageToSend = mapper.messageDtoToSendMessageWSDto(response.message)
+        val messageToSend = mapper.messageDtoToWebSocketMessageDto(response.message)
 
         val messageJson = Gson().toJson(messageToSend)
         webSocketClient.send(messageJson)
@@ -509,6 +511,18 @@ class MaturRepositoryImpl @Inject constructor(
         started = SharingStarted.Lazily,
         initialValue = listOf()
     )
+
+    override suspend fun sendTypingStatus(isTyping: Boolean, userId: Int, dialogUserId: Int) {
+        val typingToSend = mapper.typingToWebSocketMessageDto(
+            isTyping = isTyping,
+            userId = userId,
+            dialogUserId = dialogUserId
+        )
+
+        val typingJson = Gson().toJson(typingToSend)
+        webSocketClient.send(typingJson)
+        Log.d("sendTypingStatus", "typing json = $typingJson")
+    }
 
     override fun onlineStatus(): StateFlow<OnlineStatus> = onlineStatusDialogUserStateFlow
 

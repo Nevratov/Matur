@@ -50,4 +50,6 @@ interface MaturRepository {
     suspend fun removeMessage(message: Message)
 
     suspend fun editMessage(message: Message)
+
+    suspend fun sendTypingStatus(isTyping: Boolean, userId: Int, dialogUserId: Int)
 }

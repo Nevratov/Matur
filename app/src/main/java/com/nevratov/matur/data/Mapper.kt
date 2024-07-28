@@ -11,8 +11,7 @@ import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RegUserInfoDto
-import com.nevratov.matur.data.model.ResponseWSDto
-import com.nevratov.matur.data.model.SendMessageWSDto
+import com.nevratov.matur.data.model.WebSocketMessageDto
 import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.data.network.webSocket.WebSocketConst
 import com.nevratov.matur.domain.entity.OnlineStatus
@@ -116,7 +115,7 @@ class Mapper {
         return chatList
     }
 
-    fun responseWSDtoToMessage(responseWSDto: ResponseWSDto): Message = Message(
+    fun responseWSDtoToMessage(responseWSDto: WebSocketMessageDto): Message = Message(
         id = responseWSDto.id,
         senderId = responseWSDto.senderId,
         receiverId = responseWSDto.receiverId,
@@ -127,43 +126,52 @@ class Mapper {
         replyMessage = null //todo
     )
 
-    fun responseWSDtoToOnlineStatus(responseWSDto: ResponseWSDto): OnlineStatus {
-        return when (responseWSDto.type) {
+    fun webSocketMessageDtoToOnlineStatus(webSocketMessage: WebSocketMessageDto): OnlineStatus {
+        return when (webSocketMessage.type) {
             WebSocketConst.STATUS_TYPE -> {
-                OnlineStatus (
-                    userId = responseWSDto.senderId,
-                    isOnline = responseWSDto.content == WebSocketConst.IS_ONLINE
+                OnlineStatus(
+                    userId = webSocketMessage.senderId,
+                    isOnline = webSocketMessage.content == WebSocketConst.IS_ONLINE_STATUS
                 )
             }
+
             WebSocketConst.TYPING_TYPE -> {
-                OnlineStatus (
-                    userId = responseWSDto.senderId,
+                OnlineStatus(
+                    userId = webSocketMessage.senderId,
                     isOnline = true,
-                    isTyping = responseWSDto.content == WebSocketConst.IS_TYPING
+                    isTyping = webSocketMessage.content == WebSocketConst.IS_TYPING_STATUS
                 )
             }
-            else -> { throw RuntimeException("response type ${responseWSDto.type} is unknown") }
+
+            else -> {
+                throw RuntimeException("response type ${webSocketMessage.type} is unknown")
+            }
         }
     }
 
     fun messageIdToDeleteMessageDto(id: Int): DeleteMessageDto = DeleteMessageDto(messageId = id)
 
-    // Now, we get MessageDTO in ResponseSendMessage, this method no actual
-//    fun messageToSendMessageDto(message: Message): SendMessageWSDto {
-//        return SendMessageWSDto(
-//            senderId = message.senderId,
-//            receiverId = message.receiverId,
-//            message = message.content,
-//
-//        )
-//    }
+    fun messageDtoToWebSocketMessageDto(message: MessageDto): WebSocketMessageDto =
+        WebSocketMessageDto(
+            id = message.id,
+            senderId = message.senderId,
+            receiverId = message.receiverId,
+            content = message.content,
+            timestamp = message.timestampCreateSec,
+            type = WebSocketConst.MESSAGE_TYPE
+        )
 
-    fun messageDtoToSendMessageWSDto(message: MessageDto): SendMessageWSDto = SendMessageWSDto(
-        senderId = message.senderId,
-        receiverId = message.receiverId,
-        message = message.content,
-        id = message.id,
-        timestamp = message.timestampCreateSec
+    fun typingToWebSocketMessageDto(
+        isTyping: Boolean,
+        userId: Int,
+        dialogUserId: Int
+    ): WebSocketMessageDto = WebSocketMessageDto(
+        id = 0,
+        senderId = userId,
+        receiverId = dialogUserId,
+        content = if (isTyping) WebSocketConst.IS_TYPING_CONTENT else WebSocketConst.IS_NOT_TYPING_CONTENT,
+        timestamp = 0,
+        type = WebSocketConst.TYPING_TYPE
     )
 
     fun loginDataToLoginDataDto(loginData: LoginData): LoginDataDto {

@@ -3,7 +3,7 @@ package com.nevratov.matur.data.network.webSocket
 import android.util.Log
 import com.google.gson.Gson
 import com.nevratov.matur.data.Mapper
-import com.nevratov.matur.data.model.ResponseWSDto
+import com.nevratov.matur.data.model.WebSocketMessageDto
 import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.presentation.chat.Message
 import com.nevratov.matur.presentation.chat.UserId
@@ -31,14 +31,14 @@ class WebSocketListener (
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
-        val responseDto = Gson().fromJson(text, ResponseWSDto::class.java)
+        val responseDto = Gson().fromJson(text, WebSocketMessageDto::class.java)
         when(responseDto.type) {
             WebSocketConst.MESSAGE_TYPE -> {
                 onMessageReceived(mapper.responseWSDtoToMessage(responseDto))
             }
             WebSocketConst.STATUS_TYPE, WebSocketConst.TYPING_TYPE -> {
                 Log.d("chatScreenState", "type = $responseDto")
-                onStatusReceived(mapper.responseWSDtoToOnlineStatus(responseDto))
+                onStatusReceived(mapper.webSocketMessageDtoToOnlineStatus(responseDto))
             }
             WebSocketConst.READ_ALL_TYPE -> {
                 onUserIdReadAllMessages(responseDto.senderId)
