@@ -19,7 +19,11 @@ data class Message(
     private val calendar = Calendar.getInstance().apply {
         time = Date(timestamp)
     }
-    private val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-    val time: String = dateFormat.format(calendar.time)
+
+    private val dateFormat = SimpleDateFormat("d MMMM", Locale("ru"))
+    val date: String = dateFormat.format(calendar.time)
+
+    private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+    val time: String = timeFormat.format(calendar.time)
 }
 

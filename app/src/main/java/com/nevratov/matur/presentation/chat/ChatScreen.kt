@@ -80,6 +80,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
@@ -180,6 +181,8 @@ private fun Chat(
 
     val lazyListState = rememberLazyListState()
 
+    val groupMessagesByDate = screenState.messages.groupBy { it.date }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -194,42 +197,46 @@ private fun Chat(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = lazyListState
         ) {
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            items(screenState.messages, key = { it.id }) { message ->
-                val dismissState = rememberDismissState(
-                    confirmValueChange = { dismissValue ->
-                        if (dismissValue == DismissValue.DismissedToStart) {
-                            messageMode = MessageMode.Reply(message)
+            groupMessagesByDate.forEach { (date, messages) ->
+
+                items(messages, key = { it.id }) { message ->
+
+                    val dismissState = rememberDismissState(
+                        confirmValueChange = { dismissValue ->
+                            if (dismissValue == DismissValue.DismissedToStart) {
+                                messageMode = MessageMode.Reply(message)
+                            }
+                            false
+                        },
+                        positionalThreshold = { fullWith ->
+                            fullWith * 0.1f
                         }
-                        false
-                    },
-                    positionalThreshold = { fullWith ->
-                        fullWith * 0.1f
-                    }
-                )
-                SwipeToDismiss(
-                    modifier = Modifier.animateItemPlacement(),
-                    state = dismissState,
-                    directions = setOf(DismissDirection.EndToStart),
-                    background = {
-                        BackgroundDismissIco(dismissState = dismissState)
-                    },
-                    dismissContent = {
-                        MessageItem(
-                            message = message,
-                            maxWidthItem = maxWidthItem,
-                            screenState = screenState,
-                            onEditClicked = {
-                                inputMessage.value = inputMessage.value.copy(text = message.content)
-                                messageMode = MessageMode.Edit(message)
-                            },
-                            onRemoveClicked = { viewModel.removeMessage(message) },
-                            onReplyClicked = { messageMode = MessageMode.Reply(message) }
-                        )
-                    }
-                )
+                    )
+                    SwipeToDismiss(
+                        modifier = Modifier.animateItemPlacement(),
+                        state = dismissState,
+                        directions = setOf(DismissDirection.EndToStart),
+                        background = {
+                            BackgroundDismissIco(dismissState = dismissState)
+                        },
+                        dismissContent = {
+                            MessageItem(
+                                message = message,
+                                maxWidthItem = maxWidthItem,
+                                screenState = screenState,
+                                onEditClicked = {
+                                    inputMessage.value = inputMessage.value.copy(text = message.content)
+                                    messageMode = MessageMode.Edit(message)
+                                },
+                                onRemoveClicked = { viewModel.removeMessage(message) },
+                                onReplyClicked = { messageMode = MessageMode.Reply(message) }
+                            )
+                        }
+                    )
+                }
+                item {
+                    DateDelimiter(date = date)
+                }
             }
             // Load next messages
             item {
@@ -315,12 +322,33 @@ private fun Chat(
     }
 }
 
-
 private fun triggerVibrate(context: Context) {
     @Suppress("DEPRECATION")
     val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     val vibrationEffect = VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE)
     vibrator.vibrate(vibrationEffect)
+}
+
+@Composable
+private fun DateDelimiter(
+    date: String
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(CircleShape)
+                .background(VeryLightGray)
+                .padding(8.dp),
+            color = MaterialTheme.colorScheme.onBackground,
+            text = date,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -329,7 +357,7 @@ private fun BackgroundDismissIco(
     dismissState: DismissState
 ) {
     val isDismissed = dismissState.targetValue == DismissValue.DismissedToStart
-    val sizeIco by animateDpAsState(targetValue = if (isDismissed) 26.dp else 18.dp)
+    val sizeIco by animateDpAsState(targetValue = if (isDismissed) 26.dp else 18.dp, label = "size")
 
     val context = LocalContext.current
     LaunchedEffect(key1 = isDismissed) {
