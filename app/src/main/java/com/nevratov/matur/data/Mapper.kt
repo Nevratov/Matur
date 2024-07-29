@@ -98,7 +98,8 @@ class Mapper {
     fun messageToCreateMessageDto(message: Message): CreateMessageDto {
         return CreateMessageDto(
             receiverId = message.receiverId,
-            message = message.content
+            message = message.content,
+            replyMessageId = message.replyMessage?.id
         )
     }
 
