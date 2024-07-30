@@ -454,9 +454,6 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sendMessage(message: Message) {
-        Log.d("sendMessage", "in sendMessage = $message")
-        val cmDto = mapper.messageToCreateMessageDto(message)
-        Log.d("sendMessage", "crDto = $cmDto")
         val response = apiService.sendMessage(
             token = getToken(),
             message = mapper.messageToCreateMessageDto(message)

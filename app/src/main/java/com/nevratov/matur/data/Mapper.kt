@@ -1,6 +1,7 @@
 package com.nevratov.matur.data
 
 import android.util.Log
+import com.google.gson.Gson
 import com.nevratov.matur.data.model.ChatListItemDto
 import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.CreateNewFCMTokenDto
@@ -98,7 +99,7 @@ class Mapper {
     fun messageToCreateMessageDto(message: Message): CreateMessageDto {
         return CreateMessageDto(
             receiverId = message.receiverId,
-            message = message.content,
+            messageJson = message.content,
             replyMessageId = message.replyMessage?.id
         )
     }
@@ -152,15 +153,17 @@ class Mapper {
 
     fun messageIdToDeleteMessageDto(id: Int): DeleteMessageDto = DeleteMessageDto(messageId = id)
 
-    fun messageDtoToWebSocketMessageDto(message: MessageDto): WebSocketMessageDto =
-        WebSocketMessageDto(
+    fun messageDtoToWebSocketMessageDto(message: MessageDto): WebSocketMessageDto {
+        val messageJson = Gson().toJson(message)
+        return WebSocketMessageDto(
             id = message.id,
             senderId = message.senderId,
             receiverId = message.receiverId,
-            content = message.content,
+            content = messageJson,
             timestamp = message.timestampCreateSec,
             type = WebSocketConst.MESSAGE_TYPE
         )
+    }
 
     fun typingToWebSocketMessageDto(
         isTyping: Boolean,

@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DismissDirection
@@ -450,6 +451,52 @@ private fun ProfilePanel(
                     fontSize = 12.sp,
                     color = Color.LightGray,
                 )
+            }
+        }
+        Row {
+            var expanded by remember {
+                mutableStateOf(false)
+            }
+            IconButton(
+                onClick = { expanded = !expanded }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Больше действий"
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Отключить уведолмения") },
+                        onClick = {
+
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Поиск") },
+                        onClick = {
+
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Удалить диалог") },
+                        onClick = {
+
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Заблокировать") },
+                        onClick = {
+
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }
