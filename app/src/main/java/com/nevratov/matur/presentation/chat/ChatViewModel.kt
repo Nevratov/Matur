@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nevratov.matur.domain.entity.User
+import com.nevratov.matur.domain.usecases.BlockUserByIdUseCase
 import com.nevratov.matur.domain.usecases.EditMessageUseCase
 import com.nevratov.matur.domain.usecases.GetMessagesByUserIdUseCase
 import com.nevratov.matur.domain.usecases.GetUserUseCase
@@ -40,6 +41,7 @@ class ChatViewModel @Inject constructor(
     private val resetDialogOptionsUseCase: ResetDialogOptionsUseCase,
     private val onlineStatus: OnlineStatusUseCase,
     private val sendTypingStatusUseCase: SendTypingStatusUseCase,
+    private val blockUserByIdUseCase: BlockUserByIdUseCase,
     private val application: Application,
     private val dialogUser: User,
 ) : ViewModel() {
@@ -122,6 +124,12 @@ class ChatViewModel @Inject constructor(
     fun editMessage(message: Message) {
         viewModelScope.launch {
             editMessageUseCase(message)
+        }
+    }
+
+    fun blockUser() {
+        viewModelScope.launch {
+            blockUserByIdUseCase(id = dialogUser.id)
         }
     }
 

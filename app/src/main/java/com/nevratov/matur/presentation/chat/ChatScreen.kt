@@ -4,7 +4,13 @@ import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -85,8 +91,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -187,7 +195,11 @@ private fun Chat(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        ProfilePanel(screenState = screenState, onBackPressed = onBackPressed)
+        ProfilePanel(
+            screenState = screenState,
+            onBlockUser = { viewModel.blockUser() },
+            onBackPressed = onBackPressed
+        )
 
         LazyColumn(
             reverseLayout = true,
@@ -226,7 +238,8 @@ private fun Chat(
                                 maxWidthItem = maxWidthItem,
                                 screenState = screenState,
                                 onEditClicked = {
-                                    inputMessage.value = inputMessage.value.copy(text = message.content)
+                                    inputMessage.value =
+                                        inputMessage.value.copy(text = message.content)
                                     messageMode = MessageMode.Edit(message)
                                 },
                                 onRemoveClicked = { viewModel.removeMessage(message) },
@@ -323,10 +336,11 @@ private fun Chat(
     }
 }
 
-private fun triggerVibrate(context: Context) {
+private fun triggerVibrate(context: Context, durationMillis: Long = 50) {
     @Suppress("DEPRECATION")
     val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    val vibrationEffect = VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE)
+    val vibrationEffect =
+        VibrationEffect.createOneShot(durationMillis, VibrationEffect.DEFAULT_AMPLITUDE)
     vibrator.vibrate(vibrationEffect)
 }
 
@@ -390,6 +404,7 @@ private fun BackgroundDismissIco(
 @Composable
 private fun ProfilePanel(
     screenState: ChatScreenState.Content,
+    onBlockUser: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
     Row(
@@ -453,53 +468,65 @@ private fun ProfilePanel(
                 )
             }
         }
-        Row {
-            var expanded by remember {
-                mutableStateOf(false)
-            }
-            IconButton(
-                onClick = { expanded = !expanded }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "Больше действий"
-                )
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Отключить уведолмения") },
-                        onClick = {
-
-                            expanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Поиск") },
-                        onClick = {
-
-                            expanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Удалить диалог") },
-                        onClick = {
-
-                            expanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Заблокировать") },
-                        onClick = {
-
-                            expanded = false
-                        }
-                    )
-                }
-            }
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            ProfilePanelOptions(onBlockUser = onBlockUser)
         }
     }
+}
+
+@Composable
+private fun ProfilePanelOptions(
+    onBlockUser: () -> Unit
+) {
+    Log.d("ProfilePanelOptions", "REC")
+    var expanded by remember { mutableStateOf(false) }
+
+    IconButton(
+        onClick = { expanded = !expanded }
+    ) {
+        Icon(
+            imageVector = Icons.Default.MoreVert,
+            contentDescription = "Больше действий",
+            tint = MaterialTheme.colorScheme.background
+        )
+    }
+
+    DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Отключить уведолмения") },
+                onClick = {
+
+                    expanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Поиск") },
+                onClick = {
+
+                    expanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Удалить диалог") },
+                onClick = {
+
+                    expanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Заблокировать") },
+                onClick = {
+                    onBlockUser()
+                    expanded = false
+                }
+            )
+        }
 }
 
 @Composable
@@ -556,7 +583,7 @@ private fun Typing(
                     focusedIndicatorColor = VeryLightGray,
                     unfocusedIndicatorColor = VeryLightGray,
                     focusedContainerColor = VeryLightGray,
-                unfocusedContainerColor = VeryLightGray,
+                    unfocusedContainerColor = VeryLightGray,
                 ),
                 value = message,
                 onValueChange = { onValueChanged(it) },
@@ -591,6 +618,7 @@ private fun MessageItem(
     val pressOffsetState = remember { mutableStateOf(DpOffset.Zero) }
     val itemHeightState = remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
+    val context = LocalContext.current
 
     val contentAlignment =
         if (message.senderId == screenState.user.id) Alignment.CenterEnd
@@ -628,6 +656,7 @@ private fun MessageItem(
             .pointerInput(true) {
                 detectTapGestures(
                     onLongPress = {
+                        triggerVibrate(context = context, durationMillis = 20)
                         pressOffsetState.value = DpOffset(it.x.toDp(), it.y.toDp())
                         isMenuVisibleState.value = true
                     }

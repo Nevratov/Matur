@@ -4,13 +4,14 @@ import com.nevratov.matur.data.model.ChatListResponseDto
 import com.nevratov.matur.data.model.ChatMessagesResponse
 import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.CreateNewFCMTokenDto
-import com.nevratov.matur.data.model.DeleteMessageDto
+import com.nevratov.matur.data.model.RemoveMessageDto
 import com.nevratov.matur.data.model.DislikedUserDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.LoginResponseDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RegUserInfoDto
+import com.nevratov.matur.data.model.RemoveDialogDto
 import com.nevratov.matur.data.model.SendMessageResponse
 import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.data.model.UsersToExploreResponseDto
@@ -84,6 +85,18 @@ interface ApiService {
     @POST("im/delete")
     suspend fun removeMessage(
         @Header("Authorization") token: String,
-        @Body deleteMessage: DeleteMessageDto
+        @Body deleteMessage: RemoveMessageDto
+    )
+
+    @POST("im/delete")
+    suspend fun removeDialogByUserId(
+        @Header("Authorization") token: String,
+        @Body removeDialog: RemoveDialogDto
+    )
+
+    @POST("user/block/{id}")
+    suspend fun blockUserById(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
     )
 }

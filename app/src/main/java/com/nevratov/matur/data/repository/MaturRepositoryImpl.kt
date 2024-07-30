@@ -26,7 +26,6 @@ import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
 import com.nevratov.matur.presentation.chat.Message
-import com.nevratov.matur.presentation.chat.UserId
 import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
@@ -543,6 +542,10 @@ class MaturRepositoryImpl @Inject constructor(
         _chatMessages.clear()
         dialogPage = DEFAULT_PAGE
         dialogUserId = null
+    }
+
+    override suspend fun blockUserById(id: Int) {
+        apiService.blockUserById(token = getToken(), id = id)
     }
 
     override fun createNewFCMToken(newToken: String) {
