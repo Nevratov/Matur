@@ -99,4 +99,10 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("id") id: Int
     )
+
+    @POST("user/unblock/{id}")
+    suspend fun unblockUserById(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    )
 }

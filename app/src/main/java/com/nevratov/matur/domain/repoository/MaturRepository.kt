@@ -49,9 +49,13 @@ interface MaturRepository {
 
     suspend fun removeMessage(message: Message)
 
+    suspend fun removeDialogById(id: Int)
+
     suspend fun editMessage(message: Message)
 
     suspend fun sendTypingStatus(isTyping: Boolean, userId: Int, dialogUserId: Int)
 
     suspend fun blockUserById(id: Int)
+
+    suspend fun unblockUserById(id: Int)
 }

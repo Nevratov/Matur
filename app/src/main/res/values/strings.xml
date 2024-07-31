@@ -29,6 +29,12 @@
     <string name="remove_message_description">Удалить сообщение</string>
     <string name="reply_message_action">Ответить</string>
     <string name="reply_message_description">Ответить на сообщение</string>
+    <string name="disable_notifications_action">Отключить уведомления</string>
+    <string name="enable_notifications_action">Включить уведомления</string>
+    <string name="search_action">Поиск</string>
+    <string name="remove_dialog_action">Удалить диалог</string>
+    <string name="block_action">Заблокировать</string>
+    <string name="unblock_action">Разблокировать</string>
 
 
     <array name="monthsOfYear">

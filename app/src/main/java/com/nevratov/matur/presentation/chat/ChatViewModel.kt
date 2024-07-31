@@ -12,10 +12,12 @@ import com.nevratov.matur.domain.usecases.GetMessagesByUserIdUseCase
 import com.nevratov.matur.domain.usecases.GetUserUseCase
 import com.nevratov.matur.domain.usecases.LoadNextMessagesUseCase
 import com.nevratov.matur.domain.usecases.OnlineStatusUseCase
+import com.nevratov.matur.domain.usecases.RemoveDialogByIdUseCase
 import com.nevratov.matur.domain.usecases.RemoveMessageUseCase
 import com.nevratov.matur.domain.usecases.ResetDialogOptionsUseCase
 import com.nevratov.matur.domain.usecases.SendMessageUseCase
 import com.nevratov.matur.domain.usecases.SendTypingStatusUseCase
+import com.nevratov.matur.domain.usecases.UnblockUserByIdUseCase
 import com.nevratov.matur.extentions.mergeWith
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +43,9 @@ class ChatViewModel @Inject constructor(
     private val resetDialogOptionsUseCase: ResetDialogOptionsUseCase,
     private val onlineStatus: OnlineStatusUseCase,
     private val sendTypingStatusUseCase: SendTypingStatusUseCase,
+    private val removeDialogByIdUseCase: RemoveDialogByIdUseCase,
     private val blockUserByIdUseCase: BlockUserByIdUseCase,
+    private val unblockUserByIdUseCase: UnblockUserByIdUseCase,
     private val application: Application,
     private val dialogUser: User,
 ) : ViewModel() {
@@ -127,9 +131,21 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun removeDialogById() {
+        viewModelScope.launch {
+            removeDialogByIdUseCase(id = dialogUser.id)
+        }
+    }
+
     fun blockUser() {
         viewModelScope.launch {
             blockUserByIdUseCase(id = dialogUser.id)
+        }
+    }
+
+    fun unblockUser() {
+        viewModelScope.launch {
+            unblockUserByIdUseCase(id = dialogUser.id)
         }
     }
 

@@ -4,13 +4,7 @@ import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -91,10 +85,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
 import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -192,12 +184,13 @@ private fun Chat(
 
     val groupMessagesByDate = screenState.messages.groupBy { it.date }
 
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         ProfilePanel(
             screenState = screenState,
-            onBlockUser = { viewModel.blockUser() },
+            viewModel = viewModel,
             onBackPressed = onBackPressed
         )
 
@@ -404,9 +397,16 @@ private fun BackgroundDismissIco(
 @Composable
 private fun ProfilePanel(
     screenState: ChatScreenState.Content,
-    onBlockUser: () -> Unit,
+    viewModel: ChatViewModel,
     onBackPressed: () -> Unit,
 ) {
+    val profileUserActions = listOf(
+        ProfileAction.Notification(isEnabled = true, action = {  }),
+        ProfileAction.Search(action = {  }),
+        ProfileAction.RemoveDialog(action = {  }),
+        ProfileAction.Block(isBlocked = false, action = {  })
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -472,14 +472,14 @@ private fun ProfilePanel(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            ProfilePanelOptions(onBlockUser = onBlockUser)
+            ProfilePanelActions(profileUserActions = profileUserActions)
         }
     }
 }
 
 @Composable
-private fun ProfilePanelOptions(
-    onBlockUser: () -> Unit
+private fun ProfilePanelActions(
+    profileUserActions: List<ProfileAction>
 ) {
     Log.d("ProfilePanelOptions", "REC")
     var expanded by remember { mutableStateOf(false) }
@@ -497,36 +497,21 @@ private fun ProfilePanelOptions(
     DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
-        ) {
+    ) {
+        profileUserActions.forEach {  action ->
             DropdownMenuItem(
-                text = { Text("Отключить уведолмения") },
+                text = { Text(text = stringResource(id = action.nameResId)) },
                 onClick = {
-
+                    action.action()
                     expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Поиск") },
-                onClick = {
-
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Удалить диалог") },
-                onClick = {
-
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Заблокировать") },
-                onClick = {
-                    onBlockUser()
-                    expanded = false
-                }
+                },
+                leadingIcon = { Icon(
+                    painter = painterResource(id = action.icoResId),
+                    contentDescription = stringResource(id = action.descriptionResId)
+                )}
             )
         }
+    }
 }
 
 @Composable

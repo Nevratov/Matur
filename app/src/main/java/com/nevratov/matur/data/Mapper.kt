@@ -12,6 +12,7 @@ import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RegUserInfoDto
+import com.nevratov.matur.data.model.RemoveDialogDto
 import com.nevratov.matur.data.model.WebSocketMessageDto
 import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.data.network.webSocket.WebSocketConst
@@ -177,6 +178,8 @@ class Mapper {
         timestamp = 0,
         type = WebSocketConst.TYPING_TYPE
     )
+
+    fun idToRemoveDialogDto(id: Int) = RemoveDialogDto(userId = id)
 
     fun loginDataToLoginDataDto(loginData: LoginData): LoginDataDto {
         return LoginDataDto(

@@ -16,6 +16,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.nevratov.matur.R
 import com.nevratov.matur.data.Mapper
+import com.nevratov.matur.data.model.RemoveDialogDto
 import com.nevratov.matur.data.network.ApiFactory
 import com.nevratov.matur.data.network.webSocket.WebSocketClient
 import com.nevratov.matur.data.network.webSocket.WebSocketListener
@@ -544,8 +545,19 @@ class MaturRepositoryImpl @Inject constructor(
         dialogUserId = null
     }
 
+    override suspend fun removeDialogById(id: Int) {
+        apiService.removeDialogByUserId(
+            token = getToken(),
+            removeDialog = mapper.idToRemoveDialogDto(id)
+        )
+    }
+
     override suspend fun blockUserById(id: Int) {
         apiService.blockUserById(token = getToken(), id = id)
+    }
+
+    override suspend fun unblockUserById(id: Int) {
+        apiService.unblockUserById(token = getToken(), id = id)
     }
 
     override fun createNewFCMToken(newToken: String) {
