@@ -19,10 +19,7 @@ import com.nevratov.matur.domain.usecases.SendMessageUseCase
 import com.nevratov.matur.domain.usecases.SendTypingStatusUseCase
 import com.nevratov.matur.domain.usecases.UnblockUserByIdUseCase
 import com.nevratov.matur.extentions.mergeWith
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -47,34 +44,12 @@ class ChatViewModel @Inject constructor(
     private val blockUserByIdUseCase: BlockUserByIdUseCase,
     private val unblockUserByIdUseCase: UnblockUserByIdUseCase,
     private val application: Application,
-    private val dialogUser: User,
+    private var dialogUser: User,
 ) : ViewModel() {
 
-    private val loadNextMessagesFlow = MutableSharedFlow<ChatScreenState>()
-    private val onlineStatusRefreshFlow = MutableSharedFlow<ChatScreenState>()
+    private val screenStateRefreshFlow = MutableSharedFlow<ChatScreenState>()
 
     private var typingJob: Job? = null
-
-
-    fun typing() {
-        Log.d("sendTypingStatus", "typingJob = ${typingJob?.isActive}")
-        val currentTypingJob = typingJob
-        if (currentTypingJob != null && currentTypingJob.isActive) {
-            Log.d("sendTypingStatus", "if - cancel Job")
-            typingJob?.cancel()
-        } else {
-            Log.d("sendTypingStatus", "else")
-            viewModelScope.launch {
-                sendTypingStatusUseCase(isTyping = true, userId = user.id, dialogUserId = dialogUser.id)
-            }
-        }
-        typingJob = viewModelScope.launch {
-            Log.d("sendTypingStatus", "start Job")
-            delay(Duration.ofSeconds(3))
-            sendTypingStatusUseCase(isTyping = false, userId = user.id, dialogUserId = dialogUser.id)
-            Log.d("sendTypingStatus", "finish Job")
-        }
-    }
 
     val chatScreenState = getMessagesByUserIdUseCase(id = dialogUser.id)
         .onStart { observeOnlineStatus() }
@@ -88,8 +63,7 @@ class ChatViewModel @Inject constructor(
                 onlineStatus = status
             )
         }
-        .mergeWith(loadNextMessagesFlow)
-        .mergeWith(onlineStatusRefreshFlow)
+        .mergeWith(screenStateRefreshFlow)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
@@ -138,14 +112,24 @@ class ChatViewModel @Inject constructor(
     }
 
     fun blockUser() {
+        val currentState = chatScreenState.value
+        if (currentState !is ChatScreenState.Content) return
         viewModelScope.launch {
             blockUserByIdUseCase(id = dialogUser.id)
+            dialogUser = dialogUser.copy(isBlocked = true)
+            val newState = currentState.copy(dialogUser = dialogUser)
+            screenStateRefreshFlow.emit(newState)
         }
     }
 
     fun unblockUser() {
+        val currentState = chatScreenState.value
+        if (currentState !is ChatScreenState.Content) return
         viewModelScope.launch {
             unblockUserByIdUseCase(id = dialogUser.id)
+            dialogUser = dialogUser.copy(isBlocked = false)
+            val newState = currentState.copy(dialogUser = dialogUser)
+            screenStateRefreshFlow.emit(newState)
         }
     }
 
@@ -157,13 +141,13 @@ class ChatViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            loadNextMessagesFlow.emit(currentState.copy(loadNextMessages = true))
+            screenStateRefreshFlow.emit(currentState.copy(loadNextMessages = true))
             val isNextMessages = loadNextMessagesUseCase(messagesWithId = dialogUser.id)
             when (isNextMessages) {
                 true -> {}
                 false -> {
                     val newState = chatScreenState.value as ChatScreenState.Content
-                    loadNextMessagesFlow.emit(
+                    screenStateRefreshFlow.emit(
                         newState.copy(
                             loadNextMessages = false,
                             isNextMessages = false
@@ -171,6 +155,21 @@ class ChatViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    fun typing() {
+        val currentTypingJob = typingJob
+        if (currentTypingJob != null && currentTypingJob.isActive) {
+            typingJob?.cancel()
+        } else {
+            viewModelScope.launch {
+                sendTypingStatusUseCase(isTyping = true, userId = user.id, dialogUserId = dialogUser.id)
+            }
+        }
+        typingJob = viewModelScope.launch {
+            delay(Duration.ofSeconds(3))
+            sendTypingStatusUseCase(isTyping = false, userId = user.id, dialogUserId = dialogUser.id)
         }
     }
 
@@ -184,10 +183,10 @@ class ChatViewModel @Inject constructor(
                 val currentState = chatScreenState.value
                 if (currentState !is ChatScreenState.Content) return@collect
 
-                if (status.isOnline) onlineStatusRefreshFlow.emit(currentState.copy(onlineStatus = status))
+                if (status.isOnline) screenStateRefreshFlow.emit(currentState.copy(onlineStatus = status))
                 else {
                     val currentTimestamp = System.currentTimeMillis()
-                    onlineStatusRefreshFlow.emit(
+                    screenStateRefreshFlow.emit(
                         currentState.copy(
                             onlineStatus = status,
                             dialogUser = dialogUser.copy(wasOnlineTimestamp = currentTimestamp)

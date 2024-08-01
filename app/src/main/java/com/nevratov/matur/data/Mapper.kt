@@ -51,7 +51,8 @@ class Mapper {
             religiosityLevel = userDto.religiosityLevel.toString(),
             expectations = userDto.expectations,
             drinking = userDto.drinking.toString(),
-            smoking = userDto.smoking.toString()
+            smoking = userDto.smoking.toString(),
+            isBlocked = userDto.isBlocked
         )
     }
 

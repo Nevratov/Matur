@@ -400,11 +400,15 @@ private fun ProfilePanel(
     viewModel: ChatViewModel,
     onBackPressed: () -> Unit,
 ) {
+    val isBlocked = screenState.dialogUser.isBlocked
     val profileUserActions = listOf(
         ProfileAction.Notification(isEnabled = true, action = {  }),
         ProfileAction.Search(action = {  }),
         ProfileAction.RemoveDialog(action = {  }),
-        ProfileAction.Block(isBlocked = false, action = {  })
+        ProfileAction.Block(
+            isBlocked = isBlocked,
+            action = { if (isBlocked) viewModel.unblockUser() else viewModel.blockUser()  }
+        )
     )
 
     Row(

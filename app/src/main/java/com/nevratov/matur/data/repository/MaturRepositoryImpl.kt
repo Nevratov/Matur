@@ -118,7 +118,8 @@ class MaturRepositoryImpl @Inject constructor(
                     expectations = "",
                     drinking = "",
                     smoking = "",
-                    logoUrl = url
+                    logoUrl = url,
+                    isBlocked = false
                 )
             )
         }
@@ -422,7 +423,7 @@ class MaturRepositoryImpl @Inject constructor(
         onlineStatusRefreshFlow.emit(onlineStatus)
 
         loadNextMessages(messagesWithId = id)
-        refreshChatList(chatMessages.first())
+        refreshChatList(newMessage = chatMessages.first())
 
         refreshMessagesEvents.collect {
             emit(chatMessages)

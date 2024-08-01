@@ -71,7 +71,8 @@ fun MatchesScreen(
                     religiosityLevel = "",
                     expectations = "",
                     drinking = "",
-                    smoking = ""
+                    smoking = "",
+                    isBlocked = false
                 )
             )
         }

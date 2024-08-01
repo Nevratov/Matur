@@ -34,7 +34,8 @@ data class User(
     val religiosityLevel: String,
     val expectations: String?,
     val drinking: String,
-    val smoking: String
+    val smoking: String,
+    val isBlocked: Boolean
 ) : Parcelable {
 
     private val currentTime: Long
