@@ -288,6 +288,7 @@ private fun Chat(
             },
             onEmojiIcoClicked = { showEmojiPicker.value = !showEmojiPicker.value },
             messageMode = messageMode,
+            isBlockedUser = screenState.dialogUser.isBlocked,
             onConfirmClicked = {
                 if (inputMessage.value.text.isBlank()) return@Typing
                 when (val currentMessageMode = messageMode) {
@@ -538,6 +539,7 @@ private fun Typing(
     onValueChanged: (TextFieldValue) -> Unit,
     onEmojiIcoClicked: () -> Unit,
     messageMode: MessageMode,
+    isBlockedUser: Boolean
 ) {
     val message = messageState.value
 
@@ -562,17 +564,25 @@ private fun Typing(
                 )
             }
 
+            val placeholder = if (isBlockedUser) {
+                stringResource(id = R.string.is_blocked_placeholder_chat)
+            } else {
+                stringResource(id = R.string.message_placeholder_chat)
+            }
+
             TextField(
                 modifier = Modifier
                     .weight(1f)
                     .background(VeryLightGray),
-                placeholder = { Text(stringResource(R.string.message_placeholer_chat)) },
+                placeholder = { Text(placeholder) },
+                enabled = if (isBlockedUser) false else true,
                 maxLines = 6,
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = VeryLightGray,
                     unfocusedIndicatorColor = VeryLightGray,
                     focusedContainerColor = VeryLightGray,
                     unfocusedContainerColor = VeryLightGray,
+                    disabledIndicatorColor = VeryLightGray
                 ),
                 value = message,
                 onValueChange = { onValueChanged(it) },
