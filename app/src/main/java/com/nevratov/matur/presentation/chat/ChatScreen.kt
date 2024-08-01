@@ -4,7 +4,17 @@ import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -107,7 +117,6 @@ fun ChatScreen(
     dialogUser: User,
     onBackPressed: () -> Unit
 ) {
-    Log.d("Rebugger", "ChatScreen")
     val component = (LocalContext.current.applicationContext as MaturApplication).component
     val viewModel = component.chatListComponentFactory().create(dialogUser).getViewModel()
 
@@ -403,12 +412,12 @@ private fun ProfilePanel(
 ) {
     val isBlocked = screenState.dialogUser.isBlocked
     val profileUserActions = listOf(
-        ProfileAction.Notification(isEnabled = true, action = {  }),
-        ProfileAction.Search(action = {  }),
-        ProfileAction.RemoveDialog(action = {  }),
+        ProfileAction.Notification(isEnabled = true, action = { }),
+        ProfileAction.Search(action = { }),
+        ProfileAction.RemoveDialog(action = { }),
         ProfileAction.Block(
             isBlocked = isBlocked,
-            action = { if (isBlocked) viewModel.unblockUser() else viewModel.blockUser()  }
+            action = { if (isBlocked) viewModel.unblockUser() else viewModel.blockUser() }
         )
     )
 
@@ -500,20 +509,22 @@ private fun ProfilePanelActions(
     }
 
     DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
+        expanded = expanded,
+        onDismissRequest = { expanded = false }
     ) {
-        profileUserActions.forEach {  action ->
+        profileUserActions.forEach { action ->
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = action.nameResId)) },
                 onClick = {
                     action.action()
                     expanded = false
                 },
-                leadingIcon = { Icon(
-                    painter = painterResource(id = action.icoResId),
-                    contentDescription = stringResource(id = action.descriptionResId)
-                )}
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = action.icoResId),
+                        contentDescription = stringResource(id = action.descriptionResId)
+                    )
+                }
             )
         }
     }
@@ -564,17 +575,28 @@ private fun Typing(
                 )
             }
 
-            val placeholder = if (isBlockedUser) {
-                stringResource(id = R.string.is_blocked_placeholder_chat)
-            } else {
-                stringResource(id = R.string.message_placeholder_chat)
-            }
-
             TextField(
                 modifier = Modifier
                     .weight(1f)
                     .background(VeryLightGray),
-                placeholder = { Text(placeholder) },
+                placeholder = {
+                    AnimatedContent(
+                        targetState = isBlockedUser,
+                        transitionSpec = { slideInVertically(tween(2000)) {it}.togetherWith(
+                            slideOutVertically(tween(2000)) { -it }
+                        ) }
+                    ) {
+                        val text = if (it) {
+                            stringResource(id = R.string.is_blocked_placeholder_chat)
+                        } else {
+                            stringResource(id = R.string.message_placeholder_chat)
+                        }
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = text
+                        )
+                    }
+                },
                 enabled = if (isBlockedUser) false else true,
                 maxLines = 6,
                 colors = TextFieldDefaults.colors(
@@ -582,11 +604,13 @@ private fun Typing(
                     unfocusedIndicatorColor = VeryLightGray,
                     focusedContainerColor = VeryLightGray,
                     unfocusedContainerColor = VeryLightGray,
-                    disabledIndicatorColor = VeryLightGray
+                    disabledContainerColor = VeryLightGray,
+                    disabledIndicatorColor = VeryLightGray,
                 ),
                 value = message,
                 onValueChange = { onValueChanged(it) },
             )
+
         }
 
         val icoConfirm =
