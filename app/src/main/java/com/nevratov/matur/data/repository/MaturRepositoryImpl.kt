@@ -555,10 +555,20 @@ class MaturRepositoryImpl @Inject constructor(
 
     override suspend fun blockUserById(id: Int) {
         apiService.blockUserById(token = getToken(), id = id)
+        val chatItem = chatList.find { it.user.id == id } ?: throw RuntimeException("chatItem == null")
+        val newItem = chatItem.copy(user = chatItem.user.copy(isBlocked = true))
+        _chatList.remove(chatItem)
+        _chatList.add(newItem)
+        chatListRefreshEvents.emit(Unit)
     }
 
     override suspend fun unblockUserById(id: Int) {
         apiService.unblockUserById(token = getToken(), id = id)
+        val chatItem = chatList.find { it.user.id == id } ?: throw RuntimeException("chatItem == null")
+        val newItem = chatItem.copy(user = chatItem.user.copy(isBlocked = false))
+        _chatList.remove(chatItem)
+        _chatList.add(newItem)
+        chatListRefreshEvents.emit(Unit)
     }
 
     override fun createNewFCMToken(newToken: String) {

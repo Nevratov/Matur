@@ -38,7 +38,7 @@ sealed class ProfileAction(
         nameResId: Int = R.string.remove_dialog_action
     ): ProfileAction(
         action = action,
-        icoResId = R.drawable.remove_chat_ico,
+        icoResId = R.drawable.remove_chat_ico2,
         nameResId = nameResId,
         descriptionResId = nameResId
     )
