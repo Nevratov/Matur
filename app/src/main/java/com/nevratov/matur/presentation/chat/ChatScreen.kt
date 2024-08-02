@@ -463,24 +463,31 @@ private fun ProfilePanel(
                 Pair(Color.Red, screenState.dialogUser.wasOnlineText)
             }
 
-            Row(verticalAlignment = Alignment.Bottom) {
-                if (screenState.onlineStatus.isTyping) {
-                    TypingAnimation()
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .clip(CircleShape)
-                            .background(color)
+//            AnimatedContent(
+//                targetState = screenState.onlineStatus.isOnline,
+//                transitionSpec = { slideInVertically(tween(2000)) { it }.togetherWith(
+//                    slideOutVertically(tween(2000)) { -it }
+//                ) }, label = "animate status"
+//            ) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    if (screenState.onlineStatus.isTyping) {
+                        TypingAnimation()
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .clip(CircleShape)
+                                .background(color)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = textStatus,
+                        fontSize = 12.sp,
+                        color = Color.LightGray,
                     )
                 }
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = textStatus,
-                    fontSize = 12.sp,
-                    color = Color.LightGray,
-                )
-            }
+//            }
         }
         Row(
             Modifier.fillMaxWidth(),

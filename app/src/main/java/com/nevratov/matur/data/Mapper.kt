@@ -85,7 +85,7 @@ class Mapper {
         )
     }
 
-    fun messageDtoToMessage(message: MessageDto): Message {
+    fun messageDtoToMessage(message: MessageDto) : Message {
         return Message(
             id = message.id,
             senderId = message.senderId,
@@ -94,8 +94,14 @@ class Mapper {
             timestamp = message.timestampCreateSec * MILLIS_IN_SEC,
             timestampEdited = message.timestampUpdateSec * MILLIS_IN_SEC,
             isRead = message.isRead == 1,
-            replyMessage = message.replyMessage?.let { messageDtoToMessage(it) }
+            replyMessage = message.replyMessage?.let { messageDtoToMessage(message.replyMessage) }
+
         )
+    }
+
+    fun webSocketMessageDtoToMessage(webSocketMessage: WebSocketMessageDto): Message {
+        val messageDto = Gson().fromJson(webSocketMessage.content, MessageDto::class.java)
+        return messageDtoToMessage(messageDto)
     }
 
     fun messageToCreateMessageDto(message: Message): CreateMessageDto {

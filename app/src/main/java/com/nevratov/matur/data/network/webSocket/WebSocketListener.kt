@@ -35,8 +35,7 @@ class WebSocketListener (
         val responseDto = Gson().fromJson(text, WebSocketMessageDto::class.java)
         when(responseDto.type) {
             WebSocketConst.MESSAGE_TYPE -> {
-                val message = Gson().fromJson(responseDto.content, MessageDto::class.java)
-                onMessageReceived(mapper.messageDtoToMessage(message))
+                onMessageReceived(mapper.webSocketMessageDtoToMessage(responseDto))
             }
             WebSocketConst.STATUS_TYPE, WebSocketConst.TYPING_TYPE -> {
                 Log.d("chatScreenState", "type = $responseDto")
@@ -55,8 +54,7 @@ class WebSocketListener (
             sender_id = senderId
         ))
         webSocket.send(json)
-        logWebSocket("webSocket onOpen - connected")
-        logWebSocket(json)
+        logWebSocket("webSocket onOpen - connected | myJsonId = $json")
     }
 
     private fun logWebSocket(text: String) {

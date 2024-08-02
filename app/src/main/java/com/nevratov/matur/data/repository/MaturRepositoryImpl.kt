@@ -16,7 +16,6 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.nevratov.matur.R
 import com.nevratov.matur.data.Mapper
-import com.nevratov.matur.data.model.RemoveDialogDto
 import com.nevratov.matur.data.network.ApiFactory
 import com.nevratov.matur.data.network.webSocket.WebSocketClient
 import com.nevratov.matur.data.network.webSocket.WebSocketListener
