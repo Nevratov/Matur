@@ -111,7 +111,6 @@ import com.nevratov.matur.ui.theme.Liloviy
 import com.nevratov.matur.ui.theme.LiloviyDark
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
 import com.nevratov.matur.ui.theme.VeryLightGray
-import com.theapache64.rebugger.Rebugger
 
 @Composable
 fun ChatScreen(
