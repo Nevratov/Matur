@@ -140,7 +140,6 @@ class Mapper {
             }
 
             WebSocketConst.TYPING_TYPE -> {
-                Log.d("chatScreenState", "mapper is typing | content = $content %%% const = ${WebSocketConst.IS_TYPING_CONTENT}  ")
                 OnlineStatus(
                     userId = webSocketMessage.senderId,
                     isOnline = true,

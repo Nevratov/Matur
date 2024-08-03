@@ -197,7 +197,6 @@ class MaturRepositoryImpl @Inject constructor(
 
     private val onlineStatusDialogUserStateFlow = flow {
         onlineStatusRefreshFlow.collect { newStatus ->
-            Log.d("chatScreenState", "collect")
             _onlineUsers[newStatus.userId] = newStatus.isOnline
             if (newStatus.userId == dialogUserId) {
                 emit(newStatus)
@@ -272,7 +271,6 @@ class MaturRepositoryImpl @Inject constructor(
                     if (dialogUserId != message.senderId) sendNotificationNewMessage(message)
                 },
                 onStatusReceived = { status ->
-                    Log.d("chatScreenState", "recived: $status")
                     coroutineScope.launch {
                         onlineStatusRefreshFlow.emit(status)
                     }

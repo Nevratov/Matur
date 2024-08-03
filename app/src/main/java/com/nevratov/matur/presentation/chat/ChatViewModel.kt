@@ -54,8 +54,7 @@ class ChatViewModel @Inject constructor(
     val chatScreenState = getMessagesByUserIdUseCase(id = dialogUser.id)
         .onStart { observeOnlineStatus() }
         .map {
-            val status = onlineStatus.invoke().value
-            Log.d("chatScreenState", it.toString())
+            val status = onlineStatus().value
             ChatScreenState.Content(
                 messages = it,
                 user = user,
@@ -186,10 +185,11 @@ class ChatViewModel @Inject constructor(
                 if (status.isOnline) screenStateRefreshFlow.emit(currentState.copy(onlineStatus = status))
                 else {
                     val currentTimestamp = System.currentTimeMillis()
+                    dialogUser = dialogUser.copy(wasOnlineTimestamp = currentTimestamp)
                     screenStateRefreshFlow.emit(
                         currentState.copy(
                             onlineStatus = status,
-                            dialogUser = dialogUser.copy(wasOnlineTimestamp = currentTimestamp)
+                            dialogUser = dialogUser
                         )
                     )
                 }

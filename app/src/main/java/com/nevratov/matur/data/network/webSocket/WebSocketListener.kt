@@ -38,9 +38,7 @@ class WebSocketListener (
                 onMessageReceived(mapper.webSocketMessageDtoToMessage(responseDto))
             }
             WebSocketConst.STATUS_TYPE, WebSocketConst.TYPING_TYPE -> {
-                Log.d("chatScreenState", "type = $responseDto")
                 val status = mapper.webSocketMessageDtoToOnlineStatus(responseDto)
-                Log.d("chatScreenState", "status = $status")
                 onStatusReceived(mapper.webSocketMessageDtoToOnlineStatus(responseDto))
             }
             WebSocketConst.READ_ALL_TYPE -> {

@@ -111,6 +111,7 @@ import com.nevratov.matur.ui.theme.Liloviy
 import com.nevratov.matur.ui.theme.LiloviyDark
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
 import com.nevratov.matur.ui.theme.VeryLightGray
+import com.theapache64.rebugger.Rebugger
 
 @Composable
 fun ChatScreen(
@@ -162,7 +163,8 @@ private fun ChatScreenContent(
             )
         }
 
-        ChatScreenState.Initial -> {}
+        ChatScreenState.Initial -> {
+        }
 
         ChatScreenState.Loading -> {
             Box(
@@ -410,6 +412,10 @@ private fun ProfilePanel(
     viewModel: ChatViewModel,
     onBackPressed: () -> Unit,
 ) {
+
+    Log.d("ProfilePanel", screenState.dialogUser.wasOnlineText)
+
+
     val isBlocked = screenState.dialogUser.isBlocked
     val profileUserActions = listOf(
         ProfileAction.Notification(isEnabled = true, action = { }),
@@ -447,7 +453,9 @@ private fun ProfilePanel(
             contentDescription = "person's photo"
         )
         Spacer(modifier = Modifier.width(12.dp))
-        Column {
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
             Text(
                 text = screenState.dialogUser.name,
                 fontWeight = FontWeight.Medium,
@@ -455,22 +463,28 @@ private fun ProfilePanel(
                 color = MaterialTheme.colorScheme.background
             )
 
-            val (color, textStatus) = if (screenState.onlineStatus.isTyping) {
-                Pair(Color.Gray, "печатает")
-            } else if (screenState.onlineStatus.isOnline) {
-                Pair(Color.Green, "online")
-            } else {
-                Pair(Color.Red, screenState.dialogUser.wasOnlineText)
-            }
+            AnimatedContent(
+                modifier = Modifier.fillMaxWidth(),
+                targetState = screenState.onlineStatus,
+                transitionSpec = {
+                    slideInVertically(tween(2000)) { it }.togetherWith(
+                        slideOutVertically(tween(2000)) { -it }
+                    )
+                }, label = "animate status"
+            ) { status ->
+                Row(
+                    verticalAlignment = Alignment.Bottom
+                ) {
 
-//            AnimatedContent(
-//                targetState = screenState.onlineStatus.isOnline,
-//                transitionSpec = { slideInVertically(tween(2000)) { it }.togetherWith(
-//                    slideOutVertically(tween(2000)) { -it }
-//                ) }, label = "animate status"
-//            ) {
-                Row(verticalAlignment = Alignment.Bottom) {
-                    if (screenState.onlineStatus.isTyping) {
+                    val (color, textStatus) = if (status.isTyping) {
+                        Pair(Color.Gray, "печатает")
+                    } else if (status.isOnline) {
+                        Pair(Color.Green, "online")
+                    } else {
+                        Pair(Color.Red, screenState.dialogUser.wasOnlineText)
+                    }
+
+                    if (status.isTyping) {
                         TypingAnimation()
                     } else {
                         Box(
@@ -487,10 +501,10 @@ private fun ProfilePanel(
                         color = Color.LightGray,
                     )
                 }
-//            }
+            }
         }
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.wrapContentWidth(),
             horizontalArrangement = Arrangement.End
         ) {
             ProfilePanelActions(profileUserActions = profileUserActions)
@@ -502,7 +516,6 @@ private fun ProfilePanel(
 private fun ProfilePanelActions(
     profileUserActions: List<ProfileAction>
 ) {
-    Log.d("ProfilePanelOptions", "REC")
     var expanded by remember { mutableStateOf(false) }
 
     IconButton(
@@ -589,9 +602,11 @@ private fun Typing(
                 placeholder = {
                     AnimatedContent(
                         targetState = isBlockedUser,
-                        transitionSpec = { slideInVertically(tween(2000)) {it}.togetherWith(
-                            slideOutVertically(tween(2000)) { -it }
-                        ) }
+                        transitionSpec = {
+                            slideInVertically(tween(2000)) { it }.togetherWith(
+                                slideOutVertically(tween(2000)) { -it }
+                            )
+                        }
                     ) {
                         val text = if (it) {
                             stringResource(id = R.string.is_blocked_placeholder_chat)
