@@ -10,7 +10,6 @@ object WebSocketConst {
 
     // STATUS
     const val IS_ONLINE_STATUS = "online"
-    const val IS_TYPING_STATUS = "isTyping"
 
     // CONTENT
 

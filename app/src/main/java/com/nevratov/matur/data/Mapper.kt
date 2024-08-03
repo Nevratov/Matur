@@ -23,6 +23,8 @@ import com.nevratov.matur.presentation.chat_list.ChatListItem
 import com.nevratov.matur.presentation.main.login.LoginData
 import com.nevratov.matur.presentation.main.registration.Genders
 import com.nevratov.matur.presentation.main.registration.RegUserInfo
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class Mapper {
 
@@ -125,31 +127,24 @@ class Mapper {
         return chatList
     }
 
-    fun responseWSDtoToMessage(responseWSDto: WebSocketMessageDto): Message = Message(
-        id = responseWSDto.id,
-        senderId = responseWSDto.senderId,
-        receiverId = responseWSDto.receiverId,
-        content = responseWSDto.content,
-        timestamp = responseWSDto.timestamp * MILLIS_IN_SEC,
-        timestampEdited = responseWSDto.timestamp * MILLIS_IN_SEC,
-        isRead = false,
-        replyMessage = null //todo
-    )
-
     fun webSocketMessageDtoToOnlineStatus(webSocketMessage: WebSocketMessageDto): OnlineStatus {
+        val contentJson = Json.parseToJsonElement(webSocketMessage.content)
+        val content = Json.encodeToString(contentJson)
+        Log.d("webSocketTest", "encodeString = $content")
         return when (webSocketMessage.type) {
             WebSocketConst.STATUS_TYPE -> {
                 OnlineStatus(
                     userId = webSocketMessage.senderId,
-                    isOnline = webSocketMessage.content == WebSocketConst.IS_ONLINE_STATUS
+                    isOnline = content.contains(WebSocketConst.IS_ONLINE_STATUS)
                 )
             }
 
             WebSocketConst.TYPING_TYPE -> {
+                Log.d("chatScreenState", "mapper is typing | content = $content %%% const = ${WebSocketConst.IS_TYPING_CONTENT}  ")
                 OnlineStatus(
                     userId = webSocketMessage.senderId,
                     isOnline = true,
-                    isTyping = webSocketMessage.content == WebSocketConst.IS_TYPING_STATUS
+                    isTyping = content.contains(WebSocketConst.IS_TYPING_CONTENT)
                 )
             }
 
@@ -177,14 +172,20 @@ class Mapper {
         isTyping: Boolean,
         userId: Int,
         dialogUserId: Int
-    ): WebSocketMessageDto = WebSocketMessageDto(
-        id = 0,
-        senderId = userId,
-        receiverId = dialogUserId,
-        content = if (isTyping) WebSocketConst.IS_TYPING_CONTENT else WebSocketConst.IS_NOT_TYPING_CONTENT,
-        timestamp = 0,
-        type = WebSocketConst.TYPING_TYPE
-    )
+    ): WebSocketMessageDto {
+        val content =
+            if (isTyping) Gson().toJson(WebSocketConst.IS_TYPING_CONTENT)
+            else Gson().toJson(WebSocketConst.IS_NOT_TYPING_CONTENT)
+
+        return WebSocketMessageDto(
+            id = 0,
+            senderId = userId,
+            receiverId = dialogUserId,
+            content = content,
+            timestamp = 0,
+            type = WebSocketConst.TYPING_TYPE
+        )
+    }
 
     fun idToRemoveDialogDto(id: Int) = RemoveDialogDto(userId = id)
 
