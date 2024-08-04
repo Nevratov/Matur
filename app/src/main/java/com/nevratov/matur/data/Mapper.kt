@@ -130,7 +130,6 @@ class Mapper {
     fun webSocketMessageDtoToOnlineStatus(webSocketMessage: WebSocketMessageDto): OnlineStatus {
         val contentJson = Json.parseToJsonElement(webSocketMessage.content)
         val content = Json.encodeToString(contentJson)
-        Log.d("webSocketTest", "encodeString = $content")
         return when (webSocketMessage.type) {
             WebSocketConst.STATUS_TYPE -> {
                 OnlineStatus(

@@ -466,8 +466,8 @@ private fun ProfilePanel(
                 modifier = Modifier.fillMaxWidth(),
                 targetState = screenState.onlineStatus,
                 transitionSpec = {
-                    slideInVertically(tween(2000)) { it }.togetherWith(
-                        slideOutVertically(tween(2000)) { -it }
+                    slideInVertically(tween(1000)) { it }.togetherWith(
+                        slideOutVertically(tween(1000)) { -it }
                     )
                 }, label = "animate status"
             ) { status ->

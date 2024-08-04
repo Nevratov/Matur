@@ -49,7 +49,7 @@ class ChatViewModel @Inject constructor(
 
     private val screenStateRefreshFlow = MutableSharedFlow<ChatScreenState>()
 
-    private var typingJob: Job? = null
+
 
     val chatScreenState = getMessagesByUserIdUseCase(id = dialogUser.id)
         .onStart { observeOnlineStatus() }
@@ -70,6 +70,8 @@ class ChatViewModel @Inject constructor(
         )
 
     private val user = getUserUseCase()
+    private var typingJob: Job? = null
+    private var toast: Toast? = null
 
     fun sendMessage(textMessage: String, replyMessage: Message? = null) {
         val currentTime = System.currentTimeMillis()
@@ -173,7 +175,10 @@ class ChatViewModel @Inject constructor(
     }
 
     fun showToast() {
-        Toast.makeText(application, "Вы достигли конца диалога", Toast.LENGTH_LONG).show()
+        toast?.cancel()
+        toast = Toast.makeText(application, "Вы достигли конца диалога", Toast.LENGTH_LONG)
+        toast?.show()
+
     }
 
     private fun observeOnlineStatus() {
