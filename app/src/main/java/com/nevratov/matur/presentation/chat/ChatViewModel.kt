@@ -178,7 +178,6 @@ class ChatViewModel @Inject constructor(
         toast?.cancel()
         toast = Toast.makeText(application, "Вы достигли конца диалога", Toast.LENGTH_LONG)
         toast?.show()
-
     }
 
     private fun observeOnlineStatus() {

@@ -5,13 +5,8 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -28,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -78,6 +74,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -110,6 +107,8 @@ import com.nevratov.matur.ui.theme.GrayDark
 import com.nevratov.matur.ui.theme.Liloviy
 import com.nevratov.matur.ui.theme.LiloviyDark
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
+import com.nevratov.matur.ui.theme.MaturColorDark
+import com.nevratov.matur.ui.theme.MaturColorLight
 import com.nevratov.matur.ui.theme.VeryLightGray
 
 @Composable
@@ -160,6 +159,7 @@ private fun ChatScreenContent(
                 viewModel = viewModel,
                 onBackPressed = onBackPressed
             )
+
         }
 
         ChatScreenState.Initial -> {
@@ -196,7 +196,12 @@ private fun Chat(
 
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .paint(
+                painter = painterResource(id = R.drawable.pattern_white_theme),
+                contentScale = ContentScale.Crop
+            )
     ) {
         ProfilePanel(
             screenState = screenState,
@@ -208,11 +213,13 @@ private fun Chat(
             reverseLayout = true,
             modifier = Modifier
                 .weight(1f)
-                .background(MaterialTheme.colorScheme.background)
-                .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 6.dp),
+//                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = lazyListState
         ) {
+            item { Spacer(modifier = Modifier.width(6.dp)) }
+
             groupMessagesByDate.forEach { (date, messages) ->
 
                 items(messages, key = { it.id }) { message ->
@@ -378,6 +385,8 @@ private fun BackgroundDismissIco(
     val isDismissed = dismissState.targetValue == DismissValue.DismissedToStart
     val sizeIco by animateDpAsState(targetValue = if (isDismissed) 26.dp else 18.dp, label = "size")
 
+    val offset by animateDpAsState(targetValue = if (isDismissed) 0.dp else 30.dp, label = "offset")
+
     val context = LocalContext.current
     LaunchedEffect(key1 = isDismissed) {
         if (isDismissed) triggerVibrate(context)
@@ -386,7 +395,8 @@ private fun BackgroundDismissIco(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(end = 4.dp),
+            .offset(x = offset)
+        ,
         contentAlignment = Alignment.CenterEnd
     ) {
         Box(
@@ -398,7 +408,7 @@ private fun BackgroundDismissIco(
                     .size(sizeIco),
                 painter = painterResource(id = R.drawable.reply_ico),
                 contentDescription = null,
-                tint = MaturAlternativeColor
+                tint = MaturColorDark
             )
         }
 
@@ -557,7 +567,11 @@ private fun ShowEmojiPicker(
     val showEmojiPicker = showEmojiPickerState.value
     if (!showEmojiPicker) return
 
-    Column(Modifier.height(200.dp)) {
+    Column(
+        Modifier
+            .height(200.dp)
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         EmojiPicker(onEmojiClicked = { onEmojiClicked(it) })
     }
 }
@@ -574,14 +588,15 @@ private fun Typing(
     val message = messageState.value
 
     Row(
-        modifier = Modifier.padding(start = 12.dp, end = 6.dp, bottom = 8.dp),
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background),
         verticalAlignment = Alignment.Bottom
     ) {
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(24.dp))
-                .weight(1f)
-                .background(VeryLightGray),
+//                .clip(RoundedCornerShape(24.dp))
+//                .background(VeryLightGray)
+                .weight(1f),
             verticalAlignment = Alignment.Bottom
         ) {
             IconButton(
@@ -621,12 +636,12 @@ private fun Typing(
                 enabled = if (isBlockedUser) false else true,
                 maxLines = 6,
                 colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = VeryLightGray,
-                    unfocusedIndicatorColor = VeryLightGray,
-                    focusedContainerColor = VeryLightGray,
-                    unfocusedContainerColor = VeryLightGray,
-                    disabledContainerColor = VeryLightGray,
-                    disabledIndicatorColor = VeryLightGray,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.background,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.background,
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                    disabledContainerColor = MaterialTheme.colorScheme.background,
+                    disabledIndicatorColor = MaterialTheme.colorScheme.background,
                 ),
                 value = message,
                 onValueChange = { onValueChanged(it) },
@@ -695,7 +710,6 @@ private fun MessageItem(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
             .onSizeChanged { itemHeightState.value = with(density) { it.height.toDp() } }
             .pointerInput(true) {
                 detectTapGestures(
@@ -843,54 +857,62 @@ private fun ModificationMessageItem(
     Row(
         Modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-
     ) {
-        Icon(
-            modifier = Modifier
-                .size(22.dp)
-                .weight(0.1f),
-            imageVector = modeIco,
-            tint = MaturAlternativeColor,
-            contentDescription = modeIcoDescription
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Column(
-            modifier = Modifier.weight(0.8f)
-        ) {
-            Text(
-                text = modeName,
-                fontSize = 16.sp,
-                color = MaturAlternativeColor,
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                text = textMessage,
-                fontSize = 10.sp,
-                color = Color.Gray,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.1f),
-            horizontalArrangement = Arrangement.End
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = { onCloseModification() }
+            Icon(
+                modifier = Modifier
+                    .size(22.dp)
+                    .weight(0.1f),
+                imageVector = modeIco,
+                tint = MaturAlternativeColor,
+                contentDescription = modeIcoDescription
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Column(
+                modifier = Modifier.weight(0.8f)
             ) {
-                Icon(
-                    modifier = Modifier.size(22.dp),
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Отменить"
+                Text(
+                    text = modeName,
+                    fontSize = 16.sp,
+                    color = MaturAlternativeColor,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = textMessage,
+                    fontSize = 10.sp,
+                    color = Color.Gray,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.1f),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = { onCloseModification() }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(22.dp),
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Отменить"
+                    )
+                }
+            }
         }
-
     }
+    Spacer(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(VeryLightGray)
+    )
 }
 
 @Composable
