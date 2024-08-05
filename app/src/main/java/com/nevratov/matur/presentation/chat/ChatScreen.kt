@@ -783,6 +783,7 @@ private fun ReplyMessageItem(
     val markColor: Color
     val textColor: Color
 
+    //todo
     if (message.senderId == screenState.user.id) {
         nameUser = screenState.user.name
         backgroundColor = Liloviy
@@ -790,8 +791,8 @@ private fun ReplyMessageItem(
         textColor = MaterialTheme.colorScheme.background
     } else {
         nameUser = screenState.dialogUser.name
-        backgroundColor = Gray
-        markColor = MaturDarkBackground
+        backgroundColor = if(isSystemInDarkTheme()) MaturDarkBackground else Gray
+        markColor = if(isSystemInDarkTheme()) Gray else MaturDarkBackground
         textColor = MaterialTheme.colorScheme.onBackground
     }
 
