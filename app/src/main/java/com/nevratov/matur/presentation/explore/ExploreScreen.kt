@@ -16,15 +16,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -103,18 +103,18 @@ fun ShowPostCard(
     viewModel: ExploreViewModel
 ) {
 
-    val dismissState = rememberDismissState()
+    val dismissState = rememberSwipeToDismissBoxState()
 
-    if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+    if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
         viewModel.like(user)
-    } else if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
+    } else if (dismissState.currentValue == SwipeToDismissBoxValue.StartToEnd) {
         viewModel.dislike(user)
     }
 
-    SwipeToDismiss(
+    SwipeToDismissBox(
         state = dismissState,
-        background = { },
-        dismissContent = {
+        backgroundContent = { },
+        content = {
             ExploreCard(
                 name = user.name,
                 aboutMe = user.aboutMe,

@@ -45,9 +45,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissState
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,11 +53,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -228,9 +227,9 @@ private fun Chat(
 
                 items(messages, key = { it.id }) { message ->
 
-                    val dismissState = rememberDismissState(
+                    val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { dismissValue ->
-                            if (dismissValue == DismissValue.DismissedToStart) {
+                            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
                                 messageMode = MessageMode.Reply(message)
                             }
                             false
@@ -239,14 +238,14 @@ private fun Chat(
                             fullWith * 0.1f
                         }
                     )
-                    SwipeToDismiss(
-                        modifier = Modifier.animateItemPlacement(),
+                    SwipeToDismissBox(
+                        modifier = Modifier.animateItem(),
                         state = dismissState,
-                        directions = setOf(DismissDirection.EndToStart),
-                        background = {
+                        enableDismissFromStartToEnd = false,
+                        backgroundContent = {
                             BackgroundDismissIco(dismissState = dismissState)
                         },
-                        dismissContent = {
+                        content = {
                             MessageItem(
                                 message = message,
                                 maxWidthItem = maxWidthItem,
@@ -384,9 +383,9 @@ private fun DateDelimiter(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BackgroundDismissIco(
-    dismissState: DismissState
+    dismissState: SwipeToDismissBoxState
 ) {
-    val isDismissed = dismissState.targetValue == DismissValue.DismissedToStart
+    val isDismissed = dismissState.targetValue == SwipeToDismissBoxValue.EndToStart
     val sizeIco by animateDpAsState(targetValue = if (isDismissed) 26.dp else 18.dp, label = "size")
 
     val offset by animateDpAsState(targetValue = if (isDismissed) 0.dp else 30.dp, label = "offset")
@@ -482,7 +481,7 @@ private fun ProfilePanel(
                 }, label = "animate status"
             ) { status ->
                 Row(
-                    verticalAlignment = Alignment.Bottom
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
 
                     val (color, textStatus) = if (status.isTyping) {
