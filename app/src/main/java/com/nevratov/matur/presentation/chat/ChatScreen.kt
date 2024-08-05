@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -11,6 +12,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +45,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -373,7 +376,7 @@ private fun DateDelimiter(
             modifier = Modifier
                 .padding(8.dp)
                 .clip(CircleShape)
-                .background(if(isSystemInDarkTheme()) GrayDark2 else VeryLightGray) //todo
+                .background(if (isSystemInDarkTheme()) GrayDark2 else VeryLightGray) //todo
                 .padding(8.dp),
             color = if(isSystemInDarkTheme()) VeryLightGray else GrayDark2,
             text = date,
@@ -427,14 +430,12 @@ private fun ProfilePanel(
     onBackPressed: () -> Unit,
 ) {
     val isBlocked = screenState.dialogUser.isBlocked
+
     val profileUserActions = listOf(
-        ProfileAction.Notification(isEnabled = true, action = { }),
-        ProfileAction.Search(action = { }),
-        ProfileAction.RemoveDialog(action = { }),
-        ProfileAction.Block(
-            isBlocked = isBlocked,
-            action = { if (isBlocked) viewModel.unblockUser() else viewModel.blockUser() }
-        )
+        ProfileAction.Notification(isEnabled = true),
+        ProfileAction.Search(),
+        ProfileAction.RemoveDialog(),
+        ProfileAction.Block(isBlocked = isBlocked)
     )
 
     Row(
@@ -517,17 +518,19 @@ private fun ProfilePanel(
             Modifier.wrapContentWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            ProfilePanelActions(profileUserActions = profileUserActions)
+            ProfilePanelActions(actions = profileUserActions, viewModel = viewModel)
         }
     }
 }
 
 @Composable
 private fun ProfilePanelActions(
-    profileUserActions: List<ProfileAction>
+    actions: List<ProfileAction>,
+    viewModel: ChatViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
-
+    var isShowWarningRemoveDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     IconButton(
         onClick = { expanded = !expanded }
     ) {
@@ -542,12 +545,25 @@ private fun ProfilePanelActions(
         expanded = expanded,
         onDismissRequest = { expanded = false }
     ) {
-        profileUserActions.forEach { action ->
+        actions.forEach { action ->
             DropdownMenuItem(
-                text = { Text(text = stringResource(id = action.nameResId)) },
+                text = { Text(text = stringResource(action.nameResId)) },
                 onClick = {
-                    action.action()
-                    expanded = false
+                    when (action) {
+                        is ProfileAction.Notification -> {
+                            Toast.makeText(context, "Ожиадем реализацию сервера...", Toast.LENGTH_SHORT).show()
+                        }
+                        is ProfileAction.Search -> {
+                            Toast.makeText(context, "Ожиадем реализацию сервера...", Toast.LENGTH_SHORT).show()
+                        }
+                        is ProfileAction.Block -> {
+                            if (action.isBlocked) viewModel.unblockUser()
+                            else viewModel.blockUser()
+                        }
+                        is ProfileAction.RemoveDialog -> {
+                            isShowWarningRemoveDialog = true
+                        }
+                    }
                 },
                 leadingIcon = {
                     Icon(
@@ -557,6 +573,26 @@ private fun ProfilePanelActions(
                 }
             )
         }
+    }
+    if (isShowWarningRemoveDialog) {
+        AlertDialog(
+            title = { Text(text = "Удаление диалога") },
+            text = {
+                Text(text = "Все сообщения будут безвозвратно удалены. Вы уверены что хотите удалить этот диалог?")
+            },
+            onDismissRequest = { isShowWarningRemoveDialog = false },
+            confirmButton = {
+                Text(
+                    modifier = Modifier.clickable { viewModel.removeDialog() },
+                    text = "Удалить"
+                ) },
+            dismissButton = {
+                Text(
+                    modifier = Modifier.clickable { isShowWarningRemoveDialog = false },
+                    text = "Отмена"
+                )
+            }
+        )
     }
 }
 
