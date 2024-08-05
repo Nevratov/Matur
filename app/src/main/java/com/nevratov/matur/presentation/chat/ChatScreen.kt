@@ -10,7 +10,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -47,7 +46,6 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -104,6 +102,8 @@ import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.MaturApplication
 import com.nevratov.matur.ui.theme.Gray
 import com.nevratov.matur.ui.theme.GrayDark2
+import com.nevratov.matur.ui.theme.GrayDark3
+import com.nevratov.matur.ui.theme.GrayDark4
 import com.nevratov.matur.ui.theme.Liloviy
 import com.nevratov.matur.ui.theme.LiloviyDark
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
@@ -176,7 +176,6 @@ private fun ChatScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun Chat(
     screenState: ChatScreenState.Content,
@@ -198,6 +197,9 @@ private fun Chat(
         if (isSystemInDarkTheme()) R.drawable.pattern_dark_theme
         else R.drawable.pattern_light_theme
 
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -205,6 +207,7 @@ private fun Chat(
                 painter = painterResource(id = backgroundPattern),
                 contentScale = ContentScale.Crop
             )
+
     ) {
         ProfilePanel(
             screenState = screenState,
@@ -261,7 +264,7 @@ private fun Chat(
                         }
                     )
                 }
-                item {
+                item(key = date) {
                     DateDelimiter(date = date)
                 }
             }
@@ -370,9 +373,9 @@ private fun DateDelimiter(
             modifier = Modifier
                 .padding(8.dp)
                 .clip(CircleShape)
-                .background(VeryLightGray)
+                .background(if(isSystemInDarkTheme()) GrayDark2 else VeryLightGray) //todo
                 .padding(8.dp),
-            color = GrayDark2,
+            color = if(isSystemInDarkTheme()) VeryLightGray else GrayDark2,
             text = date,
             fontSize = 12.sp,
             textAlign = TextAlign.Center
@@ -380,7 +383,6 @@ private fun DateDelimiter(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BackgroundDismissIco(
     dismissState: SwipeToDismissBoxState
@@ -787,11 +789,11 @@ private fun ReplyMessageItem(
         nameUser = screenState.user.name
         backgroundColor = Liloviy
         markColor = LiloviyDark
-        textColor = MaterialTheme.colorScheme.background
+        textColor = if(isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.background
     } else {
         nameUser = screenState.dialogUser.name
-        backgroundColor = if(isSystemInDarkTheme()) MaturDarkBackground else Gray
-        markColor = if(isSystemInDarkTheme()) Gray else MaturDarkBackground
+        backgroundColor = if(isSystemInDarkTheme()) GrayDark3 else Gray
+        markColor = if(isSystemInDarkTheme()) GrayDark4 else MaturDarkBackground
         textColor = MaterialTheme.colorScheme.onBackground
     }
 

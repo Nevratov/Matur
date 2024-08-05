@@ -58,13 +58,10 @@ class MaturFirebaseMessagingService () : FirebaseMessagingService() {
         )
 
         val chanelId = CHANEL_ID
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, chanelId)
             .setSmallIcon(R.drawable.matur_ico)
             .setContentTitle(CONTENT_TITLE)
             .setContentText(messageBody)
-            .setAutoCancel(true)
-            .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

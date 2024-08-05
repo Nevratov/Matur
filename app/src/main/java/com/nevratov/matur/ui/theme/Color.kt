@@ -13,6 +13,8 @@ val Gray = Color(0xFFd0cfdf)
 val MaturDarkBackground = Color(0xFFa6a5b5)
 
 val GrayDark2 = Color(0xFF29292E)
+val GrayDark3 = Color(0xFF222227)
+val GrayDark4 = Color(0xFF1B1B1F)
 
 val Liloviy = Color(0xFF746bc8)
 val LiloviyDark = Color(0xFF4e4796)

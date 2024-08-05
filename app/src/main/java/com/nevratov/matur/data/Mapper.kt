@@ -201,7 +201,7 @@ class Mapper {
 
     fun toMessagesOptionsDto(messagesWithUserId: Int, page: Int) = MessagesOptionsDto(
         messagesWithUserId = messagesWithUserId.toString(),
-        pageSize = (100 * page).toString(),
+        pageSize = (150 * page).toString(),
         page = "1"
     )
 

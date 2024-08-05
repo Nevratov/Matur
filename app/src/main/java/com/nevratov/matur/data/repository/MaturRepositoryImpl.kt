@@ -264,6 +264,11 @@ class MaturRepositoryImpl @Inject constructor(
     private val webSocketClient = WebSocketClient
 
     private suspend fun connectToWS() {
+        //todo
+        webSocketClient.disconnect()
+        _chatList.clear()
+        _chatMessages.clear()
+
         webSocketClient.connect(
             listener = WebSocketListener(
                 onMessageReceived = { message ->

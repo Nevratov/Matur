@@ -2,6 +2,7 @@ package com.nevratov.matur.presentation.matches
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,6 +35,8 @@ import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.navigation.NavigationState
 import com.nevratov.matur.presentation.BottomNavigationBar
+import com.nevratov.matur.ui.theme.GrayDark2
+import com.nevratov.matur.ui.theme.GrayDark3
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
 
 @Composable
@@ -83,7 +85,10 @@ fun MatchesScreen(
         bottomBar = { BottomNavigationBar(navigationState = navigationState) }
     ) { paddingValues ->
         Box(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isSystemInDarkTheme()) GrayDark2 else Color.White) //todo
+                .padding(paddingValues)
         ) {
             MatchesContent(
                 items = testListMessageItems,
@@ -124,7 +129,7 @@ private fun MatchesItem(
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .background(Color.White)
+            .background(if (isSystemInDarkTheme()) GrayDark3 else Color.White) //todo
             .size(width = 200.dp, height = 320.dp)
             .clickable { onItemClicked(user) }
             .padding(bottom = 32.dp),
@@ -160,7 +165,7 @@ private fun TopBar() {
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaturAlternativeColor,
-            titleContentColor = MaterialTheme.colorScheme.background
+            titleContentColor = Color.White
         )
     )
 }
