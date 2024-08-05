@@ -13,6 +13,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -103,12 +104,12 @@ import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.MaturApplication
 import com.nevratov.matur.ui.theme.Gray
-import com.nevratov.matur.ui.theme.GrayDark
+import com.nevratov.matur.ui.theme.GrayDark2
 import com.nevratov.matur.ui.theme.Liloviy
 import com.nevratov.matur.ui.theme.LiloviyDark
 import com.nevratov.matur.ui.theme.MaturAlternativeColor
 import com.nevratov.matur.ui.theme.MaturColorDark
-import com.nevratov.matur.ui.theme.MaturColorLight
+import com.nevratov.matur.ui.theme.MaturDarkBackground
 import com.nevratov.matur.ui.theme.VeryLightGray
 
 @Composable
@@ -194,12 +195,15 @@ private fun Chat(
 
     val groupMessagesByDate = screenState.messages.groupBy { it.date }
 
+    val backgroundPattern =
+        if (isSystemInDarkTheme()) R.drawable.pattern_dark_theme
+        else R.drawable.pattern_light_theme
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .paint(
-                painter = painterResource(id = R.drawable.pattern_white_theme),
+                painter = painterResource(id = backgroundPattern),
                 contentScale = ContentScale.Crop
             )
     ) {
@@ -369,7 +373,7 @@ private fun DateDelimiter(
                 .clip(CircleShape)
                 .background(VeryLightGray)
                 .padding(8.dp),
-            color = MaterialTheme.colorScheme.onBackground,
+            color = GrayDark2,
             text = date,
             fontSize = 12.sp,
             textAlign = TextAlign.Center
@@ -421,10 +425,6 @@ private fun ProfilePanel(
     viewModel: ChatViewModel,
     onBackPressed: () -> Unit,
 ) {
-
-    Log.d("ProfilePanel", screenState.dialogUser.wasOnlineText)
-
-
     val isBlocked = screenState.dialogUser.isBlocked
     val profileUserActions = listOf(
         ProfileAction.Notification(isEnabled = true, action = { }),
@@ -449,7 +449,7 @@ private fun ProfilePanel(
                 modifier = Modifier.size(30.dp),
                 imageVector = Icons.Filled.KeyboardArrowLeft,
                 contentDescription = "Back",
-                tint = MaterialTheme.colorScheme.background
+                tint = Color.White
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
@@ -469,7 +469,7 @@ private fun ProfilePanel(
                 text = screenState.dialogUser.name,
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.background
+                color = Color.White
             )
 
             AnimatedContent(
@@ -533,7 +533,7 @@ private fun ProfilePanelActions(
         Icon(
             imageVector = Icons.Default.MoreVert,
             contentDescription = "Больше действий",
-            tint = MaterialTheme.colorScheme.background
+            tint = Color.White
         )
     }
 
@@ -589,13 +589,11 @@ private fun Typing(
 
     Row(
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.background),
+            .background(if(isSystemInDarkTheme()) GrayDark2 else Color.White), //todo
         verticalAlignment = Alignment.Bottom
     ) {
         Row(
             modifier = Modifier
-//                .clip(RoundedCornerShape(24.dp))
-//                .background(VeryLightGray)
                 .weight(1f),
             verticalAlignment = Alignment.Bottom
         ) {
@@ -604,15 +602,15 @@ private fun Typing(
                 onClick = { onEmojiIcoClicked() }
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.frame_13__1_),
+                    painter = painterResource(id = R.drawable.smile_ico),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     contentDescription = null
                 )
             }
 
             TextField(
                 modifier = Modifier
-                    .weight(1f)
-                    .background(VeryLightGray),
+                    .weight(1f),
                 placeholder = {
                     AnimatedContent(
                         targetState = isBlockedUser,
@@ -633,20 +631,19 @@ private fun Typing(
                         )
                     }
                 },
-                enabled = if (isBlockedUser) false else true,
+                enabled = !isBlockedUser,
                 maxLines = 6,
                 colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = MaterialTheme.colorScheme.background,
-                    unfocusedIndicatorColor = MaterialTheme.colorScheme.background,
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                    disabledContainerColor = MaterialTheme.colorScheme.background,
-                    disabledIndicatorColor = MaterialTheme.colorScheme.background,
+                    focusedIndicatorColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White, //todo,
+                    unfocusedIndicatorColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White,
+                    focusedContainerColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White,
+                    unfocusedContainerColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White,
+                    disabledContainerColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White,
+                    disabledIndicatorColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White,
                 ),
                 value = message,
                 onValueChange = { onValueChanged(it) },
             )
-
         }
 
         val icoConfirm =
@@ -658,7 +655,11 @@ private fun Typing(
                 onConfirmClicked()
             }
         ) {
-            Icon(imageVector = icoConfirm, contentDescription = "send message")
+            Icon(
+                imageVector = icoConfirm,
+                contentDescription = "send message",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
@@ -685,9 +686,11 @@ private fun MessageItem(
 
     val (messageColor, messageBackground) =
         if (message.senderId == screenState.user.id) {
-            listOf(MaterialTheme.colorScheme.background, MaturAlternativeColor)
+            Log.d("messageColor", "message = ${message.content} | IF - Background")
+            listOf(Color.White, MaturAlternativeColor)
         } else {
-            listOf(MaterialTheme.colorScheme.onBackground, VeryLightGray)
+            Log.d("messageColor", "message = ${message.content} | ELSE - onBackground")
+            listOf(MaterialTheme.colorScheme.onBackground, MaterialTheme.colorScheme.tertiary)
         }
 
     val messageShape =
@@ -788,7 +791,7 @@ private fun ReplyMessageItem(
     } else {
         nameUser = screenState.dialogUser.name
         backgroundColor = Gray
-        markColor = GrayDark
+        markColor = MaturDarkBackground
         textColor = MaterialTheme.colorScheme.onBackground
     }
 
@@ -857,7 +860,7 @@ private fun ModificationMessageItem(
     Row(
         Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
+            .background(if (isSystemInDarkTheme()) GrayDark2 else Color.White) //todo
             .padding(horizontal = 16.dp),
     ) {
         Row(
@@ -910,8 +913,8 @@ private fun ModificationMessageItem(
     Spacer(
         modifier = Modifier
             .fillMaxWidth()
-            .height(1.dp)
-            .background(VeryLightGray)
+            .height(0.5.dp)
+            .background(if (isSystemInDarkTheme()) Color.Black else VeryLightGray) //todo
     )
 }
 

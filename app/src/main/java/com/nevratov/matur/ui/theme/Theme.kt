@@ -18,7 +18,7 @@ import com.nevratov.matur.R
 private val DarkColorScheme = darkColorScheme(
     primary = MaturColorPrimary,
     secondary = MaturColorLight,
-    tertiary = MaturColorDark,
+    tertiary = GrayDark2, // background message
 
     onPrimary = Color.White,
     background = Color.Black,
@@ -28,7 +28,7 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = MaturColorPrimary,
     secondary = MaturColorLight,
-    tertiary = MaturColorDark,
+    tertiary = VeryLightGray, // background message
 
     onPrimary = Color.Black,
     background = Color.White,
