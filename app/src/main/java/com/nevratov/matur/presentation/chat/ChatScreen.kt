@@ -86,7 +86,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -132,10 +134,18 @@ fun ChatScreen(
     val screenWidth = configuration.screenWidthDp.dp
     val maxWidthItem = screenWidth * 0.85f
 
+    val backgroundPattern =
+        if (isSystemInDarkTheme()) R.drawable.pattern_dark_theme
+        else R.drawable.pattern_light_theme
 
-    Scaffold() { paddingValues ->
+    Scaffold { paddingValues ->
         Box(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .padding(paddingValues)
+                .paint(
+                    painter = painterResource(id = backgroundPattern),
+                    contentScale = ContentScale.Crop
+                )
         ) {
             ChatScreenContent(
                 screenState = screenState,
@@ -162,19 +172,15 @@ private fun ChatScreenContent(
                 viewModel = viewModel,
                 onBackPressed = onBackPressed
             )
-
+//            ShimmerListItem()
         }
 
         ChatScreenState.Initial -> {
+            ShimmerListItem()
         }
 
         ChatScreenState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+
         }
     }
 }
@@ -196,21 +202,9 @@ private fun Chat(
 
     val groupMessagesByDate = screenState.messages.groupBy { it.date }
 
-    val backgroundPattern =
-        if (isSystemInDarkTheme()) R.drawable.pattern_dark_theme
-        else R.drawable.pattern_light_theme
-
-
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .paint(
-                painter = painterResource(id = backgroundPattern),
-                contentScale = ContentScale.Crop
-            )
-
     ) {
         ProfilePanel(
             screenState = screenState,
@@ -222,7 +216,6 @@ private fun Chat(
             reverseLayout = true,
             modifier = Modifier
                 .weight(1f)
-//                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = lazyListState
@@ -378,7 +371,7 @@ private fun DateDelimiter(
                 .clip(CircleShape)
                 .background(if (isSystemInDarkTheme()) GrayDark2 else VeryLightGray) //todo
                 .padding(8.dp),
-            color = if(isSystemInDarkTheme()) VeryLightGray else GrayDark2,
+            color = if (isSystemInDarkTheme()) VeryLightGray else GrayDark2,
             text = date,
             fontSize = 12.sp,
             textAlign = TextAlign.Center
@@ -403,8 +396,7 @@ private fun BackgroundDismissIco(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .offset(x = offset)
-        ,
+            .offset(x = offset),
         contentAlignment = Alignment.CenterEnd
     ) {
         Box(
@@ -551,15 +543,26 @@ private fun ProfilePanelActions(
                 onClick = {
                     when (action) {
                         is ProfileAction.Notification -> {
-                            Toast.makeText(context, "Ожиадем реализацию сервера...", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Ожиадем реализацию сервера...",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         is ProfileAction.Search -> {
-                            Toast.makeText(context, "Ожиадем реализацию сервера...", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Ожиадем реализацию сервера...",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         is ProfileAction.Block -> {
                             if (action.isBlocked) viewModel.unblockUser()
                             else viewModel.blockUser()
                         }
+
                         is ProfileAction.RemoveDialog -> {
                             isShowWarningRemoveDialog = true
                         }
@@ -585,7 +588,8 @@ private fun ProfilePanelActions(
                 Text(
                     modifier = Modifier.clickable { viewModel.removeDialog() },
                     text = "Удалить"
-                ) },
+                )
+            },
             dismissButton = {
                 Text(
                     modifier = Modifier.clickable { isShowWarningRemoveDialog = false },
@@ -626,7 +630,7 @@ private fun Typing(
 
     Row(
         modifier = Modifier
-            .background(if(isSystemInDarkTheme()) GrayDark2 else Color.White), //todo
+            .background(if (isSystemInDarkTheme()) GrayDark2 else Color.White), //todo
         verticalAlignment = Alignment.Bottom
     ) {
         Row(
@@ -671,12 +675,12 @@ private fun Typing(
                 enabled = !isBlockedUser,
                 maxLines = 6,
                 colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White, //todo,
-                    unfocusedIndicatorColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White,
-                    focusedContainerColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White,
-                    unfocusedContainerColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White,
-                    disabledContainerColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White,
-                    disabledIndicatorColor = if(isSystemInDarkTheme()) GrayDark2 else Color.White,
+                    focusedIndicatorColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White, //todo,
+                    unfocusedIndicatorColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White,
+                    focusedContainerColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White,
+                    unfocusedContainerColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White,
+                    disabledContainerColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White,
+                    disabledIndicatorColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White,
                 ),
                 value = message,
                 onValueChange = { onValueChanged(it) },
@@ -723,10 +727,8 @@ private fun MessageItem(
 
     val (messageColor, messageBackground) =
         if (message.senderId == screenState.user.id) {
-            Log.d("messageColor", "message = ${message.content} | IF - Background")
             listOf(Color.White, MaturAlternativeColor)
         } else {
-            Log.d("messageColor", "message = ${message.content} | ELSE - onBackground")
             listOf(MaterialTheme.colorScheme.onBackground, MaterialTheme.colorScheme.tertiary)
         }
 
@@ -825,11 +827,11 @@ private fun ReplyMessageItem(
         nameUser = screenState.user.name
         backgroundColor = Liloviy
         markColor = LiloviyDark
-        textColor = if(isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.background
+        textColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.background
     } else {
         nameUser = screenState.dialogUser.name
-        backgroundColor = if(isSystemInDarkTheme()) GrayDark3 else Gray
-        markColor = if(isSystemInDarkTheme()) GrayDark4 else MaturDarkBackground
+        backgroundColor = if (isSystemInDarkTheme()) GrayDark3 else Gray
+        markColor = if (isSystemInDarkTheme()) GrayDark4 else MaturDarkBackground
         textColor = MaterialTheme.colorScheme.onBackground
     }
 
@@ -1006,14 +1008,16 @@ private fun TimeIsReadIsEdited(
         if (message.timestamp != message.timestampEdited) {
             Text(
                 text = "изменено",
-                fontSize = 11.sp,
-                color = timeColor
+                fontSize = 10.sp,
+                color = timeColor,
+                style = TextStyle.Default
             )
         }
         Text(
             text = message.time,
-            fontSize = 11.sp,
-            color = timeColor
+            fontSize = 10.sp,
+            color = timeColor,
+            style = TextStyle.Default
         )
         if (userId == message.senderId) {
             Icon(
