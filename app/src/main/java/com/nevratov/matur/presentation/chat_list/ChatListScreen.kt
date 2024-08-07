@@ -6,6 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -66,7 +68,7 @@ fun ChatListScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(if(isSystemInDarkTheme()) GrayDark2 else Color.White) //todo
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
             ChatListContent(
@@ -180,6 +182,7 @@ fun MessageItem(
         Column(modifier = Modifier.weight(0.9f)) {
             Text(
                 text = chatListItem.user.name,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -197,9 +200,12 @@ fun MessageItem(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.Top
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 MessageTimeAndIsRead(message = chatListItem.message, userId = userId)
-                Spacer(modifier = Modifier.height(8.dp))
+
                 NewMessageIco(message = chatListItem.message, userId = userId)
             }
         }
@@ -235,30 +241,36 @@ private fun MessageTimeAndIsRead(
                     .size(22.dp)
                     .padding(end = 4.dp),
                 painter = painterResource(id = icoId),
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.Gray
             )
         }
         Text(
             text = message.time,
             fontSize = 11.sp,
-            color = Color.Gray
+            color = Color.Gray,
+            style = TextStyle.Default
         )
     }
 }
 
 @Composable
-private fun NewMessageIco(
+private fun ColumnScope.NewMessageIco(
     message: Message,
     userId: Int
 ) {
     if (!message.isRead && message.senderId != userId) {
         Box(
-            modifier = Modifier
-                .size(18.dp)
-                .clip(CircleShape)
-                .background(MaturAlternativeColor)
-                .padding(end = 4.dp)
-        )
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(18.dp)
+                    .clip(CircleShape)
+                    .background(MaturAlternativeColor),
+            )
+        }
     }
 }
 

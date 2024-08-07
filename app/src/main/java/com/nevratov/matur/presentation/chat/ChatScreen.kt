@@ -630,67 +630,68 @@ private fun Typing(
 
     Row(
         modifier = Modifier
-            .background(if (isSystemInDarkTheme()) GrayDark2 else Color.White), //todo
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxWidth(),
         verticalAlignment = Alignment.Bottom
     ) {
-        Row(
+        IconButton(
             modifier = Modifier
-                .weight(1f),
-            verticalAlignment = Alignment.Bottom
+                .padding(bottom = 4.dp)
+                .weight(0.1f),
+            onClick = { onEmojiIcoClicked() }
         ) {
-            IconButton(
-                modifier = Modifier.padding(bottom = 4.dp),
-                onClick = { onEmojiIcoClicked() }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.smile_ico),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    contentDescription = null
-                )
-            }
-
-            TextField(
-                modifier = Modifier
-                    .weight(1f),
-                placeholder = {
-                    AnimatedContent(
-                        targetState = isBlockedUser,
-                        transitionSpec = {
-                            slideInVertically(tween(2000)) { it }.togetherWith(
-                                slideOutVertically(tween(2000)) { -it }
-                            )
-                        }
-                    ) {
-                        val text = if (it) {
-                            stringResource(id = R.string.is_blocked_placeholder_chat)
-                        } else {
-                            stringResource(id = R.string.message_placeholder_chat)
-                        }
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = text
-                        )
-                    }
-                },
-                enabled = !isBlockedUser,
-                maxLines = 6,
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White, //todo,
-                    unfocusedIndicatorColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White,
-                    focusedContainerColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White,
-                    unfocusedContainerColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White,
-                    disabledContainerColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White,
-                    disabledIndicatorColor = if (isSystemInDarkTheme()) GrayDark2 else Color.White,
-                ),
-                value = message,
-                onValueChange = { onValueChanged(it) },
+            Icon(
+                painter = painterResource(id = R.drawable.smile_ico),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                contentDescription = null
             )
         }
+
+        TextField(
+            textStyle = TextStyle.Default,
+            modifier = Modifier
+                .weight(0.8f),
+            placeholder = {
+                AnimatedContent(
+                    targetState = isBlockedUser,
+                    transitionSpec = {
+                        slideInVertically(tween(2000)) { it }.togetherWith(
+                            slideOutVertically(tween(2000)) { -it }
+                        )
+                    }
+                ) {
+                    val text = if (it) {
+                        stringResource(id = R.string.is_blocked_placeholder_chat)
+                    } else {
+                        stringResource(id = R.string.message_placeholder_chat)
+                    }
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = text
+                    )
+                }
+            },
+            enabled = !isBlockedUser,
+            maxLines = 6,
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = MaterialTheme.colorScheme.background,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.background,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
+                disabledIndicatorColor = MaterialTheme.colorScheme.background,
+            ),
+            value = message,
+            onValueChange = { onValueChanged(it) },
+        )
+
 
         val icoConfirm =
             if (messageMode is MessageMode.Edit) Icons.Filled.Done else Icons.Filled.Send
         IconButton(
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier
+                .padding(bottom = 4.dp)
+                .weight(0.1f),
             colors = IconButtonDefaults.iconButtonColors(),
             onClick = {
                 onConfirmClicked()
@@ -827,7 +828,7 @@ private fun ReplyMessageItem(
         nameUser = screenState.user.name
         backgroundColor = Liloviy
         markColor = LiloviyDark
-        textColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.background
+        textColor = Color.White
     } else {
         nameUser = screenState.dialogUser.name
         backgroundColor = if (isSystemInDarkTheme()) GrayDark3 else Gray
@@ -896,14 +897,18 @@ private fun ModificationMessageItem(
             textMessage = messageMode.message.content
         }
     }
-
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .background(if (isSystemInDarkTheme()) GrayDark2 else Color.White) //todo
-            .padding(horizontal = 16.dp),
-    ) {
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .background(MaterialTheme.colorScheme.background)
+//            .padding(horizontal = 0.dp),
+//    ) {
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 0.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -932,24 +937,21 @@ private fun ModificationMessageItem(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            Row(
+
+            IconButton(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .weight(0.1f),
-                horizontalArrangement = Arrangement.End
+                onClick = { onCloseModification() }
             ) {
-                IconButton(
-                    onClick = { onCloseModification() }
-                ) {
-                    Icon(
-                        modifier = Modifier.size(22.dp),
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Отменить"
-                    )
-                }
+                Icon(
+                    modifier = Modifier.size(22.dp),
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Отменить",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
-    }
+//    }
     Spacer(
         modifier = Modifier
             .fillMaxWidth()

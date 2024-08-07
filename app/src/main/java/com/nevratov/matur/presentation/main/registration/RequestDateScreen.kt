@@ -46,6 +46,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
+import com.nevratov.matur.ui.theme.MaturColorLight
 
 @Composable
 fun RequestDateScreen(
@@ -130,7 +131,7 @@ fun RequestDateScreen(
                     viewModel.setBirthdayAndGender(day, month, year, gender)
                     onNextClicked()
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                colors = ButtonDefaults.buttonColors(containerColor = MaturColorLight)
             ) {
                 Text(text = stringResource(R.string.next_label))
             }

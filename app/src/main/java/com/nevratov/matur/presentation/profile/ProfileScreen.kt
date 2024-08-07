@@ -38,7 +38,7 @@ fun ProfileScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(if (isSystemInDarkTheme()) GrayDark2 else Color.White) //todo
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
             Column(

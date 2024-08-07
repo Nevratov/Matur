@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -87,7 +88,7 @@ fun MatchesScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(if (isSystemInDarkTheme()) GrayDark2 else Color.White) //todo
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
             MatchesContent(

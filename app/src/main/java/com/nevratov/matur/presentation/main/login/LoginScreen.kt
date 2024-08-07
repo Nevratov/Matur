@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
 import com.nevratov.matur.ui.theme.MaturColorDark
+import com.nevratov.matur.ui.theme.MaturColorLight
 
 @Composable
 fun LoginScreen (
@@ -61,9 +62,15 @@ fun LoginScreen (
             contentDescription = stringResource(R.string.logo_matur_description)
         )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = stringResource(R.string.login_label), fontSize = 26.sp)
+        Text(
+            text = stringResource(R.string.login_label), fontSize = 26.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Введите данные для входа в приложение", fontSize = 16.sp)
+        Text(
+            text = "Введите данные для входа в приложение", fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Spacer(modifier = Modifier.height(22.dp))
         Fields(state = state, viewModel = viewModel)
         Spacer(modifier = Modifier.height(40.dp))
@@ -129,7 +136,7 @@ private fun ButtonLogin(
     Button(
         enabled = state.value !is LoginScreenState.Loading,
         onClick = { viewModel.login() },
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+        colors = ButtonDefaults.buttonColors(containerColor = MaturColorLight)
     ) {
         Text(text = stringResource(R.string.login_button))
     }

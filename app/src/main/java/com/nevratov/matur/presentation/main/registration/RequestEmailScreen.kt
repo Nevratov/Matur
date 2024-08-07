@@ -29,6 +29,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
+import com.nevratov.matur.ui.theme.MaturColorLight
+import com.nevratov.matur.ui.theme.VeryLightGray
 
 @Composable
 fun RequestEmailScreen(
@@ -73,7 +75,7 @@ fun RequestEmailScreen(
                     viewModel.setEmail(email)
                     onNextClicked()
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                colors = ButtonDefaults.buttonColors(containerColor = MaturColorLight)
             ) {
                 Text(text = stringResource(R.string.next_label))
             }
