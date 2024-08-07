@@ -303,6 +303,13 @@ class MaturRepositoryImpl @Inject constructor(
             if (dialogUserId == message.senderId) {
                 _chatMessages.add(index = 0, element = message)
                 refreshMessagesEvents.emit(Unit)
+
+                val readMessage = mapper.readMessageToWebSocketMessageDto(
+                    userId = message.receiverId,
+                    dialogUserId = message.senderId
+                )
+                val readMessageJson = Gson().toJson(readMessage)
+                webSocketClient.send(readMessageJson)
             } else {
                 refreshChatList(message)
             }
@@ -462,8 +469,6 @@ class MaturRepositoryImpl @Inject constructor(
             message = mapper.messageToCreateMessageDto(message)
         )
 
-        Log.d("sendMessage", "response = $response")
-
         // TODO Catch server error response
         val messageToSend = mapper.messageDtoToWebSocketMessageDto(response.message)
 
@@ -475,7 +480,6 @@ class MaturRepositoryImpl @Inject constructor(
         _chatMessages.add(index = 0, element = messageWithId)
         refreshMessagesEvents.emit(Unit)
         refreshChatList(messageWithId)
-        Log.d("sendMessage", "Message sending")
     }
 
     override suspend fun removeMessage(message: Message) {
@@ -523,7 +527,6 @@ class MaturRepositoryImpl @Inject constructor(
 
         val typingJson = Gson().toJson(typingToSend)
         webSocketClient.send(typingJson)
-        Log.d("sendTypingStatus", "typing json = $typingJson")
     }
 
     override fun onlineStatus(): StateFlow<OnlineStatus> = onlineStatusDialogUserStateFlow

@@ -185,6 +185,17 @@ class Mapper {
         )
     }
 
+    fun readMessageToWebSocketMessageDto(userId: Int, dialogUserId: Int): WebSocketMessageDto {
+        return WebSocketMessageDto(
+            senderId = userId,
+            receiverId = dialogUserId,
+            type = WebSocketConst.READ_ALL_TYPE,
+            id = 0,
+            timestamp = 0,
+            content = "",
+        )
+    }
+
     fun idToRemoveDialogDto(id: Int) = RemoveDialogDto(userId = id)
 
     fun loginDataToLoginDataDto(loginData: LoginData): LoginDataDto {
