@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 object ApiFactory {
 
     private const val URL = "https://test.matur.app/api/"
-    private const val TIMEOUT_SEC = 2L
+    private const val TIMEOUT_SEC = 3L
 
     private val interceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

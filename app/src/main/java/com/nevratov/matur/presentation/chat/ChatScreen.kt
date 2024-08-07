@@ -14,17 +14,20 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,6 +40,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -49,6 +54,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -59,6 +65,7 @@ import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
@@ -77,6 +84,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -90,7 +98,9 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -617,6 +627,7 @@ private fun ShowEmojiPicker(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Typing(
     messageState: MutableState<TextFieldValue>,
@@ -647,44 +658,65 @@ private fun Typing(
             )
         }
 
-        TextField(
-            textStyle = TextStyle.Default,
-            modifier = Modifier
-                .weight(0.8f),
-            placeholder = {
-                AnimatedContent(
-                    targetState = isBlockedUser,
-                    transitionSpec = {
-                        slideInVertically(tween(2000)) { it }.togetherWith(
-                            slideOutVertically(tween(2000)) { -it }
-                        )
-                    }
-                ) {
-                    val text = if (it) {
-                        stringResource(id = R.string.is_blocked_placeholder_chat)
-                    } else {
-                        stringResource(id = R.string.message_placeholder_chat)
-                    }
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = text
-                    )
-                }
-            },
-            enabled = !isBlockedUser,
-            maxLines = 6,
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = MaterialTheme.colorScheme.background,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.background,
-                focusedContainerColor = MaterialTheme.colorScheme.background,
-                unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                disabledContainerColor = MaterialTheme.colorScheme.background,
-                disabledIndicatorColor = MaterialTheme.colorScheme.background,
-            ),
-            value = message,
-            onValueChange = { onValueChanged(it) },
-        )
-
+        val interactionSource = remember { MutableInteractionSource() }
+        Row(modifier = Modifier
+            .weight(0.8f)
+            .heightIn(min = 52.dp) // Default height parent Row
+            .wrapContentHeight(),
+           verticalAlignment = Alignment.CenterVertically
+        ) {
+            BasicTextField(
+                modifier = Modifier.padding(vertical = 6.dp),
+                enabled = !isBlockedUser,
+                maxLines = 6,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground
+                ),
+                cursorBrush = SolidColor(MaturAlternativeColor),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                value = message,
+                onValueChange = { onValueChanged(it) },
+            ) { innerTextField ->
+                TextFieldDefaults.DecorationBox(
+                    value = message.text,
+                    innerTextField = innerTextField,
+                    enabled = !isBlockedUser,
+                    singleLine = false,
+                    visualTransformation = VisualTransformation.None,
+                    interactionSource = interactionSource,
+                    contentPadding = PaddingValues(),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = MaterialTheme.colorScheme.background,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.background,
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.background,
+                        disabledIndicatorColor = MaterialTheme.colorScheme.background,
+                    ),
+                    placeholder = {
+                        AnimatedContent(
+                            targetState = isBlockedUser,
+                            transitionSpec = {
+                                slideInVertically(tween(2000)) { it }.togetherWith(
+                                    slideOutVertically(tween(2000)) { -it }
+                                )
+                            }, label = "Placeholder animation"
+                        ) {
+                            val text = if (it) {
+                                stringResource(id = R.string.is_blocked_placeholder_chat)
+                            } else {
+                                stringResource(id = R.string.message_placeholder_chat)
+                            }
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = text
+                            )
+                        }
+                    },
+                )
+            }
+        }
 
         val icoConfirm =
             if (messageMode is MessageMode.Edit) Icons.Filled.Done else Icons.Filled.Send
