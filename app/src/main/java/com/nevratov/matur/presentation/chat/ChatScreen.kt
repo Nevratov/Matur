@@ -3,7 +3,6 @@ package com.nevratov.matur.presentation.chat
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateDpAsState
@@ -43,13 +42,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -64,8 +63,6 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
@@ -94,7 +91,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -115,16 +111,12 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.MaturApplication
-import com.nevratov.matur.ui.theme.Gray
-import com.nevratov.matur.ui.theme.GrayDark2
-import com.nevratov.matur.ui.theme.GrayDark3
-import com.nevratov.matur.ui.theme.GrayDark4
-import com.nevratov.matur.ui.theme.Liloviy
-import com.nevratov.matur.ui.theme.LiloviyDark
-import com.nevratov.matur.ui.theme.MaturAlternativeColor
-import com.nevratov.matur.ui.theme.MaturColorDark
-import com.nevratov.matur.ui.theme.MaturDarkBackground
-import com.nevratov.matur.ui.theme.VeryLightGray
+import com.nevratov.matur.ui.theme.GrayDarkColor_1
+import com.nevratov.matur.ui.theme.GrayDarkColor_2
+import com.nevratov.matur.ui.theme.GrayLightColor_2
+import com.nevratov.matur.ui.theme.GrayLightColor_3
+import com.nevratov.matur.ui.theme.PurpleColor_1
+import com.nevratov.matur.ui.theme.PurpleColor_2
 
 @Composable
 fun ChatScreen(
@@ -379,9 +371,9 @@ private fun DateDelimiter(
             modifier = Modifier
                 .padding(8.dp)
                 .clip(CircleShape)
-                .background(if (isSystemInDarkTheme()) GrayDark2 else VeryLightGray) //todo
+                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f))
                 .padding(8.dp),
-            color = if (isSystemInDarkTheme()) VeryLightGray else GrayDark2,
+            color = Color.White,
             text = date,
             fontSize = 12.sp,
             textAlign = TextAlign.Center
@@ -418,7 +410,7 @@ private fun BackgroundDismissIco(
                     .size(sizeIco),
                 painter = painterResource(id = R.drawable.reply_ico),
                 contentDescription = null,
-                tint = MaturColorDark
+                tint = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -443,7 +435,7 @@ private fun ProfilePanel(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaturAlternativeColor)
+            .background(MaterialTheme.colorScheme.primary)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
@@ -673,7 +665,7 @@ private fun Typing(
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground
                 ),
-                cursorBrush = SolidColor(MaturAlternativeColor),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 value = message,
                 onValueChange = { onValueChanged(it) },
@@ -719,7 +711,7 @@ private fun Typing(
         }
 
         val icoConfirm =
-            if (messageMode is MessageMode.Edit) Icons.Filled.Done else Icons.Filled.Send
+            if (messageMode is MessageMode.Edit) Icons.Filled.Done else Icons.AutoMirrored.Outlined.Send
         IconButton(
             modifier = Modifier
                 .padding(bottom = 4.dp)
@@ -760,7 +752,7 @@ private fun MessageItem(
 
     val (messageColor, messageBackground) =
         if (message.senderId == screenState.user.id) {
-            listOf(Color.White, MaturAlternativeColor)
+            listOf(Color.White, MaterialTheme.colorScheme.primary)
         } else {
             listOf(MaterialTheme.colorScheme.onBackground, MaterialTheme.colorScheme.tertiary)
         }
@@ -855,16 +847,17 @@ private fun ReplyMessageItem(
     val markColor: Color
     val textColor: Color
 
+    val isDark = isSystemInDarkTheme()
     //todo
     if (message.senderId == screenState.user.id) {
         nameUser = screenState.user.name
-        backgroundColor = Liloviy
-        markColor = LiloviyDark
+        backgroundColor = PurpleColor_1
+        markColor = PurpleColor_2
         textColor = Color.White
     } else {
         nameUser = screenState.dialogUser.name
-        backgroundColor = if (isSystemInDarkTheme()) GrayDark3 else Gray
-        markColor = if (isSystemInDarkTheme()) GrayDark4 else MaturDarkBackground
+        backgroundColor = if (isDark) GrayDarkColor_1 else GrayLightColor_2
+        markColor = if (isDark) GrayDarkColor_2 else GrayLightColor_3
         textColor = MaterialTheme.colorScheme.onBackground
     }
 
@@ -929,13 +922,7 @@ private fun ModificationMessageItem(
             textMessage = messageMode.message.content
         }
     }
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(MaterialTheme.colorScheme.background)
-//            .padding(horizontal = 0.dp),
-//    ) {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -948,7 +935,7 @@ private fun ModificationMessageItem(
                     .size(22.dp)
                     .weight(0.1f),
                 imageVector = modeIco,
-                tint = MaturAlternativeColor,
+                tint = MaterialTheme.colorScheme.primary,
                 contentDescription = modeIcoDescription
             )
             Spacer(modifier = Modifier.width(4.dp))
@@ -958,15 +945,18 @@ private fun ModificationMessageItem(
                 Text(
                     text = modeName,
                     fontSize = 16.sp,
-                    color = MaturAlternativeColor,
-                    fontWeight = FontWeight.Medium
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium,
+                    style = TextStyle.Default
                 )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = textMessage,
                     fontSize = 10.sp,
                     color = Color.Gray,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    style = TextStyle.Default
                 )
             }
 
@@ -983,12 +973,11 @@ private fun ModificationMessageItem(
                 )
             }
         }
-//    }
     Spacer(
         modifier = Modifier
             .fillMaxWidth()
             .height(0.5.dp)
-            .background(if (isSystemInDarkTheme()) Color.Black else VeryLightGray) //todo
+            .background(MaterialTheme.colorScheme.primary)
     )
 }
 

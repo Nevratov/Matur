@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,8 +39,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
-import com.nevratov.matur.ui.theme.MaturColorDark
-import com.nevratov.matur.ui.theme.MaturColorLight
 
 @Composable
 fun LoginScreen (
@@ -83,7 +80,7 @@ fun LoginScreen (
                 modifier = Modifier.clickable { createAccountClicked() },
                 text = "Создать аккаунт",
                 fontSize = 14.sp,
-                color = MaturColorDark,
+                color = MaterialTheme.colorScheme.primary,
             )
             ButtonLogin(state = state, viewModel = viewModel)
         }
@@ -136,7 +133,7 @@ private fun ButtonLogin(
     Button(
         enabled = state.value !is LoginScreenState.Loading,
         onClick = { viewModel.login() },
-        colors = ButtonDefaults.buttonColors(containerColor = MaturColorLight)
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
         Text(text = stringResource(R.string.login_button))
     }

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +41,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.nevratov.matur.ui.theme.MaturAlternativeColor
 import kotlin.random.Random
 
 @Composable
@@ -74,7 +74,7 @@ private fun ShimmerProfilePanel() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaturAlternativeColor)
+            .background(MaterialTheme.colorScheme.primary)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start

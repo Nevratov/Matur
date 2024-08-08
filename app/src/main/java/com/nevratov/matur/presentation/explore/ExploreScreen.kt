@@ -47,7 +47,6 @@ import coil.compose.AsyncImage
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.navigation.NavigationState
 import com.nevratov.matur.presentation.BottomNavigationBar
-import com.nevratov.matur.ui.theme.MaturColorDark
 
 @Composable
 fun ExploreScreen(
@@ -139,7 +138,7 @@ private fun EmptyContentScreen() {
             textAlign = TextAlign.Center,
             fontSize = 22.sp,
             fontFamily = FontFamily.Cursive,
-            color = MaturColorDark
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -193,12 +192,13 @@ private fun ExploreCard(
         ) {
             ActionButton(
                 ico = Icons.Rounded.Close,
+                colorIco = Color.Red,
                 onClick = { onDislikeClicked() }
             )
             Spacer(modifier = Modifier.width(64.dp))
             ActionButton(
                 ico = Icons.Rounded.Favorite,
-                colorIco = MaturColorDark,
+                colorIco = MaterialTheme.colorScheme.primary,
                 onClick = { onLikeClicked() }
             )
         }

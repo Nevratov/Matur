@@ -2,7 +2,6 @@ package com.nevratov.matur.presentation.chat_list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,8 +48,6 @@ import com.nevratov.matur.R
 import com.nevratov.matur.navigation.NavigationState
 import com.nevratov.matur.presentation.BottomNavigationBar
 import com.nevratov.matur.presentation.chat.Message
-import com.nevratov.matur.ui.theme.GrayDark2
-import com.nevratov.matur.ui.theme.MaturAlternativeColor
 
 @Composable
 fun ChatListScreen(
@@ -149,7 +146,7 @@ private fun TopBar() {
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaturAlternativeColor,
+            containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = Color.White //todo
         )
     )
@@ -268,7 +265,7 @@ private fun ColumnScope.NewMessageIco(
                 modifier = Modifier
                     .size(18.dp)
                     .clip(CircleShape)
-                    .background(MaturAlternativeColor),
+                    .background(MaterialTheme.colorScheme.primary),
             )
         }
     }

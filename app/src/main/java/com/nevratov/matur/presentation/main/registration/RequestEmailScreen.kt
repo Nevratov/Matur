@@ -29,8 +29,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
-import com.nevratov.matur.ui.theme.MaturColorLight
-import com.nevratov.matur.ui.theme.VeryLightGray
 
 @Composable
 fun RequestEmailScreen(
@@ -51,9 +49,17 @@ fun RequestEmailScreen(
             contentDescription = stringResource(R.string.logo_matur_description)
         )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Электронная почта", fontSize = 26.sp)
+        Text(
+            text = "Электронная почта",
+            fontSize = 26.sp,
+            color = Color.White
+        )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Укажите email адрес почтового ящика", fontSize = 16.sp)
+        Text(
+            text = "Укажите email адрес почтового ящика",
+            fontSize = 16.sp,
+            color = Color.White
+        )
         Spacer(modifier = Modifier.height(22.dp))
         EmailTextField(
             email = email,
@@ -75,7 +81,7 @@ fun RequestEmailScreen(
                     viewModel.setEmail(email)
                     onNextClicked()
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = MaturColorLight)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(text = stringResource(R.string.next_label))
             }

@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -47,9 +48,17 @@ fun RequestNameScreen(
             contentDescription = stringResource(R.string.logo_matur_description)
         )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Создать аккаунт", fontSize = 26.sp)
+        Text(
+            text = "Создать аккаунт",
+            fontSize = 26.sp,
+            color = Color.White
+        )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Введите своё имя", fontSize = 16.sp)
+        Text(
+            text = "Введите своё имя",
+            fontSize = 16.sp,
+            color = Color.White
+        )
         Spacer(modifier = Modifier.height(22.dp))
         FirstNameTextField(
             firstName = firstName,

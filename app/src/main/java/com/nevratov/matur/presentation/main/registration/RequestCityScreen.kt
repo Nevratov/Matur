@@ -55,9 +55,17 @@ fun RequestCityScreen(
             contentDescription = stringResource(R.string.logo_matur_description)
         )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Город", fontSize = 26.sp)
+        Text(
+            text = "Город",
+            fontSize = 26.sp,
+            color = Color.White
+        )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Начните вводить название вашего города", fontSize = 16.sp)
+        Text(
+            text = "Начните вводить название вашего города",
+            fontSize = 16.sp,
+            color = Color.White
+        )
         Spacer(modifier = Modifier.height(22.dp))
         CityTextField(
             email = city,

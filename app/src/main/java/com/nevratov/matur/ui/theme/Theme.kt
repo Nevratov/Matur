@@ -8,7 +8,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat.getColor
@@ -16,23 +15,21 @@ import androidx.core.view.WindowCompat
 import com.nevratov.matur.R
 
 private val DarkColorScheme = darkColorScheme(
-    primary = MaturColorPrimary,
-//    secondary = GrayDark2,
-    tertiary = GrayDark2, // background message
+    primary = MaturPrimaryColor,
+    tertiary = MaturGrayColor, // background message
 
     onPrimary = Color.White,
-    background = GrayDark2,
+    background = MaturGrayColor,
     onBackground = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = MaturColorPrimary,
-//    secondary = Color.White,
-    tertiary = VeryLightGray, // background message
+    primary = MaturPrimaryColor,
+    tertiary = GrayLightColor_1, // background message
 
     onPrimary = Color.Black,
     background = Color.White,
-    onBackground = GrayDark2
+    onBackground = MaturGrayColor
 
 
 
