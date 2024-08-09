@@ -48,6 +48,7 @@
     <string name="city_label">Город</string>
     <string name="input_name_your_city_label">Начните вводить название вашего города</string>
     <string name="wrong_login_data_toast">Логин и / или пароль указаны не верно</string>
+    <string name="connection_lost_toast">Отсутствует интернет соеденение</string>
 
 
     <array name="monthsOfYear">
