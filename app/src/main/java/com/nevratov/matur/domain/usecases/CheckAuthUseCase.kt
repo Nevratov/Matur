@@ -7,5 +7,5 @@ class CheckAuthUseCase @Inject constructor(
     private val repository: MaturRepository
 ) {
 
-    operator fun invoke() = repository.checkAuthState()
+    suspend operator fun invoke() = repository.checkAuthState()
 }

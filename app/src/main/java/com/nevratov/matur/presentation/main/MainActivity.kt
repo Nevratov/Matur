@@ -52,6 +52,9 @@ class MainActivity : ComponentActivity() {
                             registrationViewModel = registrationViewModel
                         )
                     }
+                    AuthState.NotConnection -> {
+                        NotConnectionScreen()
+                    }
                     AuthState.Initial -> {}
                 }
             }

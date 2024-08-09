@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface MaturRepository {
 
-    fun checkAuthState()
+    suspend fun checkAuthState()
 
     fun getAuthStateFlow(): StateFlow<AuthState>
 

@@ -6,6 +6,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
@@ -21,20 +23,21 @@ import com.nevratov.matur.data.network.webSocket.WebSocketClient
 import com.nevratov.matur.data.network.webSocket.WebSocketListener
 import com.nevratov.matur.di.ApplicationScope
 import com.nevratov.matur.domain.entity.AuthState
+import com.nevratov.matur.domain.entity.ChatListItem
 import com.nevratov.matur.domain.entity.City
+import com.nevratov.matur.domain.entity.LoginData
+import com.nevratov.matur.domain.entity.Message
 import com.nevratov.matur.domain.entity.OnlineStatus
+import com.nevratov.matur.domain.entity.RegUserInfo
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
-import com.nevratov.matur.domain.entity.Message
-import com.nevratov.matur.domain.entity.ChatListItem
-import com.nevratov.matur.domain.entity.LoginData
-import com.nevratov.matur.domain.entity.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
@@ -61,6 +64,8 @@ class MaturRepositoryImpl @Inject constructor(
     private val authStateFlow = flow {
         checkAuthStateEvents.emit(Unit)
         checkAuthStateEvents.collect {
+            if (!isNetworkConnection()) emit(AuthState.NotConnection)
+            Log.d("checkAuthStateEvents", "collect /// Internet = ${isNetworkConnection()}")
             val user = getUserOrNull()
             val isLoggedIn = user != null
             if (isLoggedIn) {
@@ -230,6 +235,18 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
 
+    private fun isNetworkConnection(): Boolean {
+        val connectivityManager = getSystemService(application, ConnectivityManager::class.java) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+        return when {
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            else -> false
+        }
+    }
+
     // Firebase Cloud Messaging
 
     private fun firebaseGetInstance() {
@@ -365,7 +382,9 @@ class MaturRepositoryImpl @Inject constructor(
             putString(TOKEN_KEY, token)
             apply()
         }
-        checkAuthState()
+        coroutineScope.launch {
+            checkAuthState()
+        }
     }
 
     private fun getUserOrNull(): User? {
@@ -382,10 +401,10 @@ class MaturRepositoryImpl @Inject constructor(
 
     override fun getAuthStateFlow() = authStateFlow
 
-    override fun checkAuthState() {
-        coroutineScope.launch {
-            checkAuthStateEvents.emit(Unit)
-        }
+    override suspend fun checkAuthState() {
+        Log.d("checkAuthStateEvents", "emited in override fun repo")
+        checkAuthStateEvents.emit(Unit)
+        Log.d("checkAuthStateEvents", "emited in override fun repo complete")
     }
 
     override suspend fun login(loginData: LoginData): Boolean {
@@ -518,10 +537,12 @@ class MaturRepositoryImpl @Inject constructor(
         chatListRefreshEvents.collect {
             emit(chatList.sortedByDescending { it.message.timestamp })
         }
-    }.retry {
-        delay(RETRY_TIMEOUT_MILLIS)
-        true
-    }.stateIn(
+    }
+//        .retry {
+//        delay(RETRY_TIMEOUT_MILLIS)
+//        true
+//    }
+    .stateIn(
         scope = coroutineScope,
         started = SharingStarted.Lazily,
         initialValue = listOf()
