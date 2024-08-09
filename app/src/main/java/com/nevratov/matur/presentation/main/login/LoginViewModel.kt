@@ -1,46 +1,38 @@
 package com.nevratov.matur.presentation.main.login
 
+import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nevratov.matur.R
 import com.nevratov.matur.domain.usecases.LoginUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class LoginViewModel @Inject constructor(
-    val loginUseCase: LoginUseCase
+    val loginUseCase: LoginUseCase,
+    val application: Application
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<LoginScreenState>(LoginScreenState.Initial)
-    val state = _state
 
-    init {
-//        _state.value = LoginScreenState.Content("", "")
-        _state.value = LoginScreenState.Content("59aksai59@mail.ru", "123123")
-//        _state.value = LoginScreenState.Content("aeinmylife@gmail.com", "2fo7R5")
-    }
+    private val _screenState = MutableStateFlow<LoginScreenState>(LoginScreenState.initialState)
+    val screenState = _screenState
 
-    fun login() {
-        val currentState = state.value
+    fun login(email: String, password: String) {
+        val currentState = screenState.value
         if (currentState !is LoginScreenState.Content) return
-        _state.value = LoginScreenState.Loading
-        val loginData = LoginData(email = currentState.email, password = currentState.password)
+
+        _screenState.value = LoginScreenState.Loading
+        val loginData = LoginData(email = email, password = password)
         viewModelScope.launch {
-            loginUseCase(loginData)
-        }
-    }
-
-    fun changeEmail(email: String) {
-        val currentState = _state.value
-        if (currentState is LoginScreenState.Content) {
-            _state.value = currentState.copy(email = email)
-        }
-    }
-
-    fun changePassword(password: String) {
-        val currentState = _state.value
-        if (currentState is LoginScreenState.Content) {
-            _state.value = currentState.copy(password = password)
+            val answer = loginUseCase(loginData)
+            if (!answer) Toast.makeText(
+                application,
+                application.getString(R.string.wrong_login_data_toast),
+                Toast.LENGTH_LONG
+            ).show()
+            _screenState.value = currentState.copy(email = email, password = password)
         }
     }
 }

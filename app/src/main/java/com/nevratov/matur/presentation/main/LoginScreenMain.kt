@@ -36,7 +36,7 @@ fun LoginMainScreen(
                 loginScreenContent = {
                     LoginScreen(
                         viewModel = loginViewModel,
-                        createAccountClicked = { navigationState.navigateTo(Screen.RequestName.route) }
+                        onCreateAccountClicked = { navigationState.navigateTo(Screen.RequestName.route) }
                     )
                 },
                 requestNameScreenContent = {

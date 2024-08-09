@@ -8,5 +8,5 @@ class LoginUseCase @Inject constructor(
     private val repository: MaturRepository
 ) {
 
-    operator fun invoke(loginData: LoginData) = repository.login(loginData)
+    suspend operator fun invoke(loginData: LoginData) = repository.login(loginData)
 }

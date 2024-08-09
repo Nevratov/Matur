@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.log
 import kotlin.random.Random
 
 @ApplicationScope
@@ -50,7 +51,8 @@ class MaturRepositoryImpl @Inject constructor(
     private val mapper = Mapper()
 
     private val userSharedPreferences = application.getSharedPreferences(USER_KEY, MODE_PRIVATE)
-    private val firebaseSharedPreferences = application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
+    private val firebaseSharedPreferences =
+        application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -250,7 +252,10 @@ class MaturRepositoryImpl @Inject constructor(
         Log.d("FCM", "check token, old token = $oldToken")
         if (oldToken == newToken) return
 
-        apiService.createNewFCMToken(token = getToken(), newToken = mapper.stringToCreateFCMTokenDto(newToken))
+        apiService.createNewFCMToken(
+            token = getToken(),
+            newToken = mapper.stringToCreateFCMTokenDto(newToken)
+        )
         firebaseSharedPreferences.edit().apply {
             putString(FCM_TOKEN_KEY, newToken)
             apply()
@@ -384,14 +389,19 @@ class MaturRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun login(loginData: LoginData) {
-        coroutineScope.launch {
-            val loginResponse = apiService.login(mapper.loginDataToLoginDataDto(loginData))
-            if (!loginResponse.isSuccessful) return@launch
-            val userDto = loginResponse.body()?.user ?: throw RuntimeException("user is null")
-            val token = loginResponse.body()?.token ?: throw RuntimeException("token is null")
+    override suspend fun login(loginData: LoginData): Boolean {
+        val loginResponse = apiService.login(mapper.loginDataToLoginDataDto(loginData))
+
+        if (loginResponse.isSuccessful) {
+            val response = loginResponse.body() ?: throw RuntimeException("response == null")
+            val userDto = response.user
+            val token = response.token
             saveUserAndToken(user = mapper.userDtoToUser(userDto), token = token)
+            return true
+        } else {
+            return false
         }
+
     }
 
     override fun getUsersToExplore() = loadedExploreUsers
@@ -560,7 +570,8 @@ class MaturRepositoryImpl @Inject constructor(
 
     override suspend fun blockUserById(id: Int) {
         apiService.blockUserById(token = getToken(), id = id)
-        val chatItem = chatList.find { it.user.id == id } ?: throw RuntimeException("chatItem == null")
+        val chatItem =
+            chatList.find { it.user.id == id } ?: throw RuntimeException("chatItem == null")
         val newItem = chatItem.copy(user = chatItem.user.copy(isBlocked = true))
         _chatList.remove(chatItem)
         _chatList.add(newItem)
@@ -569,7 +580,8 @@ class MaturRepositoryImpl @Inject constructor(
 
     override suspend fun unblockUserById(id: Int) {
         apiService.unblockUserById(token = getToken(), id = id)
-        val chatItem = chatList.find { it.user.id == id } ?: throw RuntimeException("chatItem == null")
+        val chatItem =
+            chatList.find { it.user.id == id } ?: throw RuntimeException("chatItem == null")
         val newItem = chatItem.copy(user = chatItem.user.copy(isBlocked = false))
         _chatList.remove(chatItem)
         _chatList.add(newItem)
@@ -586,13 +598,14 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     companion object {
-        private val EMPTY_ONLINE_STATUS =  OnlineStatus(
+        private val EMPTY_ONLINE_STATUS = OnlineStatus(
             userId = 0,
             isOnline = false,
             isTyping = false,
             isOpenedChatScreen = false
         )
 
+        private const val LOGIN_STATUS_SUCCESS = "success"
         private const val USER_KEY = "user_data"
         private const val TOKEN_KEY = "token"
         const val FIREBASE_NAME = "firebase"

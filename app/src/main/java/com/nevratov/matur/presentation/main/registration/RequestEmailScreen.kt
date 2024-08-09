@@ -50,15 +50,15 @@ fun RequestEmailScreen(
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "Электронная почта",
+            text = stringResource(R.string.input_email_label),
             fontSize = 26.sp,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "Укажите email адрес почтового ящика",
+            text = stringResource(R.string.input_email_description_label),
             fontSize = 16.sp,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(22.dp))
         EmailTextField(
@@ -81,7 +81,10 @@ fun RequestEmailScreen(
                     viewModel.setEmail(email)
                     onNextClicked()
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White
+                )
             ) {
                 Text(text = stringResource(R.string.next_label))
             }

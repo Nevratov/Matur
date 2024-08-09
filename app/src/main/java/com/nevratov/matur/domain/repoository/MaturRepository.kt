@@ -17,7 +17,7 @@ interface MaturRepository {
 
     fun getAuthStateFlow(): StateFlow<AuthState>
 
-    fun login(loginData: LoginData)
+    suspend fun login(loginData: LoginData): Boolean
 
     suspend fun registration(regUserInfo: RegUserInfo)
 

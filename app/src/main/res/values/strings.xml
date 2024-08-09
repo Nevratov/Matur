@@ -36,6 +36,18 @@
     <string name="remove_dialog_action">Удалить диалог</string>
     <string name="block_action">Заблокировать</string>
     <string name="unblock_action">Разблокировать</string>
+    <string name="password_label">Пароль</string>
+    <string name="password_visibility_description">Видимость пароля</string>
+    <string name="input_data_login_label">Введите данные для входа в приложение</string>
+    <string name="create_account_label">Создать аккаунт</string>
+    <string name="input_your_name_label">Введите своё имя</string>
+    <string name="general_information_label">Общие сведения</string>
+    <string name="input_date_and_gender_label">Укажите свою дату рождения и пол</string>
+    <string name="input_email_label">Электронная почта</string>
+    <string name="input_email_description_label">Укажите email адрес почтового ящика</string>
+    <string name="city_label">Город</string>
+    <string name="input_name_your_city_label">Начните вводить название вашего города</string>
+    <string name="wrong_login_data_toast">Логин и / или пароль указаны не верно</string>
 
 
     <array name="monthsOfYear">

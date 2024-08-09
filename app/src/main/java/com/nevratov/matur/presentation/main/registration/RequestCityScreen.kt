@@ -56,15 +56,15 @@ fun RequestCityScreen(
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "Город",
+            text = stringResource(R.string.city_label),
             fontSize = 26.sp,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "Начните вводить название вашего города",
+            text = stringResource(R.string.input_name_your_city_label),
             fontSize = 16.sp,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(22.dp))
         CityTextField(

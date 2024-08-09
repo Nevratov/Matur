@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -49,15 +50,15 @@ fun RequestNameScreen(
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "Создать аккаунт",
+            text = stringResource(R.string.create_account_label),
             fontSize = 26.sp,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "Введите своё имя",
+            text = stringResource(R.string.input_your_name_label),
             fontSize = 16.sp,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(22.dp))
         FirstNameTextField(
@@ -79,13 +80,18 @@ fun RequestNameScreen(
         )
         Spacer(modifier = Modifier.height(32.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Button(onClick = {
+            Button(
+                onClick = {
                 if (firstName.isEmpty()) isErrorFirstName = true
                 if (lastName.isEmpty()) isErrorLastName = true
                 if (isErrorFirstName || isErrorLastName) return@Button
                 viewModel.setName(firstName)
                 onNextClicked()
-            }
+            },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White
+                )
             ) {
                 Text(text = stringResource(R.string.next_label))
             }
