@@ -8,6 +8,7 @@ import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.http.NetworkException
 import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
@@ -64,16 +65,18 @@ class MaturRepositoryImpl @Inject constructor(
     private val authStateFlow = flow {
         checkAuthStateEvents.emit(Unit)
         checkAuthStateEvents.collect {
-            if (!isNetworkConnection()) emit(AuthState.NotConnection)
-            Log.d("checkAuthStateEvents", "collect /// Internet = ${isNetworkConnection()}")
+            if (!isNetworkConnection()) {
+                emit(AuthState.NotConnection)
+                throw RuntimeException("There is no internet connection")
+            }
+
             val user = getUserOrNull()
             val isLoggedIn = user != null
             if (isLoggedIn) {
                 connectToWS()
                 getOnlineUsersId()
-                emit(AuthState.Authorized)
-                //Test FCM
                 firebaseGetInstance()
+                emit(AuthState.Authorized)
             } else {
                 emit(AuthState.NotAuthorized)
             }
