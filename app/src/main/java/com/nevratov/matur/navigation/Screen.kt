@@ -8,8 +8,6 @@ sealed class Screen(val route: String) {
 
     data object Login: Screen(LOGIN_ROUTE)
 
-    data object RegistrationContainer: Screen(REGISTRATION_ROUTE)
-
     data object RequestName: Screen(REQUEST_NAME_ROUTE)
 
     data object RequestDate: Screen(REQUEST_DATE_ROUTE)
@@ -40,7 +38,6 @@ sealed class Screen(val route: String) {
         const val KEY_DIALOG_USER = "dialog_user"
 
         private const val LOGIN_ROUTE = "login"
-        private const val REGISTRATION_ROUTE = "registration"
         private const val REQUEST_NAME_ROUTE = "request_name"
         private const val REQUEST_DATE_ROUTE = "request_date"
         private const val REQUEST_CITY_ROUTE = "request_city"

@@ -1,7 +1,5 @@
 package com.nevratov.matur.presentation.chat
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Search
 import com.nevratov.matur.R
 
 sealed class ProfileAction(

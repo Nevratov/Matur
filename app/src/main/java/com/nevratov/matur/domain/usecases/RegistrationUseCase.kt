@@ -1,7 +1,7 @@
 package com.nevratov.matur.domain.usecases
 
 import com.nevratov.matur.domain.repoository.MaturRepository
-import com.nevratov.matur.presentation.main.registration.RegUserInfo
+import com.nevratov.matur.domain.entity.RegUserInfo
 import javax.inject.Inject
 
 class RegistrationUseCase @Inject constructor(

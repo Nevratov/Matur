@@ -18,15 +18,16 @@ import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.data.network.webSocket.WebSocketConst
 import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.domain.entity.User
-import com.nevratov.matur.presentation.chat.Message
-import com.nevratov.matur.presentation.chat_list.ChatListItem
-import com.nevratov.matur.presentation.main.login.LoginData
+import com.nevratov.matur.domain.entity.Message
+import com.nevratov.matur.domain.entity.ChatListItem
+import com.nevratov.matur.domain.entity.LoginData
 import com.nevratov.matur.presentation.main.registration.Genders
-import com.nevratov.matur.presentation.main.registration.RegUserInfo
+import com.nevratov.matur.domain.entity.RegUserInfo
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
-class Mapper {
+class Mapper @Inject constructor() {
 
     fun userDtoToUser(userDto: UserDto): User {
         Log.d("User", userDto.toString())
@@ -134,7 +135,7 @@ class Mapper {
             WebSocketConst.STATUS_TYPE -> {
                 OnlineStatus(
                     userId = webSocketMessage.senderId,
-                    isOnline = content.contains(WebSocketConst.IS_ONLINE_STATUS)
+                    isOnline = content.contains(WebSocketConst.IS_ONLINE_CONTENT)
                 )
             }
 

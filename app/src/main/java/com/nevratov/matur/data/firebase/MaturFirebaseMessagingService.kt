@@ -23,16 +23,12 @@ class MaturFirebaseMessagingService () : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        log("From: ${message.from}")
 
-        //
         if (message.data.isNotEmpty()) {
             log("Message data payload: ${message.data}")
         }
 
-        //
         message.notification?.let {
-            log("Message Notification Body: ${it.body}")
             it.body?.let { body ->
                 sendNotification(body)
             }
@@ -41,12 +37,9 @@ class MaturFirebaseMessagingService () : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.d("FCM", "onNewToken = $token")
     }
 
-
     private fun sendNotification(messageBody: String) {
-        log("in sendNotification")
         val requestCode = 0
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -74,7 +67,6 @@ class MaturFirebaseMessagingService () : FirebaseMessagingService() {
         notificationManager.createNotificationChannel(channel)
 
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
-        log("notification notify")
     }
 
     companion object {

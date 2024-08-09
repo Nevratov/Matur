@@ -92,7 +92,6 @@ fun RequestCityScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShowCities(
     cities: List<City> = listOf(),

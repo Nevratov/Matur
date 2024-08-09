@@ -1,7 +1,7 @@
 package com.nevratov.matur.domain.usecases
 
 import com.nevratov.matur.domain.repoository.MaturRepository
-import com.nevratov.matur.presentation.chat.Message
+import com.nevratov.matur.domain.entity.Message
 import javax.inject.Inject
 
 class EditMessageUseCase @Inject constructor(

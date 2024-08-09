@@ -23,7 +23,6 @@ object ApiFactory {
         .writeTimeout(TIMEOUT_SEC, TimeUnit.SECONDS)
         .build()
 
-
     private val retrofit = Retrofit.Builder()
         .baseUrl(URL)
         .addConverterFactory(GsonConverterFactory.create())
@@ -31,6 +30,4 @@ object ApiFactory {
         .build()
 
     val apiService: ApiService = retrofit.create(ApiService::class.java)
-
-
 }

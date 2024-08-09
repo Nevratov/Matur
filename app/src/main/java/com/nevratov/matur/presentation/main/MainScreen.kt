@@ -22,7 +22,6 @@ fun MainScreen(
     exploreViewModel: ExploreViewModel,
     chatListViewModel: ChatListViewModel
 ) {
-    Log.d("MainScreen", "REC")
 
     val navigationState = rememberNavigationState()
 

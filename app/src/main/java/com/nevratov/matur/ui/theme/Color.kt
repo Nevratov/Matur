@@ -2,7 +2,6 @@ package com.nevratov.matur.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-
 val MaturPrimaryColor = Color(0xFF8771E7)
 val MaturGrayColor = Color(0xFF29292E)
 

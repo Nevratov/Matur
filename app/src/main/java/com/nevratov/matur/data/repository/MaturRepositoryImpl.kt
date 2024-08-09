@@ -16,7 +16,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.nevratov.matur.R
 import com.nevratov.matur.data.Mapper
-import com.nevratov.matur.data.network.ApiFactory
+import com.nevratov.matur.data.network.ApiService
 import com.nevratov.matur.data.network.webSocket.WebSocketClient
 import com.nevratov.matur.data.network.webSocket.WebSocketListener
 import com.nevratov.matur.di.ApplicationScope
@@ -25,10 +25,10 @@ import com.nevratov.matur.domain.entity.City
 import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
-import com.nevratov.matur.presentation.chat.Message
-import com.nevratov.matur.presentation.chat_list.ChatListItem
-import com.nevratov.matur.presentation.main.login.LoginData
-import com.nevratov.matur.presentation.main.registration.RegUserInfo
+import com.nevratov.matur.domain.entity.Message
+import com.nevratov.matur.domain.entity.ChatListItem
+import com.nevratov.matur.domain.entity.LoginData
+import com.nevratov.matur.domain.entity.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -40,15 +40,14 @@ import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.log
 import kotlin.random.Random
 
 @ApplicationScope
 class MaturRepositoryImpl @Inject constructor(
+    private val apiService: ApiService,
+    private val mapper: Mapper,
     private val application: Application
 ) : MaturRepository {
-    private val apiService = ApiFactory.apiService
-    private val mapper = Mapper()
 
     private val userSharedPreferences = application.getSharedPreferences(USER_KEY, MODE_PRIVATE)
     private val firebaseSharedPreferences =

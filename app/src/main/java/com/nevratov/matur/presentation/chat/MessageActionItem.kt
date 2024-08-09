@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.nevratov.matur.R
+import com.nevratov.matur.domain.entity.Message
 
 sealed class MessageActionItem(
     val titleResId: Int,

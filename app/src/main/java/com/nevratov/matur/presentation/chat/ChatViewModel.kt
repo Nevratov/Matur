@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nevratov.matur.domain.entity.Message
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.usecases.BlockUserByIdUseCase
 import com.nevratov.matur.domain.usecases.EditMessageUseCase
@@ -49,8 +50,6 @@ class ChatViewModel @Inject constructor(
 
     private val screenStateRefreshFlow = MutableSharedFlow<ChatScreenState>()
 
-
-
     val chatScreenState = getMessagesByUserIdUseCase(id = dialogUser.id)
         .onStart { observeOnlineStatus() }
         .map {
@@ -91,7 +90,6 @@ class ChatViewModel @Inject constructor(
             typingJob?.cancel()
             sendTypingStatusUseCase(isTyping = false, userId = user.id, dialogUserId = dialogUser.id)
         }
-
     }
 
     fun removeMessage(message: Message) {
@@ -200,7 +198,6 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
-
 
     public override fun onCleared() {
         Log.d("ChatScreen", "onCleared")

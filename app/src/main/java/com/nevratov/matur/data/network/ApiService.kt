@@ -4,7 +4,6 @@ import com.nevratov.matur.data.model.ChatListResponseDto
 import com.nevratov.matur.data.model.ChatMessagesResponse
 import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.CreateNewFCMTokenDto
-import com.nevratov.matur.data.model.RemoveMessageDto
 import com.nevratov.matur.data.model.DislikedUserDto
 import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
@@ -12,6 +11,7 @@ import com.nevratov.matur.data.model.LoginResponseDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RegUserInfoDto
 import com.nevratov.matur.data.model.RemoveDialogDto
+import com.nevratov.matur.data.model.RemoveMessageDto
 import com.nevratov.matur.data.model.SendMessageResponse
 import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.data.model.UsersToExploreResponseDto
@@ -26,17 +26,31 @@ import retrofit2.http.Query
 
 interface ApiService {
 
+    @GET("user/online")
+    suspend fun getOnlineUsersId(@Header("Authorization") token: String): List<Int>
+
+    @GET("city/get-by-name")
+    suspend fun getCitiesByName(@Query("q") name: String): List<City>
+
+    @GET("im")
+    suspend fun getChatList(
+        @Header("Authorization") token: String
+    ) : ChatListResponseDto
+
+    @GET("user/view/{id}")
+    suspend fun getUserById(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): UserDto
+
+    @GET("like/user-list")
+    suspend fun getUsersToExplore(@Header("Authorization") token: String): UsersToExploreResponseDto
+
     @POST("profile/login")
     suspend fun login(@Body loginData: LoginDataDto): Response<LoginResponseDto>
 
     @POST("profile/sign-up")
     suspend fun registerUser(@Body regUserInfo: RegUserInfoDto)
-
-    @GET("city/get-by-name")
-    suspend fun getCitiesByName(@Query("q") name: String): List<City>
-
-    @GET("like/user-list")
-    suspend fun getUsersToExplore(@Header("Authorization") token: String): UsersToExploreResponseDto
 
     @POST("dislike/create")
     suspend fun dislike(
@@ -61,20 +75,6 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Body messagesOptions: MessagesOptionsDto
     ): ChatMessagesResponse
-
-    @GET("im")
-    suspend fun getChatList(
-        @Header("Authorization") token: String
-    ) : ChatListResponseDto
-
-    @GET("user/view/{id}")
-    suspend fun getUserById(
-        @Header("Authorization") token: String,
-        @Path("id") id: Int
-    ): UserDto
-
-    @GET("user/online")
-    suspend fun getOnlineUsersId(@Header("Authorization") token: String): List<Int>
 
     @POST("firebase-token/create")
     suspend fun createNewFCMToken(

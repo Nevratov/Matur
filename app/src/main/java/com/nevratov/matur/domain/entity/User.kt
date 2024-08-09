@@ -2,7 +2,6 @@ package com.nevratov.matur.domain.entity
 
 import android.icu.util.Calendar
 import android.os.Parcelable
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 import java.util.Date

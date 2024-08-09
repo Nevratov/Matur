@@ -109,6 +109,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants.IterateForever
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nevratov.matur.R
+import com.nevratov.matur.domain.entity.Message
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.presentation.MaturApplication
 import com.nevratov.matur.ui.theme.GrayDarkColor_1
@@ -174,7 +175,6 @@ private fun ChatScreenContent(
                 viewModel = viewModel,
                 onBackPressed = onBackPressed
             )
-//            ShimmerListItem()
         }
 
         ChatScreenState.Initial -> {

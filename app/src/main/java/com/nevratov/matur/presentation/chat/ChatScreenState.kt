@@ -1,5 +1,6 @@
 package com.nevratov.matur.presentation.chat
 
+import com.nevratov.matur.domain.entity.Message
 import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.domain.entity.User
 

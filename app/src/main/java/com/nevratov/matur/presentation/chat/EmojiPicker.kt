@@ -1,15 +1,11 @@
 package com.nevratov.matur.presentation.chat
 
 import android.view.LayoutInflater
-import android.view.View
-import android.widget.EditText
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
-import androidx.emoji2.emojipicker.EmojiViewItem
 import com.nevratov.matur.R
 
 

@@ -1,20 +1,15 @@
 package com.nevratov.matur.navigation
 
 import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.google.gson.Gson
-import com.nevratov.matur.domain.entity.User
 
 @Composable
 fun LoginNavGraph(

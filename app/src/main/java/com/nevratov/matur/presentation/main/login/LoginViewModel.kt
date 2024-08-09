@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nevratov.matur.R
+import com.nevratov.matur.domain.entity.LoginData
 import com.nevratov.matur.domain.usecases.LoginUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -14,7 +15,6 @@ class LoginViewModel @Inject constructor(
     val loginUseCase: LoginUseCase,
     val application: Application
 ) : ViewModel() {
-
 
     private val _screenState = MutableStateFlow<LoginScreenState>(LoginScreenState.initialState)
     val screenState = _screenState

@@ -45,9 +45,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
+import com.nevratov.matur.domain.entity.ChatListItem
 import com.nevratov.matur.navigation.NavigationState
 import com.nevratov.matur.presentation.BottomNavigationBar
-import com.nevratov.matur.presentation.chat.Message
+import com.nevratov.matur.domain.entity.Message
 
 @Composable
 fun ChatListScreen(

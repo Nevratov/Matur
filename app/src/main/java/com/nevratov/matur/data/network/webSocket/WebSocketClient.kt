@@ -26,8 +26,6 @@ object WebSocketClient {
         webSocket?.send(message)
     }
 
-
     private const val URL_SERVER = "wss://test.matur.app/websocket/connect"
-
 }
 

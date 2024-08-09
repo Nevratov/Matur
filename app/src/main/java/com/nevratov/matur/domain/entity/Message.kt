@@ -1,4 +1,4 @@
-package com.nevratov.matur.presentation.chat
+package com.nevratov.matur.domain.entity
 
 import android.icu.util.Calendar
 import java.text.SimpleDateFormat
