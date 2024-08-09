@@ -75,19 +75,6 @@ class Mapper @Inject constructor() {
         )
     }
 
-    fun messageToMessageDto(message: Message): MessageDto {
-        return MessageDto(
-            id = message.id,
-            senderId = message.senderId,
-            receiverId = message.receiverId,
-            content = message.content,
-            timestampCreateSec = message.timestamp / 1000,
-            timestampUpdateSec = message.timestamp / 1000,
-            isRead = if (message.isRead) 1 else 0,
-            replyMessage = message.replyMessage?.let { messageToMessageDto(it) }
-        )
-    }
-
     fun messageDtoToMessage(message: MessageDto) : Message {
         return Message(
             id = message.id,

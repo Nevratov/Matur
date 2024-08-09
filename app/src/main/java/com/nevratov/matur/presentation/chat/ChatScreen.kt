@@ -42,12 +42,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -443,7 +443,7 @@ private fun ProfilePanel(
         IconButton(onClick = { onBackPressed() }) {
             Icon(
                 modifier = Modifier.size(30.dp),
-                imageVector = Icons.Filled.KeyboardArrowLeft,
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = "Back",
                 tint = Color.White
             )
@@ -916,7 +916,7 @@ private fun ModificationMessageItem(
         }
 
         is MessageMode.Reply -> {
-            modeIco = Icons.Default.ArrowBack
+            modeIco = Icons.AutoMirrored.Filled.ArrowBack
             modeName = stringResource(id = R.string.reply_message_action)
             modeIcoDescription = stringResource(id = R.string.reply_message_description)
             textMessage = messageMode.message.content

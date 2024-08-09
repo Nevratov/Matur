@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ExploreViewModel @Inject constructor(
-    private val getUsersToExploreUseCase: GetUsersToExploreUseCase,
+    getUsersToExploreUseCase: GetUsersToExploreUseCase,
     private val likeUseCase: LikeUseCase,
     private val dislikeUseCase: DislikeUseCase
 ): ViewModel() {

@@ -1,7 +1,7 @@
 package com.nevratov.matur.presentation.chat
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -32,7 +32,7 @@ sealed class MessageActionItem(
     data class Reply(val onReplyClicked: () -> Unit): MessageActionItem(
         titleResId = R.string.reply_message_action,
         descriptionResId = R.string.reply_message_description,
-        icon = Icons.Default.ArrowBack,
+        icon = Icons.AutoMirrored.Filled.ArrowBack,
         action = onReplyClicked
     )
 }

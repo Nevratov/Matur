@@ -604,7 +604,6 @@ class MaturRepositoryImpl @Inject constructor(
             isOpenedChatScreen = false
         )
 
-        private const val LOGIN_STATUS_SUCCESS = "success"
         private const val USER_KEY = "user_data"
         private const val TOKEN_KEY = "token"
         const val FIREBASE_NAME = "firebase"

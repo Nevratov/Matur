@@ -14,7 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -98,7 +98,7 @@ private fun ShowCities(
     onCitySelected: (City) -> Unit
 ) {
 
-    LazyColumn() {
+    LazyColumn {
         items(items = cities, key = {it.id}) { city->
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -115,7 +115,7 @@ private fun ShowCities(
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
-            Divider(color = Color.Gray.copy(alpha = 0.3f))
+            HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f))
         }
     }
 }

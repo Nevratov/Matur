@@ -32,12 +32,12 @@ import java.time.Duration
 import javax.inject.Inject
 
 class ChatViewModel @Inject constructor(
+    getMessagesByUserIdUseCase: GetMessagesByUserIdUseCase,
+    getUserUseCase: GetUserUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val removeMessageUseCase: RemoveMessageUseCase,
     private val editMessageUseCase: EditMessageUseCase,
-    private val getMessagesByUserIdUseCase: GetMessagesByUserIdUseCase,
     private val loadNextMessagesUseCase: LoadNextMessagesUseCase,
-    private val getUserUseCase: GetUserUseCase,
     private val resetDialogOptionsUseCase: ResetDialogOptionsUseCase,
     private val onlineStatus: OnlineStatusUseCase,
     private val sendTypingStatusUseCase: SendTypingStatusUseCase,
