@@ -43,8 +43,7 @@ import com.nevratov.matur.R
 
 @Composable
 fun LoginScreen (
-    viewModel: LoginViewModel,
-    onCreateAccountClicked:  () -> Unit
+    viewModel: LoginViewModel
 ) {
     val screenState = viewModel.screenState.collectAsState()
 
@@ -71,8 +70,7 @@ fun LoginScreen (
         Spacer(modifier = Modifier.height(22.dp))
         LoginScreenContent(
             screenState = screenState,
-            viewModel = viewModel,
-            onCreateAccountClicked = onCreateAccountClicked
+            viewModel = viewModel
         )
     }
 }
@@ -80,8 +78,7 @@ fun LoginScreen (
 @Composable
 private fun LoginScreenContent(
     screenState: State<LoginScreenState>,
-    viewModel: LoginViewModel,
-    onCreateAccountClicked: () -> Unit
+    viewModel: LoginViewModel
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -90,8 +87,7 @@ private fun LoginScreenContent(
             is LoginScreenState.Content -> {
                 LoginForm(
                     screenState = currentState,
-                    viewModel = viewModel,
-                    onCreateAccountClicked = onCreateAccountClicked
+                    viewModel = viewModel
                 )
             }
             LoginScreenState.Loading -> { ShowProgressBar() }
@@ -102,8 +98,7 @@ private fun LoginScreenContent(
 @Composable
 private fun LoginForm(
     screenState: LoginScreenState.Content,
-    viewModel: LoginViewModel,
-    onCreateAccountClicked: () -> Unit,
+    viewModel: LoginViewModel
 ) {
     var email by rememberSaveable { mutableStateOf(screenState.email) }
     var password by rememberSaveable { mutableStateOf(screenState.password) }

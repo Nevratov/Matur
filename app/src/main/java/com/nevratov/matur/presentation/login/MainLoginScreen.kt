@@ -26,8 +26,7 @@ fun MainLoginScreen(
                 navHostController = navigationState.navHostController,
                 loginScreenContent = {
                     LoginScreen(
-                        viewModel = loginViewModel,
-                        onCreateAccountClicked = { navigationState.navigateTo(Screen.RequestName.route) }
+                        viewModel = loginViewModel
                     )
                 },
             )
