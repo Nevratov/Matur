@@ -405,9 +405,7 @@ class MaturRepositoryImpl @Inject constructor(
     override fun getAuthStateFlow() = authStateFlow
 
     override suspend fun checkAuthState() {
-        Log.d("checkAuthStateEvents", "emited in override fun repo")
         checkAuthStateEvents.emit(Unit)
-        Log.d("checkAuthStateEvents", "emited in override fun repo complete")
     }
 
     override suspend fun login(loginData: LoginData): Boolean {

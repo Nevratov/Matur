@@ -1,7 +1,6 @@
 package com.nevratov.matur.presentation.chat
 
 import android.app.Application
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,10 +24,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.delay
-import java.time.Duration
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class ChatViewModel @Inject constructor(
@@ -62,6 +61,10 @@ class ChatViewModel @Inject constructor(
             )
         }
         .mergeWith(screenStateRefreshFlow)
+        .retry {
+            delay(RETRY_TIMEOUT_MILLIS)
+            true
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
@@ -167,7 +170,7 @@ class ChatViewModel @Inject constructor(
             }
         }
         typingJob = viewModelScope.launch {
-            delay(Duration.ofSeconds(3))
+            delay(TYPING_STATUS_MILLIS)
             sendTypingStatusUseCase(isTyping = false, userId = user.id, dialogUserId = dialogUser.id)
         }
     }
@@ -200,8 +203,12 @@ class ChatViewModel @Inject constructor(
     }
 
     public override fun onCleared() {
-        Log.d("ChatScreen", "onCleared")
         super.onCleared()
         resetDialogOptionsUseCase()
+    }
+
+    companion object {
+        private const val RETRY_TIMEOUT_MILLIS = 1000L
+        private const val TYPING_STATUS_MILLIS = 3000L
     }
 }
