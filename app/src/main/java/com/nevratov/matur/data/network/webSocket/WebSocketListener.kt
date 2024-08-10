@@ -49,7 +49,7 @@ class WebSocketListener (
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
         val json = JsonObject().apply {
-            addProperty("senderId", senderId)
+            addProperty("sender_id", senderId)
         }
         val jsonString = Gson().toJson(json)
 
