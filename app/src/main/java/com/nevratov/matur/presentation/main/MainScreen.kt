@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelProvider
 import com.nevratov.matur.navigation.AppNavGraph
 import com.nevratov.matur.navigation.Screen
 import com.nevratov.matur.navigation.rememberNavigationState
+import com.nevratov.matur.presentation.ViewModelFactory
 import com.nevratov.matur.presentation.chat.ChatScreen
 import com.nevratov.matur.presentation.chat_list.ChatListScreen
 import com.nevratov.matur.presentation.chat_list.ChatListViewModel
@@ -16,7 +18,6 @@ import com.nevratov.matur.presentation.permissions.RequestNotificationPermission
 fun MainScreen(
     chatListViewModel: ChatListViewModel
 ) {
-
     val navigationState = rememberNavigationState()
 
     Box(

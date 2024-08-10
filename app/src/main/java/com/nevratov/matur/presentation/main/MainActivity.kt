@@ -4,24 +4,32 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.ViewModelProvider
 import com.nevratov.matur.domain.entity.AuthState
+import com.nevratov.matur.presentation.ViewModelFactory
 import com.nevratov.matur.presentation.chat_list.ChatListViewModel
 import com.nevratov.matur.presentation.getApplicationComponent
-import com.nevratov.matur.presentation.login.MainLoginScreen
 import com.nevratov.matur.presentation.login.LoginViewModel
+import com.nevratov.matur.presentation.login.MainLoginScreen
 import com.nevratov.matur.ui.theme.MaturTheme
 import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var mainViewModel: MainViewModel
+    lateinit var viewModelFactory: ViewModelFactory
 
-    @Inject
-    lateinit var loginViewModel: LoginViewModel
+    private val chatListViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[ChatListViewModel::class.java]
+    }
 
-    @Inject
-    lateinit var chatListViewModel: ChatListViewModel
+    private val mainViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
+    }
+
+    private val loginViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +60,5 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
 

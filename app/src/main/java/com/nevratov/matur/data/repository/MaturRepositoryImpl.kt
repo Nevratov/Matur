@@ -8,6 +8,7 @@ import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -420,7 +421,9 @@ class MaturRepositoryImpl @Inject constructor(
         emit(downloadedChatList)
 
         chatListRefreshEvents.collect {
+            Log.d("Key bug", "1 step")
             emit(chatList.sortedByDescending { it.message.timestamp })
+            Log.d("Key bug", "2 step")
         }
     }.stateIn(
         scope = coroutineScope,

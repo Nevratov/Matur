@@ -75,6 +75,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -195,7 +198,11 @@ private fun Chat(
     viewModel: ChatViewModel,
     onBackPressed: () -> Unit
 ) {
-    val inputMessage = remember { mutableStateOf(TextFieldValue("")) }
+    val messageField = rememberSaveable(
+        saver = textFieldSaver,
+        init = { mutableStateOf(TextFieldValue("")) }
+    )
+
     var messageMode by remember { mutableStateOf<MessageMode>(MessageMode.Classic) }
     val showEmojiPicker = remember { mutableStateOf(false) }
 
@@ -253,8 +260,8 @@ private fun Chat(
                                 maxWidthItem = maxWidthItem,
                                 screenState = screenState,
                                 onEditClicked = {
-                                    inputMessage.value =
-                                        inputMessage.value.copy(text = message.content)
+                                    messageField.value =
+                                        messageField.value.copy(text = message.content)
                                     messageMode = MessageMode.Edit(message)
                                 },
                                 onRemoveClicked = { viewModel.removeMessage(message) },
@@ -297,27 +304,27 @@ private fun Chat(
         ModificationMessageItem(
             messageMode = messageMode,
             onCloseModification = {
-                inputMessage.value = TextFieldValue("")
+                messageField.value = TextFieldValue("")
                 messageMode = MessageMode.Classic
             }
         )
 
         Typing(
-            messageState = inputMessage,
+            messageFieldState = messageField,
             onValueChanged = { newValue ->
-                inputMessage.value = newValue.copy(text = newValue.text)
+                messageField.value = newValue.copy(text = newValue.text)
                 viewModel.typing()
             },
             onEmojiIcoClicked = { showEmojiPicker.value = !showEmojiPicker.value },
             messageMode = messageMode,
             isBlockedUser = screenState.dialogUser.isBlocked,
             onConfirmClicked = {
-                if (inputMessage.value.text.isBlank()) return@Typing
+                if (messageField.value.text.isBlank()) return@Typing
                 when (val currentMessageMode = messageMode) {
                     is MessageMode.Edit -> {
                         viewModel.editMessage(
                             currentMessageMode.message.copy(
-                                content = inputMessage.value.text,
+                                content = messageField.value.text,
                                 timestampEdited = System.currentTimeMillis()
                             )
                         )
@@ -325,16 +332,16 @@ private fun Chat(
 
                     is MessageMode.Reply -> {
                         viewModel.sendMessage(
-                            textMessage = inputMessage.value.text,
+                            textMessage = messageField.value.text,
                             replyMessage = currentMessageMode.message
                         )
                     }
 
                     MessageMode.Classic -> {
-                        viewModel.sendMessage(textMessage = inputMessage.value.text)
+                        viewModel.sendMessage(textMessage = messageField.value.text)
                     }
                 }
-                inputMessage.value = TextFieldValue("")
+                messageField.value = TextFieldValue("")
                 messageMode = MessageMode.Classic
             }
         )
@@ -342,8 +349,8 @@ private fun Chat(
         ShowEmojiPicker(
             showEmojiPickerState = showEmojiPicker,
             onEmojiClicked = { emoji ->
-                val newMessage = StringBuilder().append(inputMessage.value.text).append(emoji)
-                inputMessage.value = inputMessage.value.copy(
+                val newMessage = StringBuilder().append(messageField.value.text).append(emoji)
+                messageField.value = messageField.value.copy(
                     text = newMessage.toString(),
                     selection = TextRange(newMessage.length)
                 )
@@ -629,14 +636,14 @@ private fun ShowEmojiPicker(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Typing(
-    messageState: MutableState<TextFieldValue>,
+    messageFieldState: MutableState<TextFieldValue>,
     onConfirmClicked: () -> Unit,
     onValueChanged: (TextFieldValue) -> Unit,
     onEmojiIcoClicked: () -> Unit,
     messageMode: MessageMode,
     isBlockedUser: Boolean
 ) {
-    val message = messageState.value
+    val message = messageFieldState.value
 
     Row(
         modifier = Modifier
@@ -1075,3 +1082,7 @@ private fun TypingAnimation() {
 }
 
 private const val FIRST_ELEMENT = 0
+val textFieldSaver: Saver<MutableState<TextFieldValue>, String> = Saver(
+    save = { it.value.text },
+    restore = { mutableStateOf(TextFieldValue(text = it)) }
+)
