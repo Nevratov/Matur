@@ -1,61 +1,49 @@
 package com.nevratov.matur.domain.repoository
 
 import com.nevratov.matur.domain.entity.AuthState
-import com.nevratov.matur.domain.entity.City
-import com.nevratov.matur.domain.entity.OnlineStatus
-import com.nevratov.matur.domain.entity.User
-import com.nevratov.matur.domain.entity.Message
 import com.nevratov.matur.domain.entity.ChatListItem
 import com.nevratov.matur.domain.entity.LoginData
-import com.nevratov.matur.domain.entity.RegUserInfo
+import com.nevratov.matur.domain.entity.Message
+import com.nevratov.matur.domain.entity.OnlineStatus
+import com.nevratov.matur.domain.entity.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface MaturRepository {
 
-    suspend fun checkAuthState()
-
-    fun getAuthStateFlow(): StateFlow<AuthState>
-
-    suspend fun login(loginData: LoginData): Boolean
-
-    suspend fun registration(regUserInfo: RegUserInfo)
-
-    suspend fun getCitiesByName(name: String): List<City>
-
-    suspend fun dislike(dislikedUser: User)
-
-    suspend fun like(likedUser: User)
-
-    fun getUsersToExplore(): StateFlow<User?>
-
-    fun getChatByUserId(id: Int): Flow<List<Message>>
-
-    suspend fun sendMessage(message: Message)
-
     fun getUser(): User
-
-    suspend fun getUserById(id: Int): User
-
-    fun getChatList(): StateFlow<List<ChatListItem>>
-
-    fun onlineStatus(): StateFlow<OnlineStatus>
-
-    suspend fun loadNextMessages(messagesWithId: Int): Boolean
 
     fun resetDialogOptions()
 
     fun createNewFCMToken(newToken: String)
 
-    suspend fun removeMessage(message: Message)
+    fun onlineStatus(): StateFlow<OnlineStatus>
 
-    suspend fun removeDialogById(id: Int)
+    fun getAuthStateFlow(): StateFlow<AuthState>
 
-    suspend fun editMessage(message: Message)
+    fun getChatByUserId(id: Int): Flow<List<Message>>
 
-    suspend fun sendTypingStatus(isTyping: Boolean, userId: Int, dialogUserId: Int)
+    fun getChatList(): StateFlow<List<ChatListItem>>
+
+    suspend fun checkAuthState()
 
     suspend fun blockUserById(id: Int)
 
     suspend fun unblockUserById(id: Int)
+
+    suspend fun removeDialogById(id: Int)
+
+    suspend fun getUserById(id: Int): User
+
+    suspend fun sendMessage(message: Message)
+
+    suspend fun editMessage(message: Message)
+
+    suspend fun removeMessage(message: Message)
+
+    suspend fun login(loginData: LoginData): Boolean
+
+    suspend fun loadNextMessages(messagesWithId: Int): Boolean
+
+    suspend fun sendTypingStatus(isTyping: Boolean, userId: Int, dialogUserId: Int)
 }

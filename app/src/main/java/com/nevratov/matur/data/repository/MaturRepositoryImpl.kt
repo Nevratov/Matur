@@ -8,8 +8,6 @@ import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.net.http.NetworkException
-import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -25,11 +23,9 @@ import com.nevratov.matur.data.network.webSocket.WebSocketListener
 import com.nevratov.matur.di.ApplicationScope
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.domain.entity.ChatListItem
-import com.nevratov.matur.domain.entity.City
 import com.nevratov.matur.domain.entity.LoginData
 import com.nevratov.matur.domain.entity.Message
 import com.nevratov.matur.domain.entity.OnlineStatus
-import com.nevratov.matur.domain.entity.RegUserInfo
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
 import kotlinx.coroutines.CoroutineScope
@@ -38,13 +34,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 @ApplicationScope
 class MaturRepositoryImpl @Inject constructor(
@@ -54,9 +48,7 @@ class MaturRepositoryImpl @Inject constructor(
 ) : MaturRepository {
 
     private val userSharedPreferences = application.getSharedPreferences(USER_KEY, MODE_PRIVATE)
-    private val firebaseSharedPreferences =
-        application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
-
+    private val firebaseSharedPreferences = application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     // AuthState
@@ -90,82 +82,7 @@ class MaturRepositoryImpl @Inject constructor(
         initialValue = AuthState.Initial
     )
 
-    // ExploreUsers
-
-    private val _testListExploreUsers = mutableListOf<User>().apply {
-
-        repeat(19) {
-
-            val url = if (Random.nextBoolean()) {
-                "https://i.pinimg.com/736x/e8/45/14/e84514699a36c54b570359d52b0ef83f.jpg"
-            } else {
-                "https://celes.club/uploads/posts/2021-11/1638298686_53-celes-club-p-malenkii-barashek-zhivotnie-krasivo-foto-58.jpg"
-            }
-
-            add(
-                User(
-                    id = it,
-                    name = "Надя $it",
-                    gender = "",
-                    birthday = "",
-                    wasOnlineTimestamp = 0,
-                    cityId = 1,
-                    aboutMe = "Очень красивая девушка твоей мечты. Шлю $it воздушных поцелуев",
-                    height = 160,
-                    weight = 50,
-                    bodyType = "",
-                    education = "",
-                    job = "",
-                    maritalStatus = "",
-                    children = "",
-                    house = "1",
-                    nationality = "",
-                    languageSkills = "",
-                    religion = "",
-                    religiosityLevel = "",
-                    expectations = "",
-                    drinking = "",
-                    smoking = "",
-                    logoUrl = url,
-                    isBlocked = false
-                )
-            )
-        }
-    }
-    private val testListExploreUsers: List<User>
-        get() = _testListExploreUsers
-
-
-//    private var _exploreUsers = mutableListOf<User>()
-//    private val exploreUsers: List<User>
-//        get() = _exploreUsers
-
-    private val refreshExploreUsersEvents = MutableSharedFlow<Unit>(replay = 1)
-    private val loadedExploreUsers = flow {
-//            val token = getToken()
-//            val usersResponse = apiService.getUsersToExplore(token = token)
-//            val usersDto = usersResponse.listUsers
-//            val users = mapper.listUserDtoToListUser(usersDto)
-//            _exploreUsers.apply {
-//                clear()
-//                addAll(users)
-//            }
-//            emit(exploreUsers)
-        refreshExploreUsersEvents.emit(Unit)
-        refreshExploreUsersEvents.collect {
-//            emit(listOf())
-//            delay(10)
-
-            emit(testListExploreUsers.firstOrNull())
-        }
-    }
-        .stateIn(
-            scope = coroutineScope,
-            started = SharingStarted.Lazily,
-            initialValue = null
-        )
-
-    // ChatList Screen Items
+    // ChatList Screen
 
     private val _chatList = mutableListOf<ChatListItem>()
     private val chatList: List<ChatListItem>
@@ -183,7 +100,6 @@ class MaturRepositoryImpl @Inject constructor(
             )
             remove(chatListItem)
             newChatListItem?.let { add(index = 0, element = it) }
-            Log.d("refreshChatList", _chatList.toString())
         }
         chatListRefreshEvents.emit(Unit)
     }
@@ -238,6 +154,8 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
 
+    // Network connection check
+
     private fun isNetworkConnection(): Boolean {
         val connectivityManager = getSystemService(application, ConnectivityManager::class.java) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork ?: return false
@@ -255,12 +173,10 @@ class MaturRepositoryImpl @Inject constructor(
     private fun firebaseGetInstance() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
             coroutineScope.launch {
                 val token = task.result
-                Log.d("FCM", "task.isSuccessful | token = $token")
                 checkOnNewFCMToken(token)
             }
         })
@@ -268,18 +184,16 @@ class MaturRepositoryImpl @Inject constructor(
 
     private suspend fun checkOnNewFCMToken(newToken: String) {
         val oldToken = firebaseSharedPreferences.getString(FCM_TOKEN_KEY, null)
-        Log.d("FCM", "check token, old token = $oldToken")
         if (oldToken == newToken) return
 
         apiService.createNewFCMToken(
             token = getToken(),
-            newToken = mapper.stringToCreateFCMTokenDto(newToken)
+            newToken = mapper.tokenToCreateFCMTokenDto(newToken)
         )
         firebaseSharedPreferences.edit().apply {
             putString(FCM_TOKEN_KEY, newToken)
             apply()
         }
-        Log.d("FCM", "new Token is REGISTER")
     }
 
 
@@ -371,7 +285,6 @@ class MaturRepositoryImpl @Inject constructor(
             )
 
             notificationManager?.createNotificationChannel(channel)
-
             notificationManager?.notify(NOTIFICATION_ID, notificationBuilder.build())
         }
     }
@@ -420,33 +333,6 @@ class MaturRepositoryImpl @Inject constructor(
         } else {
             return false
         }
-
-    }
-
-    override fun getUsersToExplore() = loadedExploreUsers
-
-    override suspend fun dislike(dislikedUser: User) {
-//        apiService.dislike(
-//            token = getToken(),
-//            dislikedUser = mapper.userToDislikedUserDto(dislikedUser)
-//        )
-//        _exploreUsers.remove(dislikedUser)
-//        refreshExploreUsersEvents.emit(exploreUsers)
-        _testListExploreUsers.remove(dislikedUser)
-        refreshExploreUsersEvents.emit(Unit)
-    }
-
-    override suspend fun like(likedUser: User) {
-//        apiService.like(
-//            token = getToken(),
-//            likedUser = mapper.userToLikedUserDto(likedUser)
-//        )
-//        _exploreUsers.remove(likedUser)
-//        refreshExploreUsersEvents.emit(exploreUsers)
-
-
-        _testListExploreUsers.remove(likedUser)
-        refreshExploreUsersEvents.emit(Unit)
     }
 
     override fun getChatByUserId(id: Int) = flow {
@@ -498,7 +384,6 @@ class MaturRepositoryImpl @Inject constructor(
             message = mapper.messageToCreateMessageDto(message)
         )
 
-        // TODO Catch server error response
         val messageToSend = mapper.messageDtoToWebSocketMessageDto(response.message)
 
         val messageJson = Gson().toJson(messageToSend)
@@ -526,7 +411,6 @@ class MaturRepositoryImpl @Inject constructor(
             _chatMessages[index] = message
             refreshMessagesEvents.emit(Unit)
         }
-
     }
 
     override fun getChatList(): StateFlow<List<ChatListItem>> = flow {
@@ -538,12 +422,7 @@ class MaturRepositoryImpl @Inject constructor(
         chatListRefreshEvents.collect {
             emit(chatList.sortedByDescending { it.message.timestamp })
         }
-    }
-//        .retry {
-//        delay(RETRY_TIMEOUT_MILLIS)
-//        true
-//    }
-    .stateIn(
+    }.stateIn(
         scope = coroutineScope,
         started = SharingStarted.Lazily,
         initialValue = listOf()
@@ -561,14 +440,6 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     override fun onlineStatus(): StateFlow<OnlineStatus> = onlineStatusDialogUserStateFlow
-
-    override suspend fun registration(regUserInfo: RegUserInfo) {
-        apiService.registerUser(mapper.regUserInfoToRegUserInfoDto(regUserInfo))
-    }
-
-    override suspend fun getCitiesByName(name: String): List<City> {
-        return apiService.getCitiesByName(name)
-    }
 
     override fun getUser(): User = getUserOrNull() ?: throw RuntimeException("User == null")
 
@@ -613,7 +484,7 @@ class MaturRepositoryImpl @Inject constructor(
         coroutineScope.launch {
             apiService.createNewFCMToken(
                 token = getToken(),
-                newToken = mapper.stringToCreateFCMTokenDto(newToken)
+                newToken = mapper.tokenToCreateFCMTokenDto(newToken)
             )
         }
     }

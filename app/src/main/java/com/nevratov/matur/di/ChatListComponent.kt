@@ -5,7 +5,7 @@ import com.nevratov.matur.presentation.chat.ChatViewModel
 import dagger.BindsInstance
 import dagger.Subcomponent
 
-@Subcomponent()
+@Subcomponent
 interface ChatListComponent {
 
     fun getViewModel(): ChatViewModel

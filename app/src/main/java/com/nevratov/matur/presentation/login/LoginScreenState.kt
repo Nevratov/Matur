@@ -1,4 +1,4 @@
-package com.nevratov.matur.presentation.main.login
+package com.nevratov.matur.presentation.login
 
 sealed class LoginScreenState {
 

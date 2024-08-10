@@ -16,24 +16,13 @@ import com.nevratov.matur.domain.entity.User
 @Composable
 fun AppNavGraph(
     navHostController: NavHostController,
-    exploreScreenContent: @Composable () -> Unit,
-    matchesScreenContent: @Composable () -> Unit,
     chatListScreenContent: @Composable () -> Unit,
     chatScreenContent: @Composable (User) -> Unit,
-    profileScreenContent: @Composable () -> Unit
 ) {
     NavHost(
         navController = navHostController,
         startDestination = Screen.ChatList.route,
         builder = {
-            composableWithTransition(
-                route = Screen.Explore.route,
-                content = { exploreScreenContent() }
-            )
-            composableWithTransition(
-                route = Screen.Matches.route,
-                content = { matchesScreenContent() }
-            )
             composableWithTransition(
                 route = Screen.ChatList.route,
                 content = { chatListScreenContent() }
@@ -46,10 +35,6 @@ fun AppNavGraph(
                     val dialogUser = Gson().fromJson(dialogUserJson, User::class.java)
                     chatScreenContent(dialogUser)
                 }
-            )
-            composableWithTransition(
-                route = Screen.Profile.route,
-                content = { profileScreenContent() }
             )
         }
     )

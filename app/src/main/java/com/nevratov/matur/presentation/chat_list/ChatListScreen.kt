@@ -46,22 +46,18 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.ChatListItem
-import com.nevratov.matur.navigation.NavigationState
-import com.nevratov.matur.presentation.BottomNavigationBar
 import com.nevratov.matur.domain.entity.Message
 
 @Composable
 fun ChatListScreen(
     viewModel: ChatListViewModel,
-    navigationState: NavigationState,
     onMessageItemClicked: (ChatListItem) -> Unit
 ) {
 
     val screenState = viewModel.state.collectAsState(initial = ChatListScreenState.Initial)
 
     Scaffold(
-        topBar = { TopBar() },
-        bottomBar = { BottomNavigationBar(navigationState = navigationState) }
+        topBar = { TopBar() }
     ) { paddingValues ->
         Box(
             modifier = Modifier

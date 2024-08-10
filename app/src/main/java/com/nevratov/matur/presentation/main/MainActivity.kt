@@ -6,10 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.presentation.chat_list.ChatListViewModel
-import com.nevratov.matur.presentation.explore.ExploreViewModel
 import com.nevratov.matur.presentation.getApplicationComponent
-import com.nevratov.matur.presentation.main.login.LoginViewModel
-import com.nevratov.matur.presentation.main.registration.RegistrationViewModel
+import com.nevratov.matur.presentation.login.MainLoginScreen
+import com.nevratov.matur.presentation.login.LoginViewModel
 import com.nevratov.matur.ui.theme.MaturTheme
 import javax.inject.Inject
 
@@ -20,12 +19,6 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var loginViewModel: LoginViewModel
-
-    @Inject
-    lateinit var registrationViewModel: RegistrationViewModel
-
-    @Inject
-    lateinit var exploreViewModel: ExploreViewModel
 
     @Inject
     lateinit var chatListViewModel: ChatListViewModel
@@ -42,14 +35,12 @@ class MainActivity : ComponentActivity() {
                 when (authState.value) {
                     AuthState.Authorized -> {
                         MainScreen(
-                            exploreViewModel = exploreViewModel,
                             chatListViewModel = chatListViewModel
                         )
                     }
                     AuthState.NotAuthorized -> {
-                        LoginMainScreen(
-                            loginViewModel = loginViewModel,
-                            registrationViewModel = registrationViewModel
+                        MainLoginScreen(
+                            loginViewModel = loginViewModel
                         )
                     }
                     AuthState.NotConnection -> {

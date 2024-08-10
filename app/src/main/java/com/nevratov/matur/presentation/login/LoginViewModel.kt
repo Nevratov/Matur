@@ -1,4 +1,4 @@
-package com.nevratov.matur.presentation.main.login
+package com.nevratov.matur.presentation.login
 
 import android.app.Application
 import android.widget.Toast
@@ -8,9 +8,7 @@ import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.LoginData
 import com.nevratov.matur.domain.usecases.LoginUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

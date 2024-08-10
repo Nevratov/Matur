@@ -14,12 +14,7 @@ import androidx.navigation.compose.composable
 @Composable
 fun LoginNavGraph(
     navHostController: NavHostController,
-    loginScreenContent: @Composable () -> Unit,
-    requestNameScreenContent: @Composable () -> Unit,
-    requestDateScreenContent: @Composable () -> Unit,
-    requestCityScreenContent: @Composable () -> Unit,
-    requestEmailScreenContent: @Composable () -> Unit,
-    registrationSuccessScreenContent: @Composable () -> Unit
+    loginScreenContent: @Composable () -> Unit
 ) {
     NavHost(
         navController = navHostController,
@@ -28,26 +23,6 @@ fun LoginNavGraph(
             composableWithTransition(
                 route = Screen.Login.route,
                 content = { loginScreenContent() }
-            )
-            composableWithTransition(
-                route = Screen.RequestName.route,
-                content = { requestNameScreenContent() }
-            )
-            composableWithTransition(
-                route = Screen.RequestDate.route,
-                content = { requestDateScreenContent() }
-            )
-            composableWithTransition(
-                route = Screen.RequestCity.route,
-                content = { requestCityScreenContent() }
-            )
-            composableWithTransition(
-                route = Screen.RequestEmail.route,
-                content = { requestEmailScreenContent() }
-            )
-            composableWithTransition(
-                route = Screen.RegistrationSuccess.route,
-                content = { registrationSuccessScreenContent() }
             )
         }
     )

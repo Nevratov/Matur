@@ -1,17 +1,13 @@
 package com.nevratov.matur.data
 
-import android.util.Log
 import com.google.gson.Gson
 import com.nevratov.matur.data.model.ChatListItemDto
 import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.CreateNewFCMTokenDto
 import com.nevratov.matur.data.model.RemoveMessageDto
-import com.nevratov.matur.data.model.DislikedUserDto
-import com.nevratov.matur.data.model.LikedUserDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
-import com.nevratov.matur.data.model.RegUserInfoDto
 import com.nevratov.matur.data.model.RemoveDialogDto
 import com.nevratov.matur.data.model.WebSocketMessageDto
 import com.nevratov.matur.data.model.UserDto
@@ -21,8 +17,6 @@ import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.entity.Message
 import com.nevratov.matur.domain.entity.ChatListItem
 import com.nevratov.matur.domain.entity.LoginData
-import com.nevratov.matur.presentation.main.registration.Genders
-import com.nevratov.matur.domain.entity.RegUserInfo
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
@@ -30,12 +24,11 @@ import javax.inject.Inject
 class Mapper @Inject constructor() {
 
     fun userDtoToUser(userDto: UserDto): User {
-        Log.d("User", userDto.toString())
         return User(
             id = userDto.id,
             name = userDto.name,
             logoUrl = userDto.images.firstOrNull()?.sizes?.urlSquare1024,
-            gender = getGenderByNumber(userDto.gender),
+            gender = userDto.gender.toString(),
             birthday = userDto.birthday,
             wasOnlineTimestamp = userDto.wasOnlineTimestampSec * MILLIS_IN_SEC,
             cityId = userDto.cityId,
@@ -56,22 +49,6 @@ class Mapper @Inject constructor() {
             drinking = userDto.drinking.toString(),
             smoking = userDto.smoking.toString(),
             isBlocked = userDto.isBlocked
-        )
-    }
-
-    fun listUserDtoToListUser(listUserDto: List<UserDto>): List<User> {
-        val users = mutableListOf<User>()
-        listUserDto.forEach { users.add(userDtoToUser(it)) }
-        return users
-    }
-
-    fun regUserInfoToRegUserInfoDto(regUserInfo: RegUserInfo): RegUserInfoDto {
-        return RegUserInfoDto(
-            name = regUserInfo.name,
-            gender = getNumberByGender(regUserInfo.gender),
-            email = regUserInfo.email,
-            birthday = getBirthday(regUserInfo.day, regUserInfo.month, regUserInfo.year),
-            cityId = regUserInfo.city?.id.toString()
         )
     }
 
@@ -193,35 +170,14 @@ class Mapper @Inject constructor() {
         )
     }
 
-    fun userToDislikedUserDto(user: User) = DislikedUserDto(userId = user.id)
-
-    fun userToLikedUserDto(user: User) = LikedUserDto(userId = user.id)
-
-
     fun toMessagesOptionsDto(messagesWithUserId: Int, page: Int) = MessagesOptionsDto(
         messagesWithUserId = messagesWithUserId.toString(),
         pageSize = (150 * page).toString(),
         page = "1"
     )
 
-    fun stringToCreateFCMTokenDto(newToken: String) = CreateNewFCMTokenDto(token = newToken)
+    fun tokenToCreateFCMTokenDto(newToken: String) = CreateNewFCMTokenDto(token = newToken)
 
-
-    private fun getBirthday(day: String, month: String, year: String) = "$year-$month-$day"
-
-    private fun getNumberByGender(nameGender: String): String {
-        Genders.entries.forEach {
-            if (it.genderName == nameGender) return it.number
-        }
-        throw RuntimeException("nameGender $nameGender not found in Genders")
-    }
-
-    private fun getGenderByNumber(number: Int): String {
-        Genders.entries.forEach {
-            if (it.number == number.toString()) return it.genderName
-        }
-        throw RuntimeException("number gender $number not found in Genders")
-    }
 
     private companion object {
         private const val MILLIS_IN_SEC = 1000

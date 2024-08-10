@@ -26,12 +26,6 @@ class NavigationState(
             launchSingleTop = true
         }
     }
-
-    fun navigateToRegistrationSuccess(route: String) {
-        navHostController.navigate(route) {
-            popUpTo(0)
-        }
-    }
 }
 
 @OptIn(ExperimentalAnimationApi::class)

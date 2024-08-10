@@ -1,8 +1,7 @@
-package com.nevratov.matur.presentation.main.login
+package com.nevratov.matur.presentation.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -155,15 +154,9 @@ private fun LoginForm(
     Spacer(modifier = Modifier.height(40.dp))
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            modifier = Modifier.clickable { onCreateAccountClicked() },
-            text = "Создать аккаунт",
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.primary,
-        )
         Button(
             onClick = { viewModel.login(email = email, password = password) },
             colors = ButtonDefaults.buttonColors(
