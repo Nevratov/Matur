@@ -4,6 +4,7 @@ import android.app.Application
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.Message
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.usecases.BlockUserByIdUseCase
@@ -19,6 +20,7 @@ import com.nevratov.matur.domain.usecases.SendMessageUseCase
 import com.nevratov.matur.domain.usecases.SendTypingStatusUseCase
 import com.nevratov.matur.domain.usecases.UnblockUserByIdUseCase
 import com.nevratov.matur.extentions.mergeWith
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -71,6 +73,14 @@ class ChatViewModel @Inject constructor(
             initialValue = ChatScreenState.Initial
         )
 
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+        Toast.makeText(
+            application,
+            application.getString(R.string.connection_lost_toast),
+            Toast.LENGTH_LONG
+        ).show()
+    }
     private val user = getUserUseCase()
     private var typingJob: Job? = null
     private var toast: Toast? = null
@@ -87,7 +97,7 @@ class ChatViewModel @Inject constructor(
             isRead = false,
             replyMessage = replyMessage
         )
-        viewModelScope.launch {
+        viewModelScope.launch(context = exceptionHandler) {
             sendMessageUseCase(message)
 
             typingJob?.cancel()
@@ -96,19 +106,19 @@ class ChatViewModel @Inject constructor(
     }
 
     fun removeMessage(message: Message) {
-        viewModelScope.launch {
+        viewModelScope.launch(context = exceptionHandler) {
             removeMessageUseCase(message)
         }
     }
 
     fun editMessage(message: Message) {
-        viewModelScope.launch {
+        viewModelScope.launch(context = exceptionHandler) {
             editMessageUseCase(message)
         }
     }
 
     fun removeDialog() {
-        viewModelScope.launch {
+        viewModelScope.launch(context = exceptionHandler) {
             removeDialogByIdUseCase(id = dialogUser.id)
         }
     }
@@ -116,7 +126,7 @@ class ChatViewModel @Inject constructor(
     fun blockUser() {
         val currentState = chatScreenState.value
         if (currentState !is ChatScreenState.Content) return
-        viewModelScope.launch {
+        viewModelScope.launch(context = exceptionHandler) {
             blockUserByIdUseCase(id = dialogUser.id)
             dialogUser = dialogUser.copy(isBlocked = true)
             val newState = currentState.copy(dialogUser = dialogUser)
@@ -127,7 +137,7 @@ class ChatViewModel @Inject constructor(
     fun unblockUser() {
         val currentState = chatScreenState.value
         if (currentState !is ChatScreenState.Content) return
-        viewModelScope.launch {
+        viewModelScope.launch(context = exceptionHandler) {
             unblockUserByIdUseCase(id = dialogUser.id)
             dialogUser = dialogUser.copy(isBlocked = false)
             val newState = currentState.copy(dialogUser = dialogUser)
@@ -142,7 +152,7 @@ class ChatViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(context = exceptionHandler) {
             screenStateRefreshFlow.emit(currentState.copy(loadNextMessages = true))
             val isNextMessages = loadNextMessagesUseCase(messagesWithId = dialogUser.id)
             when (isNextMessages) {
@@ -165,11 +175,11 @@ class ChatViewModel @Inject constructor(
         if (currentTypingJob != null && currentTypingJob.isActive) {
             typingJob?.cancel()
         } else {
-            viewModelScope.launch {
+            viewModelScope.launch(context = exceptionHandler) {
                 sendTypingStatusUseCase(isTyping = true, userId = user.id, dialogUserId = dialogUser.id)
             }
         }
-        typingJob = viewModelScope.launch {
+        typingJob = viewModelScope.launch(context = exceptionHandler) {
             delay(TYPING_STATUS_MILLIS)
             sendTypingStatusUseCase(isTyping = false, userId = user.id, dialogUserId = dialogUser.id)
         }
@@ -182,7 +192,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun observeOnlineStatus() {
-        viewModelScope.launch {
+        viewModelScope.launch(context = exceptionHandler) {
             onlineStatus().collect { status ->
                 val currentState = chatScreenState.value
                 if (currentState !is ChatScreenState.Content) return@collect
