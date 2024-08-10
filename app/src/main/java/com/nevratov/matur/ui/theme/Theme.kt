@@ -58,7 +58,7 @@ fun MaturTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = getColor(context, R.color.maturAlternativeColor)
+            window.statusBarColor = getColor(context, R.color.maturPrimaryColor)
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
