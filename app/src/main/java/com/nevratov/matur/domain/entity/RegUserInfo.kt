@@ -1,15 +1,13 @@
-package com.nevratov.matur.presentation.main.registration
-
-import com.nevratov.matur.domain.entity.City
+package com.nevratov.matur.domain.entity
 
 data class RegUserInfo(
-    var name: String,
-    var day: String,
-    var month: String,
-    var year: String,
-    var gender: String,
-    var email: String,
-    var city: City?
+    val name: String,
+    val day: String,
+    val month: String,
+    val year: String,
+    val gender: String,
+    val email: String,
+    val city: City?
 ) {
     companion object {
         val initial = RegUserInfo(

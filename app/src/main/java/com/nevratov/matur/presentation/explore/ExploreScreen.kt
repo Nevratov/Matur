@@ -16,15 +16,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -47,7 +47,6 @@ import coil.compose.AsyncImage
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.navigation.NavigationState
 import com.nevratov.matur.presentation.BottomNavigationBar
-import com.nevratov.matur.ui.theme.MaturColorDark
 
 @Composable
 fun ExploreScreen(
@@ -103,18 +102,18 @@ fun ShowPostCard(
     viewModel: ExploreViewModel
 ) {
 
-    val dismissState = rememberDismissState()
+    val dismissState = rememberSwipeToDismissBoxState()
 
-    if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+    if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
         viewModel.like(user)
-    } else if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
+    } else if (dismissState.currentValue == SwipeToDismissBoxValue.StartToEnd) {
         viewModel.dislike(user)
     }
 
-    SwipeToDismiss(
+    SwipeToDismissBox(
         state = dismissState,
-        background = { },
-        dismissContent = {
+        backgroundContent = { },
+        content = {
             ExploreCard(
                 name = user.name,
                 aboutMe = user.aboutMe,
@@ -139,7 +138,7 @@ private fun EmptyContentScreen() {
             textAlign = TextAlign.Center,
             fontSize = 22.sp,
             fontFamily = FontFamily.Cursive,
-            color = MaturColorDark
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -193,12 +192,13 @@ private fun ExploreCard(
         ) {
             ActionButton(
                 ico = Icons.Rounded.Close,
+                colorIco = Color.Red,
                 onClick = { onDislikeClicked() }
             )
             Spacer(modifier = Modifier.width(64.dp))
             ActionButton(
                 ico = Icons.Rounded.Favorite,
-                colorIco = MaturColorDark,
+                colorIco = MaterialTheme.colorScheme.primary,
                 onClick = { onLikeClicked() }
             )
         }

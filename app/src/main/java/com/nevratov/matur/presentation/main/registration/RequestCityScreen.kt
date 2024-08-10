@@ -14,7 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -55,9 +55,17 @@ fun RequestCityScreen(
             contentDescription = stringResource(R.string.logo_matur_description)
         )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Город", fontSize = 26.sp)
+        Text(
+            text = stringResource(R.string.city_label),
+            fontSize = 26.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Начните вводить название вашего города", fontSize = 16.sp)
+        Text(
+            text = stringResource(R.string.input_name_your_city_label),
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Spacer(modifier = Modifier.height(22.dp))
         CityTextField(
             email = city,
@@ -84,14 +92,13 @@ fun RequestCityScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShowCities(
     cities: List<City> = listOf(),
     onCitySelected: (City) -> Unit
 ) {
 
-    LazyColumn() {
+    LazyColumn {
         items(items = cities, key = {it.id}) { city->
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -108,7 +115,7 @@ private fun ShowCities(
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
-            Divider(color = Color.Gray.copy(alpha = 0.3f))
+            HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f))
         }
     }
 }

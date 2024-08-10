@@ -2,7 +2,6 @@ package com.nevratov.matur.domain.entity
 
 import android.icu.util.Calendar
 import android.os.Parcelable
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 import java.util.Date
@@ -34,7 +33,8 @@ data class User(
     val religiosityLevel: String,
     val expectations: String?,
     val drinking: String,
-    val smoking: String
+    val smoking: String,
+    val isBlocked: Boolean
 ) : Parcelable {
 
     private val currentTime: Long

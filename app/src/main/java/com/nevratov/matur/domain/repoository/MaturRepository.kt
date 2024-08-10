@@ -4,20 +4,20 @@ import com.nevratov.matur.domain.entity.AuthState
 import com.nevratov.matur.domain.entity.City
 import com.nevratov.matur.domain.entity.OnlineStatus
 import com.nevratov.matur.domain.entity.User
-import com.nevratov.matur.presentation.chat.Message
-import com.nevratov.matur.presentation.chat_list.ChatListItem
-import com.nevratov.matur.presentation.main.login.LoginData
-import com.nevratov.matur.presentation.main.registration.RegUserInfo
+import com.nevratov.matur.domain.entity.Message
+import com.nevratov.matur.domain.entity.ChatListItem
+import com.nevratov.matur.domain.entity.LoginData
+import com.nevratov.matur.domain.entity.RegUserInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface MaturRepository {
 
-    fun checkAuthState()
+    suspend fun checkAuthState()
 
     fun getAuthStateFlow(): StateFlow<AuthState>
 
-    fun login(loginData: LoginData)
+    suspend fun login(loginData: LoginData): Boolean
 
     suspend fun registration(regUserInfo: RegUserInfo)
 
@@ -46,4 +46,16 @@ interface MaturRepository {
     fun resetDialogOptions()
 
     fun createNewFCMToken(newToken: String)
+
+    suspend fun removeMessage(message: Message)
+
+    suspend fun removeDialogById(id: Int)
+
+    suspend fun editMessage(message: Message)
+
+    suspend fun sendTypingStatus(isTyping: Boolean, userId: Int, dialogUserId: Int)
+
+    suspend fun blockUserById(id: Int)
+
+    suspend fun unblockUserById(id: Int)
 }

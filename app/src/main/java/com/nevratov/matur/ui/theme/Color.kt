@@ -2,20 +2,19 @@ package com.nevratov.matur.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val MaturPrimaryColor = Color(0xFF8771E7)
+val MaturGrayColor = Color(0xFF29292E)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val GrayLightColor_1 = Color(0xFFe6e4f0)
+val GrayLightColor_2 = Color(0xFFd0cfdf)
+val GrayLightColor_3 = Color(0xFFa6a5b5)
+
+val GrayDarkColor_1 = Color(0xFF222227)
+val GrayDarkColor_2 = Color(0xFF1B1B1F)
 
 
-val MaturColorPrimary = Color(0xFFB294F9)
-val MaturColorLight = Color(0xFFBEA6F8)
-val MaturColorDark = Color(0xFF895AF8)
+val PurpleColor_1 = Color(0xFF746bc8)
+val PurpleColor_2 = Color(0xFF4e4796)
 
-val MaturAlternativeColor = Color(0xFF8771E7)
-val VeryLightGray = Color(0xFFe6e4f0)
 
-val Beige = Color(0xFFFAEED4)
+

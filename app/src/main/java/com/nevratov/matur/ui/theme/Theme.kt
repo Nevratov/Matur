@@ -8,7 +8,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat.getColor
@@ -16,23 +15,21 @@ import androidx.core.view.WindowCompat
 import com.nevratov.matur.R
 
 private val DarkColorScheme = darkColorScheme(
-    primary = MaturColorPrimary,
-    secondary = MaturColorLight,
-    tertiary = MaturColorDark,
+    primary = MaturPrimaryColor,
+    tertiary = MaturGrayColor, // background message
 
     onPrimary = Color.White,
-    background = Color.Black,
+    background = MaturGrayColor,
     onBackground = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = MaturColorPrimary,
-    secondary = MaturColorLight,
-    tertiary = MaturColorDark,
+    primary = MaturPrimaryColor,
+    tertiary = GrayLightColor_1, // background message
 
     onPrimary = Color.Black,
     background = Color.White,
-    onBackground = Color.Black
+    onBackground = MaturGrayColor
 
 
 
@@ -61,7 +58,7 @@ fun MaturTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = getColor(context, R.color.maturAlternativeColor)
+            window.statusBarColor = getColor(context, R.color.maturPrimaryColor)
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }

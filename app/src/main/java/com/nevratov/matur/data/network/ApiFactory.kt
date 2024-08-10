@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 object ApiFactory {
 
     private const val URL = "https://test.matur.app/api/"
-    private const val TIMEOUT_SEC = 2L
+    private const val TIMEOUT_SEC = 3L
 
     private val interceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -23,7 +23,6 @@ object ApiFactory {
         .writeTimeout(TIMEOUT_SEC, TimeUnit.SECONDS)
         .build()
 
-
     private val retrofit = Retrofit.Builder()
         .baseUrl(URL)
         .addConverterFactory(GsonConverterFactory.create())
@@ -31,6 +30,4 @@ object ApiFactory {
         .build()
 
     val apiService: ApiService = retrofit.create(ApiService::class.java)
-
-
 }

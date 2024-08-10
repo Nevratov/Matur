@@ -6,5 +6,7 @@ sealed class AuthState {
 
     data object NotAuthorized : AuthState()
 
+    data object NotConnection : AuthState()
+
     data object Initial : AuthState()
 }

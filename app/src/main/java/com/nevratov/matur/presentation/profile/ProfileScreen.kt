@@ -1,5 +1,6 @@
 package com.nevratov.matur.presentation.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,13 +16,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.nevratov.matur.R
 import com.nevratov.matur.navigation.NavigationState
 import com.nevratov.matur.presentation.BottomNavigationBar
-import com.nevratov.matur.ui.theme.MaturAlternativeColor
 
 @Composable
 fun ProfileScreen(
@@ -32,7 +33,10 @@ fun ProfileScreen(
         bottomBar = { BottomNavigationBar(navigationState = navigationState) }
     )  { paddingValues ->
         Box(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues)
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -40,7 +44,10 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center
             ) {
 
-                Text(text = "Тут пока нихуя нет")
+                Text(
+                    text = "Разработчик трудится над контентом...",
+                    color = MaterialTheme.colorScheme.onBackground
+                )
                 CircularProgressIndicator()
             }
         }
@@ -60,8 +67,8 @@ private fun TopBar() {
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaturAlternativeColor,
-            titleContentColor = MaterialTheme.colorScheme.background
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = Color.White
         )
     )
 }

@@ -73,9 +73,17 @@ fun RequestDateScreen(
             contentDescription = stringResource(R.string.logo_matur_description)
         )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Общие сведения", fontSize = 26.sp)
+        Text(
+            text = stringResource(R.string.general_information_label),
+            fontSize = 26.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Укажите свою дату рождения и пол", fontSize = 16.sp)
+        Text(
+            text = stringResource(R.string.input_date_and_gender_label),
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Spacer(modifier = Modifier.height(22.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -130,7 +138,10 @@ fun RequestDateScreen(
                     viewModel.setBirthdayAndGender(day, month, year, gender)
                     onNextClicked()
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White
+                )
             ) {
                 Text(text = stringResource(R.string.next_label))
             }

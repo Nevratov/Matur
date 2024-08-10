@@ -1,11 +1,11 @@
 package com.nevratov.matur.presentation.chat_list
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -26,7 +24,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -41,18 +38,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
+import com.nevratov.matur.domain.entity.ChatListItem
 import com.nevratov.matur.navigation.NavigationState
 import com.nevratov.matur.presentation.BottomNavigationBar
-import com.nevratov.matur.presentation.chat.Message
-import com.nevratov.matur.ui.theme.MaturAlternativeColor
-import com.nevratov.matur.ui.theme.VeryLightGray
+import com.nevratov.matur.domain.entity.Message
 
 @Composable
 fun ChatListScreen(
@@ -68,7 +64,10 @@ fun ChatListScreen(
         bottomBar = { BottomNavigationBar(navigationState = navigationState) }
     ) { paddingValues ->
         Box(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues)
         ) {
             ChatListContent(
                 state = screenState,
@@ -120,7 +119,7 @@ private fun ChatList(
 
     Column {
         LazyColumn(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(9.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items = chatList, key = { it.user.id }) { chatListItem ->
@@ -148,8 +147,8 @@ private fun TopBar() {
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaturAlternativeColor,
-            titleContentColor = MaterialTheme.colorScheme.background
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = Color.White //todo
         )
     )
 }
@@ -181,6 +180,7 @@ fun MessageItem(
         Column(modifier = Modifier.weight(0.9f)) {
             Text(
                 text = chatListItem.user.name,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -198,7 +198,14 @@ fun MessageItem(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.Top
         ) {
-            MessageTimeAndIsRead(message = chatListItem.message, userId = userId)
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                MessageTimeAndIsRead(message = chatListItem.message, userId = userId)
+
+                NewMessageIco(message = chatListItem.message, userId = userId)
+            }
         }
     }
 }
@@ -222,20 +229,44 @@ private fun MessageTimeAndIsRead(
     userId: Int
 ) {
     val icoId = if (message.isRead) R.drawable.check_mark_double else R.drawable.check_mark
-    if (userId == message.senderId) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (userId == message.senderId) {
             Icon(
                 modifier = Modifier
                     .size(22.dp)
                     .padding(end = 4.dp),
                 painter = painterResource(id = icoId),
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.Gray
             )
+        }
+        Text(
+            text = message.time,
+            fontSize = 11.sp,
+            color = Color.Gray,
+            style = TextStyle.Default
+        )
+    }
+}
 
-            Text(
-                text = message.time,
-                fontSize = 11.sp,
-                color = Color.Gray
+@Composable
+private fun ColumnScope.NewMessageIco(
+    message: Message,
+    userId: Int
+) {
+    if (!message.isRead && message.senderId != userId) {
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(18.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary),
             )
         }
     }

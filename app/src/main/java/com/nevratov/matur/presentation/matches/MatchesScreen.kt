@@ -35,7 +35,6 @@ import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.navigation.NavigationState
 import com.nevratov.matur.presentation.BottomNavigationBar
-import com.nevratov.matur.ui.theme.MaturAlternativeColor
 
 @Composable
 fun MatchesScreen(
@@ -71,7 +70,8 @@ fun MatchesScreen(
                     religiosityLevel = "",
                     expectations = "",
                     drinking = "",
-                    smoking = ""
+                    smoking = "",
+                    isBlocked = false
                 )
             )
         }
@@ -82,7 +82,10 @@ fun MatchesScreen(
         bottomBar = { BottomNavigationBar(navigationState = navigationState) }
     ) { paddingValues ->
         Box(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues)
         ) {
             MatchesContent(
                 items = testListMessageItems,
@@ -100,12 +103,13 @@ private fun MatchesContent(
     LazyVerticalGrid(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
 
     ) {
+        items(2) { /*top padding with correct scroll*/  }
         items(items = items, key = { it.id }) {
             MatchesItem(
                 user = it,
@@ -123,7 +127,6 @@ private fun MatchesItem(
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .background(Color.White)
             .size(width = 200.dp, height = 320.dp)
             .clickable { onItemClicked(user) }
             .padding(bottom = 32.dp),
@@ -141,7 +144,8 @@ private fun MatchesItem(
         Text(
             text = user.name,
             fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }
@@ -158,8 +162,8 @@ private fun TopBar() {
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaturAlternativeColor,
-            titleContentColor = MaterialTheme.colorScheme.background
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = Color.White
         )
     )
 }

@@ -3,6 +3,7 @@ package com.nevratov.matur.presentation.main.registration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nevratov.matur.domain.entity.City
+import com.nevratov.matur.domain.entity.RegUserInfo
 import com.nevratov.matur.domain.usecases.GetCitiesByNameUseCase
 import com.nevratov.matur.domain.usecases.RegistrationUseCase
 import com.nevratov.matur.presentation.main.registration.RegistrationState.Initial
@@ -17,28 +18,40 @@ class RegistrationViewModel @Inject constructor(
     val registrationUseCase: RegistrationUseCase
 ): ViewModel() {
 
-    private val userInfo = RegUserInfo.initial
+    private var userInfo = RegUserInfo.initial
 
     private var _regState = MutableStateFlow<RegistrationState>(Initial)
     val regState: StateFlow<RegistrationState> = _regState
 
+    private fun registration() {
+        viewModelScope.launch {
+            registrationUseCase(userInfo)
+        }
+    }
+
     fun setName(name: String) {
-        userInfo.name = name
+        userInfo = userInfo.copy(name = name)
     }
 
     fun setBirthdayAndGender(day: String, month: String, year: String, gender: String) {
-        userInfo.day = String.format(Locale.getDefault(),"%02d", day.toInt())
-        userInfo.month = getMonthNumber(month)
-        userInfo.year = year
-        userInfo.gender = gender
+        userInfo = userInfo.copy(
+            day = String.format(Locale.getDefault(),"%02d", day.toInt()),
+            month = getMonthNumber(month),
+            year = year,
+            gender = gender
+        )
     }
 
     fun setEmail(email: String) {
-        userInfo.email = email
+        userInfo = userInfo.copy(email = email)
         registration()
     }
 
-    
+
+    fun setCity(city: City) {
+        userInfo = userInfo.copy(city = city)
+    }
+
     fun getCitiesByName(name: String) {
         viewModelScope.launch {
             val cities = getCitiesByNameUseCase(name)
@@ -46,21 +59,10 @@ class RegistrationViewModel @Inject constructor(
         }
     }
 
-    fun setCity(city: City) {
-        userInfo.city = city
-    }
-
     private fun getMonthNumber(month: String): String {
         Months.entries.forEach {
             if (it.monthName == month) return it.number
         }
         throw RuntimeException("nameMonth $month not found in Months")
-    }
-
-
-    private fun registration() {
-        viewModelScope.launch {
-            registrationUseCase(userInfo)
-        }
     }
 }

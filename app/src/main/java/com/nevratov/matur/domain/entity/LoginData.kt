@@ -1,4 +1,4 @@
-package com.nevratov.matur.presentation.main.login
+package com.nevratov.matur.domain.entity
 
 data class LoginData(
     val email: String,

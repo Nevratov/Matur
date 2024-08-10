@@ -6,6 +6,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.http.NetworkException
 import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
@@ -16,25 +19,26 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.nevratov.matur.R
 import com.nevratov.matur.data.Mapper
-import com.nevratov.matur.data.network.ApiFactory
+import com.nevratov.matur.data.network.ApiService
 import com.nevratov.matur.data.network.webSocket.WebSocketClient
 import com.nevratov.matur.data.network.webSocket.WebSocketListener
 import com.nevratov.matur.di.ApplicationScope
 import com.nevratov.matur.domain.entity.AuthState
+import com.nevratov.matur.domain.entity.ChatListItem
 import com.nevratov.matur.domain.entity.City
+import com.nevratov.matur.domain.entity.LoginData
+import com.nevratov.matur.domain.entity.Message
 import com.nevratov.matur.domain.entity.OnlineStatus
+import com.nevratov.matur.domain.entity.RegUserInfo
 import com.nevratov.matur.domain.entity.User
 import com.nevratov.matur.domain.repoository.MaturRepository
-import com.nevratov.matur.presentation.chat.Message
-import com.nevratov.matur.presentation.chat_list.ChatListItem
-import com.nevratov.matur.presentation.main.login.LoginData
-import com.nevratov.matur.presentation.main.registration.RegUserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
@@ -44,13 +48,14 @@ import kotlin.random.Random
 
 @ApplicationScope
 class MaturRepositoryImpl @Inject constructor(
+    private val apiService: ApiService,
+    private val mapper: Mapper,
     private val application: Application
 ) : MaturRepository {
-    private val apiService = ApiFactory.apiService
-    private val mapper = Mapper()
 
     private val userSharedPreferences = application.getSharedPreferences(USER_KEY, MODE_PRIVATE)
-    private val firebaseSharedPreferences = application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
+    private val firebaseSharedPreferences =
+        application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -60,14 +65,18 @@ class MaturRepositoryImpl @Inject constructor(
     private val authStateFlow = flow {
         checkAuthStateEvents.emit(Unit)
         checkAuthStateEvents.collect {
+            if (!isNetworkConnection()) {
+                emit(AuthState.NotConnection)
+                throw RuntimeException("There is no internet connection")
+            }
+
             val user = getUserOrNull()
             val isLoggedIn = user != null
             if (isLoggedIn) {
                 connectToWS()
                 getOnlineUsersId()
-                emit(AuthState.Authorized)
-                //Test FCM
                 firebaseGetInstance()
+                emit(AuthState.Authorized)
             } else {
                 emit(AuthState.NotAuthorized)
             }
@@ -117,7 +126,8 @@ class MaturRepositoryImpl @Inject constructor(
                     expectations = "",
                     drinking = "",
                     smoking = "",
-                    logoUrl = url
+                    logoUrl = url,
+                    isBlocked = false
                 )
             )
         }
@@ -172,7 +182,8 @@ class MaturRepositoryImpl @Inject constructor(
                 message = newMessage,
             )
             remove(chatListItem)
-            newChatListItem?.let { add(it) }
+            newChatListItem?.let { add(index = 0, element = it) }
+            Log.d("refreshChatList", _chatList.toString())
         }
         chatListRefreshEvents.emit(Unit)
     }
@@ -195,7 +206,6 @@ class MaturRepositoryImpl @Inject constructor(
 
     private val onlineStatusDialogUserStateFlow = flow {
         onlineStatusRefreshFlow.collect { newStatus ->
-            Log.d("chatScreenState", "collect")
             _onlineUsers[newStatus.userId] = newStatus.isOnline
             if (newStatus.userId == dialogUserId) {
                 emit(newStatus)
@@ -228,6 +238,18 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
 
+    private fun isNetworkConnection(): Boolean {
+        val connectivityManager = getSystemService(application, ConnectivityManager::class.java) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+        return when {
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            else -> false
+        }
+    }
+
     // Firebase Cloud Messaging
 
     private fun firebaseGetInstance() {
@@ -249,7 +271,10 @@ class MaturRepositoryImpl @Inject constructor(
         Log.d("FCM", "check token, old token = $oldToken")
         if (oldToken == newToken) return
 
-        apiService.createNewFCMToken(token = getToken(), newToken = mapper.stringToCreateFCMTokenDto(newToken))
+        apiService.createNewFCMToken(
+            token = getToken(),
+            newToken = mapper.stringToCreateFCMTokenDto(newToken)
+        )
         firebaseSharedPreferences.edit().apply {
             putString(FCM_TOKEN_KEY, newToken)
             apply()
@@ -263,6 +288,11 @@ class MaturRepositoryImpl @Inject constructor(
     private val webSocketClient = WebSocketClient
 
     private suspend fun connectToWS() {
+        //todo
+        webSocketClient.disconnect()
+        _chatList.clear()
+        _chatMessages.clear()
+
         webSocketClient.connect(
             listener = WebSocketListener(
                 onMessageReceived = { message ->
@@ -270,7 +300,6 @@ class MaturRepositoryImpl @Inject constructor(
                     if (dialogUserId != message.senderId) sendNotificationNewMessage(message)
                 },
                 onStatusReceived = { status ->
-                    Log.d("chatScreenState", "recived: $status")
                     coroutineScope.launch {
                         onlineStatusRefreshFlow.emit(status)
                     }
@@ -298,8 +327,16 @@ class MaturRepositoryImpl @Inject constructor(
             if (dialogUserId == message.senderId) {
                 _chatMessages.add(index = 0, element = message)
                 refreshMessagesEvents.emit(Unit)
+
+                val readMessage = mapper.readMessageToWebSocketMessageDto(
+                    userId = message.receiverId,
+                    dialogUserId = message.senderId
+                )
+                val readMessageJson = Gson().toJson(readMessage)
+                webSocketClient.send(readMessageJson)
+            } else {
+                refreshChatList(message)
             }
-            refreshChatList(message)
         }
     }
 
@@ -348,7 +385,9 @@ class MaturRepositoryImpl @Inject constructor(
             putString(TOKEN_KEY, token)
             apply()
         }
-        checkAuthState()
+        coroutineScope.launch {
+            checkAuthState()
+        }
     }
 
     private fun getUserOrNull(): User? {
@@ -365,20 +404,23 @@ class MaturRepositoryImpl @Inject constructor(
 
     override fun getAuthStateFlow() = authStateFlow
 
-    override fun checkAuthState() {
-        coroutineScope.launch {
-            checkAuthStateEvents.emit(Unit)
-        }
+    override suspend fun checkAuthState() {
+        checkAuthStateEvents.emit(Unit)
     }
 
-    override fun login(loginData: LoginData) {
-        coroutineScope.launch {
-            val loginResponse = apiService.login(mapper.loginDataToLoginDataDto(loginData))
-            if (!loginResponse.isSuccessful) return@launch
-            val userDto = loginResponse.body()?.user ?: throw RuntimeException("user is null")
-            val token = loginResponse.body()?.token ?: throw RuntimeException("token is null")
+    override suspend fun login(loginData: LoginData): Boolean {
+        val loginResponse = apiService.login(mapper.loginDataToLoginDataDto(loginData))
+
+        if (loginResponse.isSuccessful) {
+            val response = loginResponse.body() ?: throw RuntimeException("response == null")
+            val userDto = response.user
+            val token = response.token
             saveUserAndToken(user = mapper.userDtoToUser(userDto), token = token)
+            return true
+        } else {
+            return false
         }
+
     }
 
     override fun getUsersToExplore() = loadedExploreUsers
@@ -419,6 +461,8 @@ class MaturRepositoryImpl @Inject constructor(
         onlineStatusRefreshFlow.emit(onlineStatus)
 
         loadNextMessages(messagesWithId = id)
+        refreshChatList(newMessage = chatMessages.first())
+
         refreshMessagesEvents.collect {
             emit(chatMessages)
         }
@@ -455,7 +499,7 @@ class MaturRepositoryImpl @Inject constructor(
         )
 
         // TODO Catch server error response
-        val messageToSend = mapper.messageDtoToSendMessageWSDto(response.message)
+        val messageToSend = mapper.messageDtoToWebSocketMessageDto(response.message)
 
         val messageJson = Gson().toJson(messageToSend)
         webSocketClient.send(messageJson)
@@ -467,6 +511,24 @@ class MaturRepositoryImpl @Inject constructor(
         refreshChatList(messageWithId)
     }
 
+    override suspend fun removeMessage(message: Message) {
+        apiService.removeMessage(
+            token = getToken(),
+            deleteMessage = mapper.messageIdToDeleteMessageDto(id = message.id)
+        )
+        _chatMessages.remove(message)
+        refreshMessagesEvents.emit(Unit)
+    }
+
+    override suspend fun editMessage(message: Message) {
+        val index = chatMessages.indexOfFirst { it.id == message.id }
+        if (index != -1) {
+            _chatMessages[index] = message
+            refreshMessagesEvents.emit(Unit)
+        }
+
+    }
+
     override fun getChatList(): StateFlow<List<ChatListItem>> = flow {
         val chatListDto = apiService.getChatList(token = getToken()).chatList
         val downloadedChatList = mapper.chatListDtoToChatList(chatListDto)
@@ -476,14 +538,27 @@ class MaturRepositoryImpl @Inject constructor(
         chatListRefreshEvents.collect {
             emit(chatList.sortedByDescending { it.message.timestamp })
         }
-    }.retry {
-        delay(RETRY_TIMEOUT_MILLIS)
-        true
-    }.stateIn(
+    }
+//        .retry {
+//        delay(RETRY_TIMEOUT_MILLIS)
+//        true
+//    }
+    .stateIn(
         scope = coroutineScope,
         started = SharingStarted.Lazily,
         initialValue = listOf()
     )
+
+    override suspend fun sendTypingStatus(isTyping: Boolean, userId: Int, dialogUserId: Int) {
+        val typingToSend = mapper.typingToWebSocketMessageDto(
+            isTyping = isTyping,
+            userId = userId,
+            dialogUserId = dialogUserId
+        )
+
+        val typingJson = Gson().toJson(typingToSend)
+        webSocketClient.send(typingJson)
+    }
 
     override fun onlineStatus(): StateFlow<OnlineStatus> = onlineStatusDialogUserStateFlow
 
@@ -507,6 +582,33 @@ class MaturRepositoryImpl @Inject constructor(
         dialogUserId = null
     }
 
+    override suspend fun removeDialogById(id: Int) {
+        apiService.removeDialogByUserId(
+            token = getToken(),
+            removeDialog = mapper.idToRemoveDialogDto(id)
+        )
+    }
+
+    override suspend fun blockUserById(id: Int) {
+        apiService.blockUserById(token = getToken(), id = id)
+        val chatItem =
+            chatList.find { it.user.id == id } ?: throw RuntimeException("chatItem == null")
+        val newItem = chatItem.copy(user = chatItem.user.copy(isBlocked = true))
+        _chatList.remove(chatItem)
+        _chatList.add(newItem)
+        chatListRefreshEvents.emit(Unit)
+    }
+
+    override suspend fun unblockUserById(id: Int) {
+        apiService.unblockUserById(token = getToken(), id = id)
+        val chatItem =
+            chatList.find { it.user.id == id } ?: throw RuntimeException("chatItem == null")
+        val newItem = chatItem.copy(user = chatItem.user.copy(isBlocked = false))
+        _chatList.remove(chatItem)
+        _chatList.add(newItem)
+        chatListRefreshEvents.emit(Unit)
+    }
+
     override fun createNewFCMToken(newToken: String) {
         coroutineScope.launch {
             apiService.createNewFCMToken(
@@ -517,7 +619,7 @@ class MaturRepositoryImpl @Inject constructor(
     }
 
     companion object {
-        private val EMPTY_ONLINE_STATUS =  OnlineStatus(
+        private val EMPTY_ONLINE_STATUS = OnlineStatus(
             userId = 0,
             isOnline = false,
             isTyping = false,
