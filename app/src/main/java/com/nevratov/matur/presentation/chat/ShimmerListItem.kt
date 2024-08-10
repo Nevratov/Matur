@@ -38,9 +38,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.nevratov.matur.R
 import kotlin.random.Random
 
 @Composable
@@ -123,7 +125,7 @@ private fun ShimmerProfilePanel() {
             ) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
-                    contentDescription = "Больше действий",
+                    contentDescription = stringResource(id = R.string.more_actions_button),
                     tint = Color.White
                 )
             }

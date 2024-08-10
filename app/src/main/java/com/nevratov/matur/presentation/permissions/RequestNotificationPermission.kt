@@ -22,8 +22,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.content.ContextCompat
+import com.nevratov.matur.R
 
 @Composable
 fun RequestNotificationPermission() {
@@ -79,19 +81,19 @@ private fun ShowAlertDialogRequestNotificationPermission(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                text = "Отправка уведомлений"
+                text = stringResource(R.string.notification_permission_title)
             )
         },
         text = {
             Text(
-                text = "Чтобы получать уведомления о новых сообщениях, разрешите отправку уведомлений в настройках вашего телефона"
+                text = stringResource(R.string.notification_permission_description)
             )
         },
         onDismissRequest = {
             onDismissRequest()
             Toast.makeText(
                 context,
-                "Разрешение не предоставлено",
+                context.getString(R.string.notification_permission_not_allowed_toast),
                 Toast.LENGTH_SHORT
             ).show()
         },
@@ -105,7 +107,7 @@ private fun ShowAlertDialogRequestNotificationPermission(
                     )
                     context.startActivity(intent)
                 },
-                text = "Разрешить"
+                text = stringResource(R.string.notification_permission_confirm_button)
             )
         }
     )

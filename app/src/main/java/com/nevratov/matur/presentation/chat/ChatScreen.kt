@@ -6,7 +6,6 @@ import android.os.Vibrator
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -400,7 +399,13 @@ private fun BackgroundDismissIco(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .offset { IntOffset(x = offset.toPx().toInt(), y = 0) },
+            .offset {
+                IntOffset(
+                    x = offset
+                        .toPx()
+                        .toInt(), y = 0
+                )
+            },
         contentAlignment = Alignment.CenterEnd
     ) {
         Box(
@@ -484,9 +489,9 @@ private fun ProfilePanel(
                 ) {
 
                     val (color, textStatus) = if (status.isTyping) {
-                        Pair(Color.Gray, "печатает")
+                        Pair(Color.Gray, stringResource(R.string.typing_status))
                     } else if (status.isOnline) {
-                        Pair(Color.Green, "online")
+                        Pair(Color.Green, stringResource(R.string.online_status))
                     } else {
                         Pair(Color.Red, screenState.dialogUser.wasOnlineText)
                     }
@@ -532,7 +537,7 @@ private fun ProfilePanelActions(
     ) {
         Icon(
             imageVector = Icons.Default.MoreVert,
-            contentDescription = "Больше действий",
+            contentDescription = stringResource(R.string.more_actions_button),
             tint = Color.White
         )
     }
@@ -549,7 +554,7 @@ private fun ProfilePanelActions(
                         is ProfileAction.Notification -> {
                             Toast.makeText(
                                 context,
-                                "Ожиадем реализацию сервера...",
+                                context.getString(R.string.waiting_server_implementation_toast),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -557,7 +562,7 @@ private fun ProfilePanelActions(
                         is ProfileAction.Search -> {
                             Toast.makeText(
                                 context,
-                                "Ожиадем реализацию сервера...",
+                                context.getString(R.string.waiting_server_implementation_toast),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -583,21 +588,21 @@ private fun ProfilePanelActions(
     }
     if (isShowWarningRemoveDialog) {
         AlertDialog(
-            title = { Text(text = "Удаление диалога") },
+            title = { Text(text = stringResource(R.string.remove_dialog_alert_title)) },
             text = {
-                Text(text = "Все сообщения будут безвозвратно удалены. Вы уверены что хотите удалить этот диалог?")
+                Text(text = stringResource(R.string.remove_dealog_alert_description))
             },
             onDismissRequest = { isShowWarningRemoveDialog = false },
             confirmButton = {
                 Text(
                     modifier = Modifier.clickable { viewModel.removeDialog() },
-                    text = "Удалить"
+                    text = stringResource(R.string.remove_confirm_button)
                 )
             },
             dismissButton = {
                 Text(
                     modifier = Modifier.clickable { isShowWarningRemoveDialog = false },
-                    text = "Отмена"
+                    text = stringResource(R.string.remove_cancellation_button)
                 )
             }
         )
@@ -970,7 +975,7 @@ private fun ModificationMessageItem(
                 Icon(
                     modifier = Modifier.size(22.dp),
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Отменить",
+                    contentDescription = stringResource(R.string.modification_message_cancellation_button),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -1032,7 +1037,7 @@ private fun TimeIsReadIsEdited(
     ) {
         if (message.timestamp != message.timestampEdited) {
             Text(
-                text = "изменено",
+                text = stringResource(R.string.message_changed),
                 fontSize = 10.sp,
                 color = timeColor,
                 style = TextStyle.Default

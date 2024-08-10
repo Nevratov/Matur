@@ -187,7 +187,8 @@ class ChatViewModel @Inject constructor(
 
     fun showToast() {
         toast?.cancel()
-        toast = Toast.makeText(application, "Вы достигли конца диалога", Toast.LENGTH_LONG)
+        toast = Toast.makeText(application,
+            application.getString(R.string.end_dialog_toast), Toast.LENGTH_LONG)
         toast?.show()
     }
 

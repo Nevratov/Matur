@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -17,16 +16,15 @@ class MaturFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-
-        if (message.data.isNotEmpty()) {
-            log("Message data payload: ${message.data}")
-        }
-
         message.notification?.let {
             it.body?.let { body ->
                 sendNotification(body)
             }
         }
+    }
+
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
     }
 
     private fun sendNotification(messageBody: String) {
@@ -61,13 +59,8 @@ class MaturFirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
         private const val CHANEL_ID = "20"
-        private const val CONTENT_TITLE = "Сообщение"
+        private const val CONTENT_TITLE = "Message"
         private const val CHANEL_NAME = "received_messages"
         private const val NOTIFICATION_ID = 22
-
-    }
-
-    private fun log(message: String) {
-        Log.d("FCM", message)
     }
 }
