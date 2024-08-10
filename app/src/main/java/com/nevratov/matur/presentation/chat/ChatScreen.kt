@@ -6,6 +6,7 @@ import android.os.Vibrator
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -101,6 +102,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -398,7 +400,7 @@ private fun BackgroundDismissIco(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .offset(x = offset),
+            .offset { IntOffset(x = offset.toPx().toInt(), y = 0) },
         contentAlignment = Alignment.CenterEnd
     ) {
         Box(

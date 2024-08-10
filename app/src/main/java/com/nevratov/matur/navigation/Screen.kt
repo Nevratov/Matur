@@ -22,7 +22,6 @@ sealed class Screen(val route: String) {
         const val KEY_DIALOG_USER = "dialog_user"
 
         private const val LOGIN_ROUTE = "login"
-        private const val REQUEST_NAME_ROUTE = "request_name"
         private const val CHAT_LIST_ROUTE = "chat_list"
         private const val CHAT_ROUTE = "chat/{$KEY_DIALOG_USER}"
     }

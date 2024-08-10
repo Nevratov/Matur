@@ -13,7 +13,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.nevratov.matur.R
 import com.nevratov.matur.presentation.main.MainActivity
 
-class MaturFirebaseMessagingService () : FirebaseMessagingService() {
+class MaturFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
@@ -27,10 +27,6 @@ class MaturFirebaseMessagingService () : FirebaseMessagingService() {
                 sendNotification(body)
             }
         }
-    }
-
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
     }
 
     private fun sendNotification(messageBody: String) {

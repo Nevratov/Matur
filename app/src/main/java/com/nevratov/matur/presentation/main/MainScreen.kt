@@ -28,7 +28,7 @@ fun MainScreen(
                 ChatListScreen(
                     viewModel = chatListViewModel,
                     onMessageItemClicked = {
-                        navigationState.navigateToChat(Screen.Chat.getRouteWithArgs(it.user))
+                        navigationState.navigateTo(Screen.Chat.getRouteWithArgs(it.user))
                     })
             },
             chatScreenContent = {

@@ -7,7 +7,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.nevratov.matur.navigation.LoginNavGraph
-import com.nevratov.matur.navigation.Screen
 import com.nevratov.matur.navigation.rememberNavigationState
 
 @Composable

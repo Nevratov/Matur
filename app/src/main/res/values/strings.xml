@@ -1,27 +1,9 @@
 <resources>
     <string name="app_name">Matur</string>
-    <string name="to_register_label">Зарегистрироваться</string>
-    <string name="email_label">Email</string>
-    <string name="family_label">Фамилия</string>
-    <string name="name_label">Имя</string>
-    <string name="next_label">Далее</string>
     <string name="logo_matur_description">logo Matur</string>
-    <string name="day_label">День</string>
-    <string name="month_label">Месяц</string>
-    <string name="year_label">Год</string>
-    <string name="gender_label">Пол</string>
     <string name="messages_label">Сообщения</string>
-    <string name="Matches_label">Совпадения</string>
     <string name="login_button">Войти</string>
     <string name="login_label">Вход</string>
-    <string name="explore_navigation_item">Поиск</string>
-    <string name="matches_navigation_item">Совпадения</string>
-    <string name="chat_navigation_item">Чат</string>
-    <string name="profile_navigation_item">Профиль</string>
-    <string name="explore_ico_description">Иконка поиска пары</string>
-    <string name="matches_description_ico">Иконка совпадений</string>
-    <string name="chat_description_ico">Иконка чата</string>
-    <string name="profile_description_ico">Иконка профиля</string>
     <string name="message_placeholder_chat">Сообщение</string>
     <string name="is_blocked_placeholder_chat">Диалог заблокирован</string>
     <string name="edit_message_action">Изменить</string>
@@ -39,35 +21,8 @@
     <string name="password_label">Пароль</string>
     <string name="password_visibility_description">Видимость пароля</string>
     <string name="input_data_login_label">Введите данные для входа в приложение</string>
-    <string name="create_account_label">Создать аккаунт</string>
-    <string name="input_your_name_label">Введите своё имя</string>
-    <string name="general_information_label">Общие сведения</string>
-    <string name="input_date_and_gender_label">Укажите свою дату рождения и пол</string>
-    <string name="input_email_label">Электронная почта</string>
-    <string name="input_email_description_label">Укажите email адрес почтового ящика</string>
-    <string name="city_label">Город</string>
-    <string name="input_name_your_city_label">Начните вводить название вашего города</string>
     <string name="wrong_login_data_toast">Логин и / или пароль указаны не верно</string>
     <string name="connection_lost_toast">Отсутствует интернет соеденение</string>
 
 
-    <array name="monthsOfYear">
-        <item>Январь</item>
-        <item>Февраль</item>
-        <item>Март</item>
-        <item>Апрель</item>
-        <item>Май</item>
-        <item>Июнь</item>
-        <item>Июль</item>
-        <item>Август</item>
-        <item>Сетнябрь</item>
-        <item>Октябрь</item>
-        <item>Ноябрь</item>
-        <item>Декабрь</item>
-    </array>
-
-    <array name="genders">
-        <item>Мужской</item>
-        <item>Женский</item>
-    </array>
 </resources>

@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -85,7 +85,7 @@ private fun ShimmerProfilePanel() {
         ) {
             Icon(
                 modifier = Modifier.size(30.dp),
-                imageVector = Icons.Filled.KeyboardArrowLeft,
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = "Back",
                 tint = Color.White
             )
@@ -173,13 +173,13 @@ fun Modifier.shimmerEffect(): Modifier = composed {
     var size by remember {
         mutableStateOf(IntSize.Zero)
     }
-    val transition = rememberInfiniteTransition()
+    val transition = rememberInfiniteTransition(label = "shimmer animation")
     val startOffset by transition.animateFloat(
         initialValue = -2 * size.width.toFloat(),
         targetValue = 2 * size.width.toFloat(),
         animationSpec = infiniteRepeatable(
             animation = tween(1000)
-        ), label = "shimmer effect"
+        ), label = "speed shimmer"
     )
     background(
         brush = Brush.linearGradient(
