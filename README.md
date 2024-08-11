@@ -59,7 +59,7 @@
 
 </details>
 <details><summary>Новое сообщение через Firebase Cloud Messages</summary>
-<img src="https://github.com/Nevratov/Matur/blob/chat_demonstration/gifs/fcm_notification.gif" width=40%>
+<img src="https://github.com/Nevratov/Matur/blob/chat_demonstration/gifs/fcm_notification.gif" width=30%>
 </details>
 
 </details>
