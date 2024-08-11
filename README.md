@@ -1,4 +1,1 @@
-<details><summary>Блокировка / разблокировка пользователя</summary>
-Всплывающий текст
-</details>
-![]([https://raw.githubusercontent.com/Nevratov/Matur/chat_demonstration/gifs/block.gif?token=GHSAT0AAAAAACSWDGY73OZ3RNBDT7GQZXD4ZVX76MA](https://raw.githubusercontent.com/Nevratov/Matur/chat_demonstration/gifs/block.gif?token=GHSAT0AAAAAACSWDGY6B73BVSQBCQA3FASWZVX77XQ))
+![alt](https://raw.githubusercontent.com/Nevratov/Matur/chat_demonstration/gifs/block.gif)
