@@ -76,7 +76,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -131,10 +130,6 @@ fun ChatScreen(
     val component = (LocalContext.current.applicationContext as MaturApplication).component
     val viewModel = component.chatListComponentFactory().create(dialogUser).getViewModel()
 
-    DisposableEffect(Unit) {
-        onDispose { viewModel.onCleared() }
-    }
-
     val screenState = viewModel.chatScreenState.collectAsState(initial = ChatScreenState.Initial)
 
     val configuration = LocalConfiguration.current
@@ -161,6 +156,10 @@ fun ChatScreen(
                 onBackPressed = onBackPressed
             )
         }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { viewModel.onCleared() }
     }
 }
 
@@ -526,7 +525,11 @@ private fun ProfilePanel(
             Modifier.wrapContentWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            ProfilePanelActions(actions = profileUserActions, viewModel = viewModel)
+            ProfilePanelActions(
+                actions = profileUserActions,
+                viewModel = viewModel,
+                onBackPressed = onBackPressed
+            )
         }
     }
 }
@@ -534,7 +537,8 @@ private fun ProfilePanel(
 @Composable
 private fun ProfilePanelActions(
     actions: List<ProfileAction>,
-    viewModel: ChatViewModel
+    viewModel: ChatViewModel,
+    onBackPressed: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     var isShowWarningRemoveDialog by remember { mutableStateOf(false) }
@@ -583,6 +587,7 @@ private fun ProfilePanelActions(
                             isShowWarningRemoveDialog = true
                         }
                     }
+                    expanded = false
                 },
                 leadingIcon = {
                     Icon(
@@ -602,7 +607,10 @@ private fun ProfilePanelActions(
             onDismissRequest = { isShowWarningRemoveDialog = false },
             confirmButton = {
                 Text(
-                    modifier = Modifier.clickable { viewModel.removeDialog() },
+                    modifier = Modifier.clickable {
+                        viewModel.removeDialog()
+                        onBackPressed()
+                    },
                     text = stringResource(R.string.remove_confirm_button)
                 )
             },
@@ -665,11 +673,12 @@ private fun Typing(
         }
 
         val interactionSource = remember { MutableInteractionSource() }
-        Row(modifier = Modifier
-            .weight(0.8f)
-            .heightIn(min = 52.dp) // Default height parent Row
-            .wrapContentHeight(),
-           verticalAlignment = Alignment.CenterVertically
+        Row(
+            modifier = Modifier
+                .weight(0.8f)
+                .heightIn(min = 52.dp) // Default height parent Row
+                .wrapContentHeight(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             BasicTextField(
                 modifier = Modifier.padding(vertical = 6.dp),
@@ -856,20 +865,20 @@ private fun ReplyMessageItem(
     replyMessage: Message,
     screenState: ChatScreenState.Content
 ) {
-    val nameUser: String
     val backgroundColor: Color
     val markColor: Color
     val textColor: Color
 
     val isDark = isSystemInDarkTheme()
-    //todo
+    val nameUser =
+        if (replyMessage.senderId == screenState.user.id) screenState.user.name
+        else screenState.dialogUser.name
+
     if (message.senderId == screenState.user.id) {
-        nameUser = screenState.user.name
         backgroundColor = PurpleColor_1
         markColor = PurpleColor_2
         textColor = Color.White
     } else {
-        nameUser = screenState.dialogUser.name
         backgroundColor = if (isDark) GrayDarkColor_1 else GrayLightColor_2
         markColor = if (isDark) GrayDarkColor_2 else GrayLightColor_3
         textColor = MaterialTheme.colorScheme.onBackground
@@ -937,56 +946,56 @@ private fun ModificationMessageItem(
         }
     }
 
-        Row(
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 0.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 0.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .size(22.dp)
+                .weight(0.1f),
+            imageVector = modeIco,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = modeIcoDescription
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Column(
+            modifier = Modifier.weight(0.8f)
+        ) {
+            Text(
+                text = modeName,
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium,
+                style = TextStyle.Default
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = textMessage,
+                fontSize = 10.sp,
+                color = Color.Gray,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = TextStyle.Default
+            )
+        }
+
+        IconButton(
+            modifier = Modifier
+                .weight(0.1f),
+            onClick = { onCloseModification() }
         ) {
             Icon(
-                modifier = Modifier
-                    .size(22.dp)
-                    .weight(0.1f),
-                imageVector = modeIco,
-                tint = MaterialTheme.colorScheme.primary,
-                contentDescription = modeIcoDescription
+                modifier = Modifier.size(22.dp),
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.modification_message_cancellation_button),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.width(4.dp))
-            Column(
-                modifier = Modifier.weight(0.8f)
-            ) {
-                Text(
-                    text = modeName,
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium,
-                    style = TextStyle.Default
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = textMessage,
-                    fontSize = 10.sp,
-                    color = Color.Gray,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = TextStyle.Default
-                )
-            }
-
-            IconButton(
-                modifier = Modifier
-                    .weight(0.1f),
-                onClick = { onCloseModification() }
-            ) {
-                Icon(
-                    modifier = Modifier.size(22.dp),
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.modification_message_cancellation_button),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
         }
+    }
     Spacer(
         modifier = Modifier
             .fillMaxWidth()
@@ -1049,6 +1058,7 @@ private fun TimeIsReadIsEdited(
                 color = timeColor,
                 style = TextStyle.Default
             )
+            Spacer(modifier = Modifier.width(4.dp))
         }
         Text(
             text = message.time,

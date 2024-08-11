@@ -14,10 +14,6 @@ class ChatListViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase
 ): ViewModel() {
 
-    init {
-        Log.d("Key bug", "init ChatViewModel $this")
-    }
-
     val state = getChatListUseCase()
         .map {
             ChatListScreenState.Content(chatList = it)

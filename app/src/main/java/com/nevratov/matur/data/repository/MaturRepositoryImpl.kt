@@ -421,9 +421,7 @@ class MaturRepositoryImpl @Inject constructor(
         emit(downloadedChatList)
 
         chatListRefreshEvents.collect {
-            Log.d("Key bug", "1 step")
             emit(chatList.sortedByDescending { it.message.timestamp })
-            Log.d("Key bug", "2 step")
         }
     }.stateIn(
         scope = coroutineScope,
@@ -461,6 +459,8 @@ class MaturRepositoryImpl @Inject constructor(
             token = getToken(),
             removeDialog = mapper.idToRemoveDialogDto(id)
         )
+        _chatList.removeIf { it.user.id == id }
+        chatListRefreshEvents.emit(Unit)
     }
 
     override suspend fun blockUserById(id: Int) {
