@@ -8,7 +8,6 @@ import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
 import coil.request.ImageRequest
