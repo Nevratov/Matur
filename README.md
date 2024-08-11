@@ -1,1 +1,2 @@
-![alt](https://raw.githubusercontent.com/Nevratov/Matur/chat_demonstration/gifs/block.gif)
+Text
+![block](https://github.com/user-attachments/assets/2d3eda70-c6fd-4ebc-a614-db70416bceab)
