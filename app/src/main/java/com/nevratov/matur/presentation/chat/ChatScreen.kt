@@ -282,10 +282,12 @@ private fun Chat(
                             .wrapContentHeight()
                             .padding(16.dp),
                         contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 } else if (!screenState.isNextMessages) {
                     viewModel.showToast()
-                } else {
+                } else if (screenState.messages.size >= MAX_MESSAGES_PER_SCREEN) {
                     SideEffect {
                         viewModel.loadNextMessages()
                     }
@@ -1092,6 +1094,7 @@ private fun TypingAnimation() {
 }
 
 private const val FIRST_ELEMENT = 0
+private const val MAX_MESSAGES_PER_SCREEN = 14
 val textFieldSaver: Saver<MutableState<TextFieldValue>, String> = Saver(
     save = { it.value.text },
     restore = { mutableStateOf(TextFieldValue(text = it)) }
