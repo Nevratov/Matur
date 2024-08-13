@@ -17,6 +17,12 @@ I have completely written the client part for Android, and my good friend is eng
 * Firebase (FCM)
 * Coil
 
+## Accounts for testing<br>Аккаунты для тестирования</br>
+You can take a seat with two accounts and evaluate the messenger's capabilities<br>Вы можете зайти с двух аккаунтов и оценить возможности мессенджера</br>
+
+1. email: user1@test.ru / password: 123123
+2. email: user2@test.ru / password: 123123
+
 ## Demonstration of the application functionality<br>Демонстрация функционала</br>
 </details>
 <details><summary>Sending a message<br>&ensp;&ensp;Отправка сообщения</br></summary>
