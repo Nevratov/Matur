@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -285,7 +286,7 @@ private fun Chat(
                     ) {
                         CircularProgressIndicator()
                     }
-                } else if (!screenState.isNextMessages) {
+                } else if (!screenState.isNextMessagesExist) {
                     viewModel.showToast()
                 } else if (screenState.messages.size >= MAX_MESSAGES_PER_SCREEN) {
                     SideEffect {
@@ -355,7 +356,8 @@ private fun Chat(
                     text = newMessage.toString(),
                     selection = TextRange(newMessage.length)
                 )
-            }
+            },
+            onBackPressed = { showEmojiPicker.value = false }
         )
     }
 }
@@ -629,7 +631,8 @@ private fun ProfilePanelActions(
 @Composable
 private fun ShowEmojiPicker(
     showEmojiPickerState: MutableState<Boolean>,
-    onEmojiClicked: (String) -> Unit
+    onEmojiClicked: (String) -> Unit,
+    onBackPressed: () -> Unit
 ) {
     val showEmojiPicker = showEmojiPickerState.value
     if (!showEmojiPicker) return
@@ -640,6 +643,10 @@ private fun ShowEmojiPicker(
             .background(MaterialTheme.colorScheme.background)
     ) {
         EmojiPicker(onEmojiClicked = { onEmojiClicked(it) })
+    }
+
+    BackHandler {
+        onBackPressed()
     }
 }
 

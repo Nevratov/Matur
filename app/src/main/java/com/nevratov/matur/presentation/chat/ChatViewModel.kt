@@ -147,22 +147,22 @@ class ChatViewModel @Inject constructor(
 
     fun loadNextMessages() {
         val currentState = chatScreenState.value as ChatScreenState.Content
-        if (!currentState.isNextMessages) {
+        if (!currentState.isNextMessagesExist) {
             showToast()
             return
         }
 
         viewModelScope.launch(context = exceptionHandler) {
             screenStateRefreshFlow.emit(currentState.copy(loadNextMessages = true))
-            val isNextMessages = loadNextMessagesUseCase(messagesWithId = dialogUser.id)
-            when (isNextMessages) {
+            val isNextMessagesExist = loadNextMessagesUseCase(messagesWithId = dialogUser.id)
+            when (isNextMessagesExist) {
                 true -> {}
                 false -> {
                     val newState = chatScreenState.value as ChatScreenState.Content
                     screenStateRefreshFlow.emit(
                         newState.copy(
                             loadNextMessages = false,
-                            isNextMessages = false
+                            isNextMessagesExist = false
                         )
                     )
                 }

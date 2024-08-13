@@ -16,6 +16,6 @@ sealed class ChatScreenState {
         val dialogUser: User,
         val onlineStatus: OnlineStatus,
         val loadNextMessages: Boolean = false,
-        val isNextMessages: Boolean = true
+        val isNextMessagesExist: Boolean = true
     ): ChatScreenState()
 }
