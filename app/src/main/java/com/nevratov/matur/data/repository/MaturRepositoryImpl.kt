@@ -97,9 +97,13 @@ class MaturRepositoryImpl @Inject constructor(
             }
             val newChatListItem = chatListItem?.copy(
                 message = newMessage,
+            ) ?: ChatListItem(
+                message = newMessage,
+                user = getUserById(newMessage.senderId)
             )
+
             remove(chatListItem)
-            newChatListItem?.let { add(index = 0, element = it) }
+            add(index = 0, element = newChatListItem)
         }
         chatListRefreshEvents.emit(Unit)
     }
@@ -236,7 +240,7 @@ class MaturRepositoryImpl @Inject constructor(
         )
     }
 
-    private fun receiveMessage(message: Message) {
+    private fun  receiveMessage(message: Message) {
         coroutineScope.launch {
             if (dialogUserId == message.senderId) {
                 _chatMessages.add(index = 0, element = message)
