@@ -853,17 +853,21 @@ private fun MessageItem(
             }
         }
 
-        val messageMenuItems = listOf(
-            MessageActionItem.Edit(onEditClicked = onEditClicked),
+        val messageMenuItems = mutableListOf(
             MessageActionItem.Remove(onRemoveClicked = onRemoveClicked),
             MessageActionItem.Reply(onReplyClicked = onReplyClicked)
         )
+        if (message.senderId == screenState.user.id) {
+            messageMenuItems.add(MessageActionItem.Edit(onEditClicked = onEditClicked))
+        }
+
+
         OnMessageClickedMenu(
             isMenuVisibleState = isMenuVisibleState,
             offsetState = pressOffsetState,
             onDismissed = { isMenuVisibleState.value = false },
             itemHeightState = itemHeightState,
-            menuItems = messageMenuItems
+            menuItems = messageMenuItems.toList()
         )
     }
 }
