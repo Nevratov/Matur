@@ -39,12 +39,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nevratov.matur.R
+import com.nevratov.matur.presentation.getApplicationComponent
 
 @Composable
-fun LoginScreen (
-    viewModel: LoginViewModel
-) {
+fun LoginScreen () {
+    val component = getApplicationComponent()
+    val viewModel: LoginViewModel = viewModel(factory = component.getViewModelFactory())
     val screenState = viewModel.screenState.collectAsState()
 
     Column(

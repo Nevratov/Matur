@@ -29,6 +29,7 @@ class WebSocketListener (
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) { }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
+        Log.d("webSocket", "onMessage = $text")
         val responseDto = Gson().fromJson(text, WebSocketMessageDto::class.java)
         when(responseDto.type) {
             WebSocketConst.MESSAGE_TYPE -> {

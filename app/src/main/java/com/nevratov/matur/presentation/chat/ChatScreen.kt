@@ -3,7 +3,6 @@ package com.nevratov.matur.presentation.chat
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -130,7 +129,7 @@ fun ChatScreen(
     onBackPressed: () -> Unit
 ) {
     val component = (LocalContext.current.applicationContext as MaturApplication).component
-    val viewModel = component.chatListComponentFactory().create(dialogUser).getViewModel()
+    val viewModel = component.getChatScreenComponentFactory().create(dialogUser).getViewModel()
 
     val screenState = viewModel.chatScreenState.collectAsState(initial = ChatScreenState.Initial)
 

@@ -10,9 +10,7 @@ import com.nevratov.matur.navigation.LoginNavGraph
 import com.nevratov.matur.navigation.rememberNavigationState
 
 @Composable
-fun MainLoginScreen(
-    loginViewModel: LoginViewModel,
-) {
+fun MainLoginScreen() {
     val navigationState = rememberNavigationState()
 
     Scaffold { paddingValues ->
@@ -24,9 +22,7 @@ fun MainLoginScreen(
             LoginNavGraph(
                 navHostController = navigationState.navHostController,
                 loginScreenContent = {
-                    LoginScreen(
-                        viewModel = loginViewModel
-                    )
+                    LoginScreen()
                 },
             )
         }

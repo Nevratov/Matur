@@ -43,16 +43,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.ChatListItem
 import com.nevratov.matur.domain.entity.Message
+import com.nevratov.matur.presentation.getApplicationComponent
 
 @Composable
 fun ChatListScreen(
-    viewModel: ChatListViewModel,
     onMessageItemClicked: (ChatListItem) -> Unit
 ) {
+    val component = getApplicationComponent()
+    val viewModel: ChatListViewModel = viewModel(factory = component.getViewModelFactory())
 
     val screenState = viewModel.state.collectAsState(initial = ChatListScreenState.Initial)
 

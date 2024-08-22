@@ -1,7 +1,7 @@
 package com.nevratov.matur.di
 
 import android.app.Application
-import com.nevratov.matur.presentation.main.MainActivity
+import com.nevratov.matur.presentation.ViewModelFactory
 import dagger.BindsInstance
 import dagger.Component
 
@@ -9,9 +9,9 @@ import dagger.Component
 @Component(modules = [DataModule::class, ViewModelModule::class])
 interface ApplicationComponent {
 
-    fun inject(activity: MainActivity)
+    fun getViewModelFactory(): ViewModelFactory
 
-    fun chatListComponentFactory(): ChatListComponent.Factory
+    fun getChatScreenComponentFactory(): ChatScreenComponent.Factory
 
     @Component.Factory
     interface ApplicationComponentFactory {

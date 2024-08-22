@@ -15,9 +15,7 @@ import com.nevratov.matur.presentation.chat_list.ChatListViewModel
 import com.nevratov.matur.presentation.permissions.RequestNotificationPermission
 
 @Composable
-fun MainScreen(
-    chatListViewModel: ChatListViewModel
-) {
+fun MainScreen() {
     val navigationState = rememberNavigationState()
 
     Box(
@@ -27,7 +25,6 @@ fun MainScreen(
             navHostController = navigationState.navHostController,
             chatListScreenContent = {
                 ChatListScreen(
-                    viewModel = chatListViewModel,
                     onMessageItemClicked = {
                         navigationState.navigateTo(Screen.Chat.getRouteWithArgs(it.user))
                     })

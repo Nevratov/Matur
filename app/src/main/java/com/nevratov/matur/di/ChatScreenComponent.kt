@@ -6,13 +6,13 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
-interface ChatListComponent {
+interface ChatScreenComponent {
 
     fun getViewModel(): ChatViewModel
 
     @Subcomponent.Factory
     interface Factory {
 
-        fun create(@BindsInstance dialogUser: User): ChatListComponent
+        fun create(@BindsInstance dialogUser: User): ChatScreenComponent
     }
 }
