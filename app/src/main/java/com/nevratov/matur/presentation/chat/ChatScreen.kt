@@ -3,6 +3,7 @@ package com.nevratov.matur.presentation.chat
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -320,6 +321,7 @@ private fun Chat(
             onEmojiIcoClicked = { showEmojiPicker.value = !showEmojiPicker.value },
             messageMode = messageMode,
             isBlockedUser = screenState.dialogUser.isBlocked,
+            hasBlocked = screenState.dialogUser.hasBlocked,
             onConfirmClicked = {
                 if (messageField.value.text.isBlank()) return@Typing
                 when (val currentMessageMode = messageMode) {
@@ -658,9 +660,11 @@ private fun Typing(
     onValueChanged: (TextFieldValue) -> Unit,
     onEmojiIcoClicked: () -> Unit,
     messageMode: MessageMode,
-    isBlockedUser: Boolean
+    isBlockedUser: Boolean,
+    hasBlocked: Boolean
 ) {
     val message = messageFieldState.value
+    val enableTyping = !isBlockedUser && !hasBlocked
 
     Row(
         modifier = Modifier
@@ -691,7 +695,7 @@ private fun Typing(
         ) {
             BasicTextField(
                 modifier = Modifier.padding(vertical = 6.dp),
-                enabled = !isBlockedUser,
+                enabled = enableTyping,
                 maxLines = 6,
                 textStyle = TextStyle(
                     fontSize = 16.sp,
@@ -705,7 +709,7 @@ private fun Typing(
                 TextFieldDefaults.DecorationBox(
                     value = message.text,
                     innerTextField = innerTextField,
-                    enabled = !isBlockedUser,
+                    enabled = enableTyping,
                     singleLine = false,
                     visualTransformation = VisualTransformation.None,
                     interactionSource = interactionSource,
@@ -720,7 +724,7 @@ private fun Typing(
                     ),
                     placeholder = {
                         AnimatedContent(
-                            targetState = isBlockedUser,
+                            targetState = isBlockedUser || hasBlocked,
                             transitionSpec = {
                                 slideInVertically(tween(2000)) { it }.togetherWith(
                                     slideOutVertically(tween(2000)) { -it }

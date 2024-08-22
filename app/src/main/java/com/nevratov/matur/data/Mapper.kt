@@ -5,19 +5,19 @@ import com.nevratov.matur.data.model.ChatListItemDto
 import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.CreateNewFCMTokenDto
 import com.nevratov.matur.data.model.EditMessageDto
-import com.nevratov.matur.data.model.RemoveMessageDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RemoveDialogDto
-import com.nevratov.matur.data.model.WebSocketMessageDto
+import com.nevratov.matur.data.model.RemoveMessageDto
 import com.nevratov.matur.data.model.UserDto
+import com.nevratov.matur.data.model.WebSocketMessageDto
 import com.nevratov.matur.data.network.webSocket.WebSocketConst
-import com.nevratov.matur.domain.entity.OnlineStatus
-import com.nevratov.matur.domain.entity.User
-import com.nevratov.matur.domain.entity.Message
 import com.nevratov.matur.domain.entity.ChatListItem
 import com.nevratov.matur.domain.entity.LoginData
+import com.nevratov.matur.domain.entity.Message
+import com.nevratov.matur.domain.entity.OnlineStatus
+import com.nevratov.matur.domain.entity.User
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
@@ -49,7 +49,8 @@ class Mapper @Inject constructor() {
             expectations = userDto.expectations,
             drinking = userDto.drinking.toString(),
             smoking = userDto.smoking.toString(),
-            isBlocked = userDto.isBlocked
+            isBlocked = userDto.isBlocked,
+            hasBlocked = userDto.hasBlocked
         )
     }
 
@@ -125,7 +126,7 @@ class Mapper @Inject constructor() {
 
     fun messageIdToRemoveMessageDto(id: Int): RemoveMessageDto = RemoveMessageDto(messageId = id)
 
-    fun messageDtoToWebSocketMessageDto(message: MessageDto): WebSocketMessageDto {
+    fun messageDtoToWebSocketMessageDto(message: MessageDto, uuid: String): WebSocketMessageDto {
         val messageJson = Gson().toJson(message)
         return WebSocketMessageDto(
             id = message.id,
@@ -133,7 +134,8 @@ class Mapper @Inject constructor() {
             receiverId = message.receiverId,
             content = messageJson,
             timestamp = message.timestampCreateSec,
-            type = WebSocketConst.MESSAGE_TYPE
+            type = WebSocketConst.MESSAGE_TYPE,
+            uuid = uuid
         )
     }
 

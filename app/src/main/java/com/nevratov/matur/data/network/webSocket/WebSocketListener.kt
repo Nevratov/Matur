@@ -1,5 +1,6 @@
 package com.nevratov.matur.data.network.webSocket
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.nevratov.matur.data.Mapper
@@ -15,7 +16,8 @@ class WebSocketListener (
     private val onMessageReceived: (Message) -> Unit,
     private val onStatusReceived: (OnlineStatus) -> Unit,
     private val onUserIdReadAllMessages: (Int) -> Unit,
-    private val senderId: Int
+    private val senderId: Int,
+    private val uuid: String
 ): WebSocketListener() {
 
     private val mapper = Mapper()
@@ -45,6 +47,7 @@ class WebSocketListener (
         super.onOpen(webSocket, response)
         val json = JsonObject().apply {
             addProperty("sender_id", senderId)
+            addProperty("uuid", uuid)
         }
         val jsonString = Gson().toJson(json)
         webSocket.send(jsonString)

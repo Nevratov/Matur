@@ -29,5 +29,5 @@ data class UserDto(
     @SerializedName("interests") val interests: List<InterestDto>,
     @SerializedName("images") val images: List<ImagesSizeDto>,
     @SerializedName("isBlock") val isBlocked: Boolean,
-
+    @SerializedName("hasBlock") val hasBlocked: Boolean
 )

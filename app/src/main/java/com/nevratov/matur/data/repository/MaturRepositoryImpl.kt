@@ -8,6 +8,7 @@ import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @ApplicationScope
@@ -47,8 +49,7 @@ class MaturRepositoryImpl @Inject constructor(
     private val application: Application
 ) : MaturRepository {
 
-    private val userSharedPreferences = application.getSharedPreferences(USER_KEY, MODE_PRIVATE)
-    private val firebaseSharedPreferences = application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
+    private val sharedPreferences = application.getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE)
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     // AuthState
@@ -65,6 +66,7 @@ class MaturRepositoryImpl @Inject constructor(
             val user = getUserOrNull()
             val isLoggedIn = user != null
             if (isLoggedIn) {
+                getDeviceUUID()
                 connectToWS()
                 getOnlineUsersId()
                 firebaseGetInstance()
@@ -175,6 +177,8 @@ class MaturRepositoryImpl @Inject constructor(
 
     // Firebase Cloud Messaging
 
+    private val firebaseSharedPreferences = application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
+
     private fun firebaseGetInstance() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -236,7 +240,8 @@ class MaturRepositoryImpl @Inject constructor(
                         }
                     }
                 },
-                senderId = getUserOrNull()?.id ?: throw RuntimeException("User == null")
+                senderId = getUserOrNull()?.id ?: throw RuntimeException("User == null"),
+                uuid = getDeviceUUID()
             )
         )
     }
@@ -294,7 +299,22 @@ class MaturRepositoryImpl @Inject constructor(
         }
     }
 
-// Save User in cache with SharedPreferences
+    // UUID
+
+    private fun getDeviceUUID(): String {
+        var uuid = sharedPreferences.getString(UUID_KEY, null)
+        if (uuid == null) {
+            uuid = generateUUID()
+            sharedPreferences.edit().putString(UUID_KEY, uuid).apply()
+        }
+        return uuid
+    }
+
+    private fun generateUUID(): String = UUID.randomUUID().toString()
+
+    // Save User in cache with SharedPreferences
+
+    private val userSharedPreferences = application.getSharedPreferences(USER_KEY, MODE_PRIVATE)
 
     private fun saveUserAndToken(user: User, token: String) {
         userSharedPreferences.edit().apply {
@@ -389,7 +409,10 @@ class MaturRepositoryImpl @Inject constructor(
             message = mapper.messageToCreateMessageDto(message)
         )
 
-        val messageToSend = mapper.messageDtoToWebSocketMessageDto(response.message)
+        val messageToSend = mapper.messageDtoToWebSocketMessageDto(
+            message = response.message,
+            uuid = getDeviceUUID()
+        )
 
         val messageJson = Gson().toJson(messageToSend)
         webSocketClient.send(messageJson)
@@ -517,8 +540,10 @@ class MaturRepositoryImpl @Inject constructor(
             isOpenedChatScreen = false
         )
 
+        private const val SHARED_PREFERENCES_NAME = "app_data"
         private const val USER_KEY = "user_data"
         private const val TOKEN_KEY = "token"
+        private const val UUID_KEY = "uuid"
         const val FIREBASE_NAME = "firebase"
         const val FCM_TOKEN_KEY = "fcm_token"
         private const val DEFAULT_PAGE = 1

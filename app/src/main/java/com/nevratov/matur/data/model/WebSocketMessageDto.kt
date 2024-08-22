@@ -9,4 +9,5 @@ data class WebSocketMessageDto(
     @SerializedName("receiver_id") val receiverId: Int,
     @SerializedName("content") val content: String,
     @SerializedName("type") val type: String,
+    @SerializedName("uuid") val uuid: String? = null,
 )
