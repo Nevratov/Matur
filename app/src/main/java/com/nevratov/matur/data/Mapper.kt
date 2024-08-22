@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.nevratov.matur.data.model.ChatListItemDto
 import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.CreateNewFCMTokenDto
+import com.nevratov.matur.data.model.EditMessageDto
 import com.nevratov.matur.data.model.RemoveMessageDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
@@ -117,7 +118,12 @@ class Mapper @Inject constructor() {
         }
     }
 
-    fun messageIdToDeleteMessageDto(id: Int): RemoveMessageDto = RemoveMessageDto(messageId = id)
+    fun messageToEditMessageDto(message: Message) = EditMessageDto(
+        messageId = message.id,
+        content = message.content
+    )
+
+    fun messageIdToRemoveMessageDto(id: Int): RemoveMessageDto = RemoveMessageDto(messageId = id)
 
     fun messageDtoToWebSocketMessageDto(message: MessageDto): WebSocketMessageDto {
         val messageJson = Gson().toJson(message)

@@ -108,6 +108,7 @@ class MaturRepositoryImpl @Inject constructor(
         chatListRefreshEvents.emit(Unit)
     }
 
+
     // Chat Screen
 
     private val _chatMessages = mutableListOf<Message>()
@@ -403,17 +404,30 @@ class MaturRepositoryImpl @Inject constructor(
     override suspend fun removeMessage(message: Message) {
         apiService.removeMessage(
             token = getToken(),
-            deleteMessage = mapper.messageIdToDeleteMessageDto(id = message.id)
+            deleteMessage = mapper.messageIdToRemoveMessageDto(id = message.id)
         )
         _chatMessages.remove(message)
         refreshMessagesEvents.emit(Unit)
     }
 
     override suspend fun editMessage(message: Message) {
+        apiService.editMessage(
+            token = getToken(),
+            editMessage = mapper.messageToEditMessageDto(message = message)
+        )
         val index = chatMessages.indexOfFirst { it.id == message.id }
         if (index != -1) {
             _chatMessages[index] = message
             refreshMessagesEvents.emit(Unit)
+        }
+        val chatListItem = chatList.find { it.user.id == dialogUserId }
+        chatListItem?.let { item ->
+            if (item.message.id == message.id) {
+                val newChatListItem = item.copy(message = message)
+                val itemIndex = _chatList.indexOf(item)
+                _chatList[itemIndex] = newChatListItem
+                chatListRefreshEvents.emit(Unit)
+            }
         }
     }
 

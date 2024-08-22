@@ -4,6 +4,7 @@ import com.nevratov.matur.data.model.ChatListResponseDto
 import com.nevratov.matur.data.model.ChatMessagesResponse
 import com.nevratov.matur.data.model.CreateMessageDto
 import com.nevratov.matur.data.model.CreateNewFCMTokenDto
+import com.nevratov.matur.data.model.EditMessageDto
 import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.LoginResponseDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
@@ -39,6 +40,12 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Body message: CreateMessageDto
     ) : SendMessageResponse
+
+    @POST("im/edit")
+    suspend fun editMessage(
+        @Header("Authorization") token: String,
+        @Body editMessage: EditMessageDto
+    )
 
     @POST("im/delete")
     suspend fun removeMessage(
