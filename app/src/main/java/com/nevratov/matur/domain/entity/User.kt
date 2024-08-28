@@ -2,6 +2,7 @@ package com.nevratov.matur.domain.entity
 
 import android.icu.util.Calendar
 import android.os.Parcelable
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 import java.util.Date
@@ -57,7 +58,7 @@ data class User(
         get() = calendar.get(Calendar.DAY_OF_MONTH)
 
     private val month: Int
-        get() = calendar.get(Calendar.MONTH)
+        get() = calendar.get(Calendar.MONTH) + 1 // start with 0 (January == 0)
 
     private val year: Int
         get() = calendar.get(Calendar.YEAR)
@@ -85,7 +86,7 @@ data class User(
 
             in MILLIS_IN_DAY..MILLIS_IN_WEEK -> {
                 String.format(
-                    locale = Locale.getDefault(),
+                    Locale.getDefault(),
                     "$pattern %02d.%02d в %02d:%02d",
                     day,
                     month,
