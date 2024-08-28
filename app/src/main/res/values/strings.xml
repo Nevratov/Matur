@@ -38,6 +38,7 @@
     <string name="notification_permission_description">Чтобы получать уведомления о новых сообщениях, разрешите отправку уведомлений в настройках вашего телефона</string>
     <string name="notification_permission_not_allowed_toast">Разрешение не предоставлено</string>
     <string name="notification_permission_confirm_button">Разрешить</string>
+    <string name="remove_evetyone_checkbox">Удалить у всех</string>
 
 
 </resources>

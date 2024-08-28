@@ -59,7 +59,7 @@ interface ApiService {
         @Body newToken: CreateNewFCMTokenDto
     )
 
-    @POST("im/delete")
+    @POST("im/clear")
     suspend fun removeDialogByUserId(
         @Header("Authorization") token: String,
         @Body removeDialog: RemoveDialogDto

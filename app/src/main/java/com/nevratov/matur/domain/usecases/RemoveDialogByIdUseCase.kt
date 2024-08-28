@@ -7,5 +7,8 @@ class RemoveDialogByIdUseCase @Inject constructor(
     private val repository: MaturRepository
 ) {
 
-    suspend operator fun invoke(id: Int) = repository.removeDialogById(id)
+    suspend operator fun invoke(
+        id: Int,
+        removeEveryone: Boolean
+    ) = repository.removeDialogById(id = id, removeEveryone = removeEveryone)
 }

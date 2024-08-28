@@ -118,9 +118,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun removeDialog() {
+    fun removeDialog(removeEveryone: Boolean) {
         viewModelScope.launch(context = exceptionHandler) {
-            removeDialogByIdUseCase(id = dialogUser.id)
+            removeDialogByIdUseCase(id = dialogUser.id, removeEveryone = removeEveryone)
         }
     }
 

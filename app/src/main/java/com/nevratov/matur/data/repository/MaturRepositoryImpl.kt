@@ -494,10 +494,10 @@ class MaturRepositoryImpl @Inject constructor(
         dialogUserId = null
     }
 
-    override suspend fun removeDialogById(id: Int) {
+    override suspend fun removeDialogById(id: Int, removeEveryone: Boolean) {
         apiService.removeDialogByUserId(
             token = getToken(),
-            removeDialog = mapper.idToRemoveDialogDto(id)
+            removeDialog = mapper.idToRemoveDialogDto(id = id, removeEveryone = removeEveryone)
         )
         _chatList.removeIf { it.user.id == id }
         chatListRefreshEvents.emit(Unit)

@@ -51,6 +51,8 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -64,6 +66,7 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
@@ -84,6 +87,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -547,6 +551,7 @@ private fun ProfilePanelActions(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var isShowWarningRemoveDialog by remember { mutableStateOf(false) }
+    var isRemoveDialogEveryone by remember { mutableStateOf(false) }
     val context = LocalContext.current
     IconButton(
         onClick = { expanded = !expanded }
@@ -607,13 +612,30 @@ private fun ProfilePanelActions(
         AlertDialog(
             title = { Text(text = stringResource(R.string.remove_dialog_alert_title)) },
             text = {
-                Text(text = stringResource(R.string.remove_dealog_alert_description))
+                Column {
+                    Text(text = stringResource(R.string.remove_dealog_alert_description))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = isRemoveDialogEveryone,
+                            onCheckedChange = { isRemoveDialogEveryone = !isRemoveDialogEveryone }
+                        )
+                        Text(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { isRemoveDialogEveryone = !isRemoveDialogEveryone }
+                                .padding(8.dp),
+                            text = stringResource(R.string.remove_evetyone_checkbox)
+                        )
+                    }
+                }
             },
             onDismissRequest = { isShowWarningRemoveDialog = false },
             confirmButton = {
                 Text(
                     modifier = Modifier.clickable {
-                        viewModel.removeDialog()
+                        viewModel.removeDialog(removeEveryone = isRemoveDialogEveryone)
                         onBackPressed()
                     },
                     text = stringResource(R.string.remove_confirm_button)

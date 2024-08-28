@@ -31,7 +31,7 @@ interface MaturRepository {
 
     suspend fun unblockUserById(id: Int)
 
-    suspend fun removeDialogById(id: Int)
+    suspend fun removeDialogById(id: Int, removeEveryone: Boolean)
 
     suspend fun getUserById(id: Int): User
 

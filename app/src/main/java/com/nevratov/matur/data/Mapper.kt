@@ -169,7 +169,10 @@ class Mapper @Inject constructor() {
         )
     }
 
-    fun idToRemoveDialogDto(id: Int) = RemoveDialogDto(userId = id)
+    fun idToRemoveDialogDto(id: Int, removeEveryone: Boolean) = RemoveDialogDto(
+        userId = id,
+        removeEveryone = if (removeEveryone) 1 else 0
+    )
 
     fun loginDataToLoginDataDto(loginData: LoginData): LoginDataDto {
         return LoginDataDto(
