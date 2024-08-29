@@ -49,7 +49,8 @@ class MaturRepositoryImpl @Inject constructor(
     private val application: Application
 ) : MaturRepository {
 
-    private val sharedPreferences = application.getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE)
+    private val sharedPreferences =
+        application.getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE)
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     // AuthState
@@ -91,7 +92,6 @@ class MaturRepositoryImpl @Inject constructor(
         get() = _chatList.toList()
 
     private val chatListRefreshEvents = MutableSharedFlow<Unit>()
-
     private suspend fun refreshChatList(newMessage: Message) {
         _chatList.apply {
             val chatListItem = find {
@@ -109,7 +109,6 @@ class MaturRepositoryImpl @Inject constructor(
         }
         chatListRefreshEvents.emit(Unit)
     }
-
 
     // Chat Screen
 
@@ -164,9 +163,11 @@ class MaturRepositoryImpl @Inject constructor(
     // Network connection check
 
     private fun isNetworkConnection(): Boolean {
-        val connectivityManager = getSystemService(application, ConnectivityManager::class.java) as ConnectivityManager
+        val connectivityManager =
+            getSystemService(application, ConnectivityManager::class.java) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork ?: return false
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+        val networkCapabilities =
+            connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
         return when {
             networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
             networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
@@ -177,7 +178,8 @@ class MaturRepositoryImpl @Inject constructor(
 
     // Firebase Cloud Messaging
 
-    private val firebaseSharedPreferences = application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
+    private val firebaseSharedPreferences =
+        application.getSharedPreferences(FIREBASE_NAME, MODE_PRIVATE)
 
     private fun firebaseGetInstance() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -246,7 +248,7 @@ class MaturRepositoryImpl @Inject constructor(
         )
     }
 
-    private fun  receiveMessage(message: Message) {
+    private fun receiveMessage(message: Message) {
         coroutineScope.launch {
             if (dialogUserId == message.senderId) {
                 _chatMessages.add(index = 0, element = message)
@@ -424,13 +426,26 @@ class MaturRepositoryImpl @Inject constructor(
         refreshChatList(messageWithId)
     }
 
-    override suspend fun removeMessage(message: Message) {
+    override suspend fun removeMessage(message: Message, removeEveryone: Boolean) {
         apiService.removeMessage(
             token = getToken(),
-            deleteMessage = mapper.messageIdToRemoveMessageDto(id = message.id)
+            deleteMessage = mapper.messageIdToRemoveMessageDto(
+                id = message.id,
+                removeEveryone = removeEveryone
+            )
         )
         _chatMessages.remove(message)
         refreshMessagesEvents.emit(Unit)
+
+        val chatListItem = chatList.find { it.user.id == dialogUserId }
+        chatListItem?.let { item ->
+            if (item.message.id == message.id) {
+                val newChatListItem = item.copy(message = chatMessages.first())
+                val itemIndex = _chatList.indexOf(item)
+                _chatList[itemIndex] = newChatListItem
+                chatListRefreshEvents.emit(Unit)
+            }
+        }
     }
 
     override suspend fun editMessage(message: Message) {

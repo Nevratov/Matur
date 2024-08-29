@@ -124,7 +124,10 @@ class Mapper @Inject constructor() {
         content = message.content
     )
 
-    fun messageIdToRemoveMessageDto(id: Int): RemoveMessageDto = RemoveMessageDto(messageId = id)
+    fun messageIdToRemoveMessageDto(id: Int, removeEveryone: Boolean) = RemoveMessageDto(
+        messageId = listOf(id),
+        removeEveryone = if (removeEveryone) 1 else 0
+    )
 
     fun messageDtoToWebSocketMessageDto(message: MessageDto, uuid: String): WebSocketMessageDto {
         val messageJson = Gson().toJson(message)

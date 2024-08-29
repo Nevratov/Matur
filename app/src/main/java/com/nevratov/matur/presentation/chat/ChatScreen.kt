@@ -51,7 +51,6 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -60,16 +59,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -87,7 +87,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -208,6 +207,7 @@ private fun Chat(
     )
 
     var messageMode by remember { mutableStateOf<MessageMode>(MessageMode.Classic) }
+    var isRemovingMessage by remember { mutableStateOf<Message?>(null) }
     val showEmojiPicker = remember { mutableStateOf(false) }
 
     var lastMessage by remember { mutableStateOf(screenState.messages.first()) }
@@ -268,7 +268,9 @@ private fun Chat(
                                         messageField.value.copy(text = message.content)
                                     messageMode = MessageMode.Edit(message)
                                 },
-                                onRemoveClicked = { viewModel.removeMessage(message) },
+                                onRemoveClicked = {
+                                    isRemovingMessage = message
+                                },
                                 onReplyClicked = { messageMode = MessageMode.Reply(message) }
                             )
                         }
@@ -300,13 +302,6 @@ private fun Chat(
             }
         }
 
-        LaunchedEffect(key1 = screenState.messages.size) {
-            if (lastMessage != screenState.messages.first()) {
-                lazyListState.scrollToItem(FIRST_ELEMENT)
-            }
-            lastMessage = screenState.messages.first()
-        }
-
         ModificationMessageItem(
             messageMode = messageMode,
             onCloseModification = {
@@ -314,6 +309,12 @@ private fun Chat(
                 messageMode = MessageMode.Classic
             }
         )
+
+        isRemovingMessage?.let {
+            RemoveMessageAlert(message = it, viewModel = viewModel, onDismissed = {
+                    isRemovingMessage = null
+                })
+        }
 
         Typing(
             messageFieldState = messageField,
@@ -365,6 +366,69 @@ private fun Chat(
             onBackPressed = { showEmojiPicker.value = false }
         )
     }
+
+    LaunchedEffect(key1 = screenState.messages.size) {
+        if (lastMessage != screenState.messages.first()) {
+            lazyListState.scrollToItem(FIRST_ELEMENT)
+        }
+        lastMessage = screenState.messages.first()
+    }
+}
+
+@Composable
+private fun RemoveMessageAlert(
+    message: Message,
+    viewModel: ChatViewModel,
+    onDismissed: () -> Unit
+) {
+    var isRemoveMessageEveryone by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        title = { Text(text = stringResource(R.string.remove_message_alert_title)) },
+        text = {
+            Column {
+                Text(text = stringResource(R.string.remove_message_alert_description))
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
+                        Checkbox(
+                            checked = isRemoveMessageEveryone,
+                            onCheckedChange = { isRemoveMessageEveryone = !isRemoveMessageEveryone }
+                        )
+                    }
+                    Text(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { isRemoveMessageEveryone = !isRemoveMessageEveryone }
+                            .padding(8.dp),
+                        text = stringResource(R.string.remove_evetyone_checkbox)
+                    )
+                }
+            }
+        },
+        onDismissRequest = { onDismissed() },
+        confirmButton = {
+            Text(
+                modifier = Modifier.clickable {
+                    viewModel.removeMessage(
+                        message = message,
+                        removeEveryone = isRemoveMessageEveryone
+                    )
+                    onDismissed()
+                },
+                text = stringResource(R.string.remove_confirm_button)
+            )
+        },
+        dismissButton = {
+            Text(
+                modifier = Modifier.clickable { onDismissed() },
+                text = stringResource(R.string.remove_cancellation_button)
+            )
+        }
+    )
 }
 
 private fun triggerVibrate(context: Context, durationMillis: Long = 50) {
@@ -613,14 +677,17 @@ private fun ProfilePanelActions(
             title = { Text(text = stringResource(R.string.remove_dialog_alert_title)) },
             text = {
                 Column {
-                    Text(text = stringResource(R.string.remove_dealog_alert_description))
+                    Text(text = stringResource(R.string.remove_dialog_alert_description))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
-                            checked = isRemoveDialogEveryone,
-                            onCheckedChange = { isRemoveDialogEveryone = !isRemoveDialogEveryone }
-                        )
+                        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
+                            Checkbox(
+                                checked = isRemoveDialogEveryone,
+                                onCheckedChange = { isRemoveDialogEveryone = !isRemoveDialogEveryone }
+                            )
+                        }
                         Text(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))

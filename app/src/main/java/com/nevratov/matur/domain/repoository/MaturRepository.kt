@@ -39,7 +39,7 @@ interface MaturRepository {
 
     suspend fun editMessage(message: Message)
 
-    suspend fun removeMessage(message: Message)
+    suspend fun removeMessage(message: Message, removeEveryone: Boolean)
 
     suspend fun login(loginData: LoginData): Boolean
 

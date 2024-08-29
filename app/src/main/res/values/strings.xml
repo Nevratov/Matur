@@ -28,7 +28,7 @@
     <string name="more_actions_button">Больше действий</string>
     <string name="waiting_server_implementation_toast">Ожиадем реализацию сервера…</string>
     <string name="remove_dialog_alert_title">Удаление диалога</string>
-    <string name="remove_dealog_alert_description">Все сообщения будут безвозвратно удалены. Вы уверены что хотите удалить этот диалог?</string>
+    <string name="remove_dialog_alert_description">Вы точно хотите удалить этот диалог?</string>
     <string name="remove_confirm_button">Удалить</string>
     <string name="remove_cancellation_button">Отмена</string>
     <string name="modification_message_cancellation_button">Отменить</string>
@@ -39,6 +39,8 @@
     <string name="notification_permission_not_allowed_toast">Разрешение не предоставлено</string>
     <string name="notification_permission_confirm_button">Разрешить</string>
     <string name="remove_evetyone_checkbox">Удалить у всех</string>
+    <string name="remove_message_alert_title">Удалить сообщение</string>
+    <string name="remove_message_alert_description">Вы точно хотите удалить сообщение?</string>
 
 
 </resources>

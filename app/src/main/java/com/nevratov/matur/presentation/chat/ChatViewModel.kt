@@ -106,9 +106,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun removeMessage(message: Message) {
+    fun removeMessage(message: Message, removeEveryone: Boolean) {
         viewModelScope.launch(context = exceptionHandler) {
-            removeMessageUseCase(message)
+            removeMessageUseCase(message = message, removeEveryone = removeEveryone)
         }
     }
 
