@@ -1,10 +1,3 @@
-## Matur - Chat messenger for Android
-Good afternoon! This page contains a messenger project for Android. This project is not targeted, it is just part of the logic of another application that I am writing at the moment. Therefore, you will not be able to find some familiar things for the chat, because they are not provided by the logic of the main application, which is still far from the presentation view, so I isolated the logic of the chat, in the implementation of which I have made enough progress. Nevertheless, at the moment, enough functionality has been implemented to conduct a comfortable correspondence. 
-I have completely written the client part for Android, and my good friend is engaged in the implementation of the server. Also, at the moment, the web version of the main application is partially implemented, on which you can also conduct correspondence.
-
-Добрый день! На данной странице размещён проект мессенджера для Android. Этот проект не является целенаправленным, это лишь часть логики другого приложения, которое я пишу на данный момент. Поэтому вы не сможете найти некоторые привычные вещи для чата, т.к. они не предусмотрены логикой основного приложения, которое пока далеко от презентационного вида, поэтому я изолировал логику чата, в реализации которого я достаточно продвинулся. Тем не менее, на данный момент реализовано достаточно функционала, чтобы вести комфортную переписку. 
-Мною полностью написана клиентская часть для Android, а реализацией сервера занимается мой хороший товарищ. Так же, на данный момент, частично реализована web версия основного приложения, на которой тоже можно вести переписку. 
-
 ## Tools<br>Инструменты</br>
 * Kotlin
 * Coroutines
