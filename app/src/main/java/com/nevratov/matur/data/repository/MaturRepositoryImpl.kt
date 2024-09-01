@@ -8,7 +8,6 @@ import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -39,6 +38,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.TreeSet
 import java.util.UUID
 import javax.inject.Inject
 
@@ -87,7 +87,7 @@ class MaturRepositoryImpl @Inject constructor(
 
     // ChatList Screen
 
-    private val _chatList = mutableListOf<ChatListItem>()
+    private val _chatList = TreeSet<ChatListItem>(compareBy { it.message.timestampEdited })
     private val chatList: List<ChatListItem>
         get() = _chatList.toList()
 
@@ -103,9 +103,8 @@ class MaturRepositoryImpl @Inject constructor(
                 message = newMessage,
                 user = getUserById(newMessage.senderId)
             )
-
             remove(chatListItem)
-            add(index = 0, element = newChatListItem)
+            add(newChatListItem)
         }
         chatListRefreshEvents.emit(Unit)
     }
@@ -135,10 +134,11 @@ class MaturRepositoryImpl @Inject constructor(
             if (!newStatus.isOpenedChatScreen) {
                 chatList.find { item -> item.user.id == newStatus.userId }?.let { item ->
                     val currentTimestamp = System.currentTimeMillis()
-                    val itemIndex = chatList.indexOf(item)
                     val newItem =
                         item.copy(user = item.user.copy(wasOnlineTimestamp = currentTimestamp))
-                    _chatList[itemIndex] = newItem
+                    _chatList.remove(item)
+                    _chatList.add(newItem)
+
                     chatListRefreshEvents.emit(Unit)
                 }
             }
@@ -441,8 +441,8 @@ class MaturRepositoryImpl @Inject constructor(
         chatListItem?.let { item ->
             if (item.message.id == message.id) {
                 val newChatListItem = item.copy(message = chatMessages.first())
-                val itemIndex = _chatList.indexOf(item)
-                _chatList[itemIndex] = newChatListItem
+                _chatList.remove(item)
+                _chatList.add(newChatListItem)
                 chatListRefreshEvents.emit(Unit)
             }
         }
@@ -462,8 +462,8 @@ class MaturRepositoryImpl @Inject constructor(
         chatListItem?.let { item ->
             if (item.message.id == message.id) {
                 val newChatListItem = item.copy(message = message)
-                val itemIndex = _chatList.indexOf(item)
-                _chatList[itemIndex] = newChatListItem
+                _chatList.remove(item)
+                _chatList.add(newChatListItem)
                 chatListRefreshEvents.emit(Unit)
             }
         }

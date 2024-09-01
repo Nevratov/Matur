@@ -83,7 +83,6 @@ private fun ChatListContent(
     onMessageItemClicked: (ChatListItem) -> Unit,
     userId: Int
 ) {
-
     when (val currentState = state.value) {
         is ChatListScreenState.Content -> {
             ChatList(
