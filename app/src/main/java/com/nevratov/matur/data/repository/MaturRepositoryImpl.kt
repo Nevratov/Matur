@@ -230,15 +230,23 @@ class MaturRepositoryImpl @Inject constructor(
                     }
                 },
                 onUserIdReadAllMessages = { id ->
-                    if (id == dialogUserId) {
-                        val readMessages = mutableListOf<Message>()
-                        _chatMessages.forEach { oldMessage ->
-                            readMessages.add(oldMessage.copy(isRead = true))
-                        }
-                        _chatMessages.clear()
-                        _chatMessages.addAll(readMessages)
-                        coroutineScope.launch {
+                    coroutineScope.launch {
+                        if (id == dialogUserId) {
+                            val readMessages = mutableListOf<Message>()
+                            _chatMessages.forEach { oldMessage ->
+                                readMessages.add(oldMessage.copy(isRead = true))
+                            }
+                            _chatMessages.clear()
+                            _chatMessages.addAll(readMessages)
                             refreshMessagesEvents.emit(Unit)
+                        }
+                        val chatListItem = chatList.find { it.user.id == id }
+                        chatListItem?.let { item ->
+                            val newChatListItem =
+                                item.copy(message = item.message.copy(isRead = true))
+                            _chatList.remove(item)
+                            _chatList.add(newChatListItem)
+                            chatListRefreshEvents.emit(Unit)
                         }
                     }
                 },
