@@ -1178,7 +1178,7 @@ private fun TimeIsReadIsEdited(
 }
 
 @Composable
-private fun TypingAnimation() {
+fun TypingAnimation() {
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.Asset("typing_animation.json")
     )

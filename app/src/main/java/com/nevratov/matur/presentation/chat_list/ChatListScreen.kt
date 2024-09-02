@@ -1,5 +1,6 @@
 package com.nevratov.matur.presentation.chat_list
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ import coil.compose.AsyncImage
 import com.nevratov.matur.R
 import com.nevratov.matur.domain.entity.ChatListItem
 import com.nevratov.matur.domain.entity.Message
+import com.nevratov.matur.presentation.chat.TypingAnimation
 import com.nevratov.matur.presentation.getApplicationComponent
 
 @Composable
@@ -56,7 +58,6 @@ fun ChatListScreen(
     onMessageItemClicked: (ChatListItem) -> Unit
 ) {
     val screenState = viewModel.state.collectAsState(initial = ChatListScreenState.Initial)
-
     Scaffold(
         topBar = { TopBar() }
     ) { paddingValues ->
@@ -181,13 +182,27 @@ fun MessageItem(
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = chatListItem.message.content,
-                fontSize = 12.sp,
-                color = Color.Gray,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (chatListItem.isTyping) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TypingAnimation()
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(id = R.string.typing_status),
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                    )
+                }
+            } else {
+                Text(
+                    text = chatListItem.message.content,
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
         Row(
             modifier = Modifier.fillMaxHeight(),

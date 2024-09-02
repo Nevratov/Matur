@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class ChatViewModel @Inject constructor(
@@ -217,6 +218,15 @@ class ChatViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         resetDialogOptionsUseCase()
+            runBlocking {
+                if (typingJob != null) {
+                    sendTypingStatusUseCase(
+                        isTyping = false,
+                        userId = user.id,
+                        dialogUserId = dialogUser.id
+                    )
+                }
+            }
     }
 
     companion object {

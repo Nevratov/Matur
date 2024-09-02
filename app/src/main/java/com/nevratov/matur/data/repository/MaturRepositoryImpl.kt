@@ -8,6 +8,7 @@ import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -135,7 +136,11 @@ class MaturRepositoryImpl @Inject constructor(
                 chatList.find { item -> item.user.id == newStatus.userId }?.let { item ->
                     val currentTimestamp = System.currentTimeMillis()
                     val newItem =
-                        item.copy(user = item.user.copy(wasOnlineTimestamp = currentTimestamp))
+                        item.copy(
+                            user = item.user.copy(
+                                wasOnlineTimestamp = currentTimestamp),
+                            isTyping = newStatus.isTyping
+                        )
                     _chatList.remove(item)
                     _chatList.add(newItem)
 
