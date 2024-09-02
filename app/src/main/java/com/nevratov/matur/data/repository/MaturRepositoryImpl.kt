@@ -104,7 +104,7 @@ class MaturRepositoryImpl @Inject constructor(
                 message = newMessage,
                 user = getUserById(newMessage.senderId)
             )
-            remove(chatListItem)
+            if (chatListItem != null) remove(chatListItem)
             add(newChatListItem)
         }
         chatListRefreshEvents.emit(Unit)
