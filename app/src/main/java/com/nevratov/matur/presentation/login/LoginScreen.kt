@@ -44,9 +44,9 @@ import com.nevratov.matur.R
 import com.nevratov.matur.presentation.getApplicationComponent
 
 @Composable
-fun LoginScreen () {
-    val component = getApplicationComponent()
-    val viewModel: LoginViewModel = viewModel(factory = component.getViewModelFactory())
+fun LoginScreen (
+    viewModel: LoginViewModel
+) {
     val screenState = viewModel.screenState.collectAsState()
 
     Column(

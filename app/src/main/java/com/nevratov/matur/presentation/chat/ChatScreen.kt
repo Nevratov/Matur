@@ -3,6 +3,7 @@ package com.nevratov.matur.presentation.chat
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -128,12 +129,9 @@ import com.nevratov.matur.ui.theme.PurpleColor_2
 
 @Composable
 fun ChatScreen(
-    dialogUser: User,
+    viewModel: ChatViewModel,
     onBackPressed: () -> Unit
 ) {
-    val component = (LocalContext.current.applicationContext as MaturApplication).component
-    val viewModel = component.getChatScreenComponentFactory().create(dialogUser).getViewModel()
-
     val screenState = viewModel.chatScreenState.collectAsState(initial = ChatScreenState.Initial)
 
     val configuration = LocalConfiguration.current
@@ -160,10 +158,6 @@ fun ChatScreen(
                 onBackPressed = onBackPressed
             )
         }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose { viewModel.onCleared() }
     }
 }
 

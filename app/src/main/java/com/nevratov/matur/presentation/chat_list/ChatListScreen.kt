@@ -52,11 +52,9 @@ import com.nevratov.matur.presentation.getApplicationComponent
 
 @Composable
 fun ChatListScreen(
+    viewModel: ChatListViewModel,
     onMessageItemClicked: (ChatListItem) -> Unit
 ) {
-    val component = getApplicationComponent()
-    val viewModel: ChatListViewModel = viewModel(factory = component.getViewModelFactory())
-
     val screenState = viewModel.state.collectAsState(initial = ChatListScreenState.Initial)
 
     Scaffold(
