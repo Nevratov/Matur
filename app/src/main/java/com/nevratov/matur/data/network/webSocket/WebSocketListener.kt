@@ -15,6 +15,7 @@ import okhttp3.WebSocketListener
 class WebSocketListener (
     private val onMessageReceived: (Message) -> Unit,
     private val onStatusReceived: (OnlineStatus) -> Unit,
+    private val onEditMessageReceived: (Message) -> Unit,
     private val onUserIdReadAllMessages: (Int) -> Unit,
     private val senderId: Int,
     private val uuid: String
@@ -40,6 +41,9 @@ class WebSocketListener (
             }
             WebSocketConst.READ_ALL_TYPE -> {
                 onUserIdReadAllMessages(responseDto.senderId)
+            }
+            WebSocketConst.EDIT_TYPE -> {
+                onEditMessageReceived(mapper.webSocketMessageDtoToMessage(responseDto))
             }
         }
     }

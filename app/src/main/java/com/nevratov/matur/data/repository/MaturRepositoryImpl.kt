@@ -8,7 +8,6 @@ import android.content.Context.MODE_PRIVATE
 import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -138,7 +137,8 @@ class MaturRepositoryImpl @Inject constructor(
                     val newItem =
                         item.copy(
                             user = item.user.copy(
-                                wasOnlineTimestamp = currentTimestamp),
+                                wasOnlineTimestamp = currentTimestamp
+                            ),
                             isTyping = newStatus.isTyping
                         )
                     _chatList.remove(item)
@@ -234,6 +234,18 @@ class MaturRepositoryImpl @Inject constructor(
                         onlineStatusRefreshFlow.emit(status)
                     }
                 },
+                onEditMessageReceived = { message ->
+                    coroutineScope.launch {
+                        refreshChatList(message)
+                        if (message.senderId == dialogUserId) {
+                            val editedMessage = chatMessages.find { it.id == message.id }
+                            val indexEditedMessage = chatMessages.indexOf(editedMessage)
+                            if (indexEditedMessage == UNKNOWN_ITEM) return@launch
+                            _chatMessages[indexEditedMessage] = message
+                            refreshMessagesEvents.emit(Unit)
+                        }
+                    }
+                },
                 onUserIdReadAllMessages = { id ->
                     coroutineScope.launch {
                         if (id == dialogUserId) {
@@ -273,6 +285,7 @@ class MaturRepositoryImpl @Inject constructor(
                 )
                 val readMessageJson = Gson().toJson(readMessage)
                 webSocketClient.send(readMessageJson)
+                refreshChatList(message.copy(isRead = true))
             } else {
                 refreshChatList(message)
             }
@@ -387,7 +400,7 @@ class MaturRepositoryImpl @Inject constructor(
         onlineStatusRefreshFlow.emit(onlineStatus)
 
         loadNextMessages(messagesWithId = id)
-        refreshChatList(newMessage = chatMessages.first())
+        refreshChatList(newMessage = chatMessages.first()) // remove new message mark
 
         refreshMessagesEvents.collect {
             emit(chatMessages)
@@ -579,5 +592,6 @@ class MaturRepositoryImpl @Inject constructor(
         private const val CHANEL_ID = "30"
         private const val CHANEL_NAME = "receive_message"
         private const val NOTIFICATION_ID = 40
+        private const val UNKNOWN_ITEM = -1
     }
 }
