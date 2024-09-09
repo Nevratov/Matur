@@ -512,6 +512,17 @@ class MaturRepositoryImpl @Inject constructor(
             _chatMessages[index] = message
             refreshMessagesEvents.emit(Unit)
         }
+
+        val messageToSend = mapper.editMessageToWebSocketMessageDto(
+            message = message,
+            senderId = getUser().id,
+            receiverId = dialogUserId ?: throw RuntimeException("Unknown receiver"),
+            uuid = getDeviceUUID()
+        )
+
+        val messageJson = Gson().toJson(messageToSend)
+        webSocketClient.send(messageJson)
+
         val chatListItem = chatList.find { it.user.id == dialogUserId }
         chatListItem?.let { item ->
             if (item.message.id == message.id) {

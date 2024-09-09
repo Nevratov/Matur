@@ -55,7 +55,7 @@ class Mapper @Inject constructor() {
         )
     }
 
-    fun messageDtoToMessage(message: MessageDto) : Message {
+    fun messageDtoToMessage(message: MessageDto): Message {
         return Message(
             id = message.id,
             senderId = message.senderId,
@@ -96,7 +96,8 @@ class Mapper @Inject constructor() {
     }
 
     fun webSocketMessageDtoToRemoveMessagesId(webSocketMessage: WebSocketMessageDto): List<Int> {
-        val removeMessages = Gson().fromJson(webSocketMessage.content, RemoveMessagesDto::class.java)
+        val removeMessages =
+            Gson().fromJson(webSocketMessage.content, RemoveMessagesDto::class.java)
         return removeMessages.messageId
     }
 
@@ -155,14 +156,31 @@ class Mapper @Inject constructor() {
         receiverId: Int,
         uuid: String
     ): WebSocketMessageDto {
-        val removeMessages = messagesIdToRemoveMessageDto(id = messagesId, removeEveryone = removeEveryone)
+        val removeMessages =
+            messagesIdToRemoveMessageDto(id = messagesId, removeEveryone = removeEveryone)
         val messageJson = Gson().toJson(removeMessages)
-        Log.d("testError", "removeMes = $removeMessages /// messageJson = $messageJson")
         return WebSocketMessageDto(
             senderId = senderId,
             receiverId = receiverId,
             content = messageJson,
             type = WebSocketConst.DELETE_TYPE,
+            uuid = uuid
+        )
+    }
+
+    fun editMessageToWebSocketMessageDto(
+        message: Message,
+        senderId: Int,
+        receiverId: Int,
+        uuid: String
+    ): WebSocketMessageDto {
+        val messageDto = messageToMessageDto(message)
+        val messageJson = Gson().toJson(messageDto)
+        return WebSocketMessageDto(
+            senderId = senderId,
+            receiverId = receiverId,
+            content = messageJson,
+            type = WebSocketConst.EDIT_TYPE,
             uuid = uuid
         )
     }
@@ -216,6 +234,19 @@ class Mapper @Inject constructor() {
     )
 
     fun tokenToCreateFCMTokenDto(newToken: String) = CreateNewFCMTokenDto(token = newToken)
+
+    private fun messageToMessageDto(message: Message): MessageDto {
+        return MessageDto(
+            id = message.id,
+            senderId = message.senderId,
+            receiverId = message.receiverId,
+            content = message.content,
+            timestampCreateSec = message.timestamp / MILLIS_IN_SEC,
+            timestampUpdateSec = message.timestampEdited / MILLIS_IN_SEC,
+            isRead = if (message.isRead) 1 else 0,
+            replyMessage = message.replyMessage?.let { messageToMessageDto(it) }
+        )
+    }
 
 
     private companion object {
