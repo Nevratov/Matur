@@ -16,6 +16,7 @@ class WebSocketListener (
     private val onMessageReceived: (Message) -> Unit,
     private val onStatusReceived: (OnlineStatus) -> Unit,
     private val onEditMessageReceived: (Message) -> Unit,
+    private val onDeleteMessagesReceived: (List<Int>) -> Unit,
     private val onUserIdReadAllMessages: (Int) -> Unit,
     private val senderId: Int,
     private val uuid: String
@@ -44,6 +45,9 @@ class WebSocketListener (
             }
             WebSocketConst.EDIT_TYPE -> {
                 onEditMessageReceived(mapper.webSocketMessageDtoToMessage(responseDto))
+            }
+            WebSocketConst.DELETE_TYPE -> {
+                onDeleteMessagesReceived(mapper.webSocketMessageDtoToRemoveMessagesId(responseDto))
             }
         }
     }

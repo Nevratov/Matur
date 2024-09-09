@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.TreeSet
 import java.util.UUID
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 @ApplicationScope
@@ -87,31 +88,33 @@ class MaturRepositoryImpl @Inject constructor(
 
     // ChatList Screen
 
-    private val _chatList = TreeSet<ChatListItem>(compareBy { it.message.timestampEdited })
+    private val _chatList =
+        TreeSet<ChatListItem>(compareByDescending { it.message.timestampEdited })
     private val chatList: List<ChatListItem>
         get() = _chatList.toList()
 
     private val chatListRefreshEvents = MutableSharedFlow<Unit>()
     private suspend fun refreshChatList(newMessage: Message) {
-        _chatList.apply {
-            val chatListItem = find {
-                it.user.id == newMessage.senderId || it.user.id == newMessage.receiverId
-            }
-            val newChatListItem = chatListItem?.copy(
-                message = newMessage,
-            ) ?: ChatListItem(
-                message = newMessage,
-                user = getUserById(newMessage.senderId)
-            )
-            if (chatListItem != null) remove(chatListItem)
-            add(newChatListItem)
+
+        val chatListItem = chatList.find {
+            it.user.id == newMessage.senderId || it.user.id == newMessage.receiverId
         }
+        val newChatListItem = chatListItem?.copy(
+            message = newMessage,
+        ) ?: ChatListItem(
+            message = newMessage,
+            user = getUserById(newMessage.senderId)
+        )
+
+        if (chatListItem != null) _chatList.remove(chatListItem)
+        _chatList.add(newChatListItem)
+
         chatListRefreshEvents.emit(Unit)
     }
 
     // Chat Screen
 
-    private val _chatMessages = mutableListOf<Message>()
+    private val _chatMessages = CopyOnWriteArrayList<Message>() // with default mutableList throw java.util.ConcurrentModificationException
     private val chatMessages: List<Message>
         get() = _chatMessages.toList()
 
@@ -227,7 +230,9 @@ class MaturRepositoryImpl @Inject constructor(
             listener = WebSocketListener(
                 onMessageReceived = { message ->
                     receiveMessage(message = message)
-                    if (dialogUserId != message.senderId) sendNotificationNewMessage(message)
+                    if (dialogUserId == null && message.senderId != getUser().id) {
+                        sendNotificationNewMessage(message)
+                    }
                 },
                 onStatusReceived = { status ->
                     coroutineScope.launch {
@@ -245,6 +250,16 @@ class MaturRepositoryImpl @Inject constructor(
                             refreshMessagesEvents.emit(Unit)
                         }
                     }
+                },
+                onDeleteMessagesReceived = { messagesId ->
+                    messagesId.forEach { id ->
+                        val message = chatMessages.find { it.id == id }
+                        _chatMessages.remove(message)
+                    }
+                    coroutineScope.launch {
+                        refreshMessagesEvents.emit(Unit)
+                    }
+                    //todo refresh chatListItem if message == last message
                 },
                 onUserIdReadAllMessages = { id ->
                     coroutineScope.launch {
@@ -275,17 +290,19 @@ class MaturRepositoryImpl @Inject constructor(
 
     private fun receiveMessage(message: Message) {
         coroutineScope.launch {
-            if (dialogUserId == message.senderId) {
+            if (dialogUserId == message.senderId || dialogUserId == message.receiverId) {
                 _chatMessages.add(index = 0, element = message)
                 refreshMessagesEvents.emit(Unit)
-
-                val readMessage = mapper.readMessageToWebSocketMessageDto(
-                    userId = message.receiverId,
-                    dialogUserId = message.senderId
-                )
-                val readMessageJson = Gson().toJson(readMessage)
-                webSocketClient.send(readMessageJson)
                 refreshChatList(message.copy(isRead = true))
+
+                if (dialogUserId == message.senderId) {
+                    val readMessage = mapper.readMessageToWebSocketMessageDto(
+                        userId = message.receiverId,
+                        dialogUserId = message.senderId
+                    )
+                    val readMessageJson = Gson().toJson(readMessage)
+                    webSocketClient.send(readMessageJson)
+                }
             } else {
                 refreshChatList(message)
             }
@@ -455,11 +472,22 @@ class MaturRepositoryImpl @Inject constructor(
     override suspend fun removeMessage(message: Message, removeEveryone: Boolean) {
         apiService.removeMessage(
             token = getToken(),
-            deleteMessage = mapper.messageIdToRemoveMessageDto(
-                id = message.id,
+            deleteMessage = mapper.messagesIdToRemoveMessageDto(
+                id = listOf(message.id),
                 removeEveryone = removeEveryone
             )
         )
+        val messageToSend = mapper.removeMessagesIdToWebSocketMessageDto(
+            messagesId = listOf(message.id),
+            removeEveryone = removeEveryone,
+            senderId = getUser().id,
+            receiverId = dialogUserId ?: throw RuntimeException("Unknown receiver"),
+            uuid = getDeviceUUID()
+        )
+
+        val messageJson = Gson().toJson(messageToSend)
+        webSocketClient.send(messageJson)
+
         _chatMessages.remove(message)
         refreshMessagesEvents.emit(Unit)
 
@@ -502,7 +530,7 @@ class MaturRepositoryImpl @Inject constructor(
         emit(downloadedChatList)
 
         chatListRefreshEvents.collect {
-            emit(chatList.sortedByDescending { it.message.timestamp })
+            emit(chatList)
         }
     }.stateIn(
         scope = coroutineScope,

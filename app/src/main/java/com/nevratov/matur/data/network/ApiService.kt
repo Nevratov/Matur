@@ -9,7 +9,7 @@ import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.LoginResponseDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RemoveDialogDto
-import com.nevratov.matur.data.model.RemoveMessageDto
+import com.nevratov.matur.data.model.RemoveMessagesDto
 import com.nevratov.matur.data.model.SendMessageResponse
 import com.nevratov.matur.data.model.UserDto
 import retrofit2.Response
@@ -50,7 +50,7 @@ interface ApiService {
     @POST("im/delete")
     suspend fun removeMessage(
         @Header("Authorization") token: String,
-        @Body deleteMessage: RemoveMessageDto
+        @Body deleteMessage: RemoveMessagesDto
     )
 
     @POST("firebase-token/create")

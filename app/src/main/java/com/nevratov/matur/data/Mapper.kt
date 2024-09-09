@@ -1,5 +1,6 @@
 package com.nevratov.matur.data
 
+import android.util.Log
 import com.google.gson.Gson
 import com.nevratov.matur.data.model.ChatListItemDto
 import com.nevratov.matur.data.model.CreateMessageDto
@@ -9,7 +10,7 @@ import com.nevratov.matur.data.model.LoginDataDto
 import com.nevratov.matur.data.model.MessageDto
 import com.nevratov.matur.data.model.MessagesOptionsDto
 import com.nevratov.matur.data.model.RemoveDialogDto
-import com.nevratov.matur.data.model.RemoveMessageDto
+import com.nevratov.matur.data.model.RemoveMessagesDto
 import com.nevratov.matur.data.model.UserDto
 import com.nevratov.matur.data.model.WebSocketMessageDto
 import com.nevratov.matur.data.network.webSocket.WebSocketConst
@@ -94,6 +95,11 @@ class Mapper @Inject constructor() {
         return chatList
     }
 
+    fun webSocketMessageDtoToRemoveMessagesId(webSocketMessage: WebSocketMessageDto): List<Int> {
+        val removeMessages = Gson().fromJson(webSocketMessage.content, RemoveMessagesDto::class.java)
+        return removeMessages.messageId
+    }
+
     fun webSocketMessageDtoToOnlineStatus(webSocketMessage: WebSocketMessageDto): OnlineStatus {
         val contentJson = Json.parseToJsonElement(webSocketMessage.content)
         val content = Json.encodeToString(contentJson)
@@ -124,9 +130,9 @@ class Mapper @Inject constructor() {
         content = message.content
     )
 
-    fun messageIdToRemoveMessageDto(id: Int, removeEveryone: Boolean) = RemoveMessageDto(
-        messageId = listOf(id),
-        removeEveryone = if (removeEveryone) 1 else 0
+    fun messagesIdToRemoveMessageDto(id: List<Int>, removeEveryone: Boolean) = RemoveMessagesDto(
+        messageId = id,
+        removeEveryone = removeEveryone
     )
 
     fun messageDtoToWebSocketMessageDto(message: MessageDto, uuid: String): WebSocketMessageDto {
@@ -138,6 +144,25 @@ class Mapper @Inject constructor() {
             content = messageJson,
             timestamp = message.timestampCreateSec,
             type = WebSocketConst.MESSAGE_TYPE,
+            uuid = uuid
+        )
+    }
+
+    fun removeMessagesIdToWebSocketMessageDto(
+        messagesId: List<Int>,
+        removeEveryone: Boolean,
+        senderId: Int,
+        receiverId: Int,
+        uuid: String
+    ): WebSocketMessageDto {
+        val removeMessages = messagesIdToRemoveMessageDto(id = messagesId, removeEveryone = removeEveryone)
+        val messageJson = Gson().toJson(removeMessages)
+        Log.d("testError", "removeMes = $removeMessages /// messageJson = $messageJson")
+        return WebSocketMessageDto(
+            senderId = senderId,
+            receiverId = receiverId,
+            content = messageJson,
+            type = WebSocketConst.DELETE_TYPE,
             uuid = uuid
         )
     }

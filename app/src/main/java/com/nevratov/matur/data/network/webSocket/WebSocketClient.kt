@@ -1,5 +1,6 @@
 package com.nevratov.matur.data.network.webSocket
 
+import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket
@@ -24,6 +25,7 @@ object WebSocketClient {
 
     fun send(message: String) {
         webSocket?.send(message)
+        Log.d("webSocket", "sendWebsocketMessage = $message")
     }
 
     private const val URL_SERVER = "wss://test.matur.app/websocket/connect"
