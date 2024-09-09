@@ -123,6 +123,23 @@ class MaturRepositoryImpl @Inject constructor(
     private var dialogUserId: Int? = null
     private var dialogPage = DEFAULT_PAGE
 
+    private suspend fun updateChatWhenMessageEdited(message: Message) {
+        // changing edited message
+        val indexEditedMessage = chatMessages.indexOfFirst { it.id == message.id }
+        if (indexEditedMessage != UNKNOWN_ITEM) {
+            _chatMessages[indexEditedMessage] = message
+            refreshMessagesEvents.emit(Unit)
+        }
+
+        // changing messages that was a response to edited message
+        chatMessages.filter { it.replyMessage?.id == message.id }.forEach {
+            val indexResponseMessage = _chatMessages.indexOf(it)
+            _chatMessages[indexResponseMessage] = it.copy(replyMessage = message)
+        }
+
+        refreshMessagesEvents.emit(Unit)
+    }
+
     // User status (online / offline / typing)
 
     private val _onlineUsers = mutableMapOf<Int, Boolean>()
@@ -241,14 +258,10 @@ class MaturRepositoryImpl @Inject constructor(
                 },
                 onEditMessageReceived = { message ->
                     coroutineScope.launch {
-                        refreshChatList(message)
-                        if (message.senderId == dialogUserId) {
-                            val editedMessage = chatMessages.find { it.id == message.id }
-                            val indexEditedMessage = chatMessages.indexOf(editedMessage)
-                            if (indexEditedMessage == UNKNOWN_ITEM) return@launch
-                            _chatMessages[indexEditedMessage] = message
-                            refreshMessagesEvents.emit(Unit)
+                        if (message.senderId == dialogUserId || message.receiverId == dialogUserId) {
+                            updateChatWhenMessageEdited(message = message)
                         }
+                        refreshChatList(message)
                     }
                 },
                 onDeleteMessagesReceived = { messagesId ->
@@ -507,11 +520,8 @@ class MaturRepositoryImpl @Inject constructor(
             token = getToken(),
             editMessage = mapper.messageToEditMessageDto(message = message)
         )
-        val index = chatMessages.indexOfFirst { it.id == message.id }
-        if (index != -1) {
-            _chatMessages[index] = message
-            refreshMessagesEvents.emit(Unit)
-        }
+
+        updateChatWhenMessageEdited(message = message)
 
         val messageToSend = mapper.editMessageToWebSocketMessageDto(
             message = message,
