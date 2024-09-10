@@ -19,7 +19,7 @@ You can take a seat with two accounts and evaluate the messenger's capabilities<
 ## Demonstration of the application functionality<br>Демонстрация функционала</br>
 </details>
 <details><summary>Sending a message<br>&ensp;&ensp;Отправка сообщения</br></summary>
-<img src="https://github.com/Nevratov/Matur/blob/chat_demonstration/gifs/send.gif" width=70%>
+<img src="https://github.com/Nevratov/Matur/blob/chat_demonstration/gifs/send1.gif">
 </details>
 
 </details>
