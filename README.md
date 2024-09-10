@@ -53,9 +53,6 @@ You can take a seat with two accounts and evaluate the messenger's capabilities<
 </details>
 
 </details>
-<details><summary>Notification of the end of the dialog<br>&ensp;&ensp;Уведомление о конце диалога</br></summary>
-<img src="https://github.com/Nevratov/Matur/blob/chat_demonstration/gifs/end_dialog.gif" width=40%>
-</details>
 
 <details><summary>Blocking the user<br>&ensp;&ensp;Блокировка пользователя</br></summary>
 <img src="https://github.com/Nevratov/Matur/blob/chat_demonstration/gifs/block.gif" width=40%>
